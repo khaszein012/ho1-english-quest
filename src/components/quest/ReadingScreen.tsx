@@ -127,17 +127,14 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
             ▶️ Read to me
           </button>
           <button
-            onClick={() => {
-              cancelSpeech();
-              setSpeaking(null);
-            }}
+            onClick={stopReading}
             className="btn-pop bg-secondary px-4 py-3 text-lg text-secondary-foreground"
           >
             ⏹️ Stop
           </button>
         </div>
 
-        <div className="space-y-5 text-2xl leading-relaxed sm:text-[1.7rem]">
+        <div className="space-y-7 text-[1.4rem] leading-[1.85] tracking-[0.01em] sm:text-[1.75rem] sm:leading-[1.9]">
           {r.paragraphs.map((_, pi) => (
             <p key={pi}>
               {sentences.map((s, si) =>
@@ -147,7 +144,7 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                     ref={(el) => {
                       sentenceRefs.current[si] = el;
                     }}
-                    className={`rounded-lg px-1 transition-colors ${
+                    className={`rounded-lg px-1 py-0.5 transition-colors ${
                       speaking === si ? "bg-gold text-gold-foreground" : ""
                     }`}
                   >
