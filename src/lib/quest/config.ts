@@ -17,7 +17,15 @@
  *   automatically mixes in review questions from earlier lessons) all adapt.
  * ============================================================================= */
 
-export const STORAGE_KEY = "arsyad-english-quest-v1";
+/**
+ * The ONLY browser-storage key this app touches. The "quest_" prefix keeps it in
+ * its own namespace, so the app can never read or overwrite data written by any
+ * other app on the same browser. Bump the version suffix if the saved shape changes.
+ */
+export const STORAGE_KEY = "quest_arsyad_english_v1";
+
+/** Older key from before the namespace prefix — read once, then migrated. */
+export const LEGACY_STORAGE_KEYS = ["arsyad-english-quest-v1"];
 
 export type VocabWord = {
   word: string;

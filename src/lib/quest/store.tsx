@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { BOSS_REQUIRED, LESSONS, STORAGE_KEY, WORD_MASTERY_TARGET, levelFor, type ScreenId } from "./config";
+import { BOSS_REQUIRED, LEGACY_STORAGE_KEYS, LESSONS, STORAGE_KEY, WORD_MASTERY_TARGET, levelFor, type ScreenId } from "./config";
 
 export type AudioMode = "app" | "teacher" | "device";
 
@@ -28,9 +28,24 @@ const emptyState: QuestState = {
 function load(): QuestState {
   if (typeof window === "undefined") return emptyState;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    let raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      // One-time migration from the old un-prefixed key, then clean it up.
+      for (const legacy of LEGACY_STORAGE_KEYS) {
+        const old = window.localStorage.getItem(legacy);
+        if (old) {
+          raw = old;
+          window.localStorage.setItem(STORAGE_KEY, old);
+          window.localStorage.removeItem(legacy);
+          break;
+        }
+      }
+    }
     if (!raw) return emptyState;
-    return { ...emptyState, ...(JSON.parse(raw) as Partial<QuestState>) };
+    const parsed = JSON.parse(raw) as unknown;
+    // Only accept our own shape — never trust a stray key from another app.
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return emptyState;
+    return { ...emptyState, ...(parsed as Partial<QuestState>) };
   } catch {
     return emptyState;
   }
