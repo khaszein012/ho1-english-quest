@@ -129,20 +129,28 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
       <AudioModePanel scriptTitle={r.title} scriptLines={r.paragraphs} />
 
       <div className="card-quest space-y-4 p-5 sm:p-7">
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => readAloud(0)}
-            className="btn-pop bg-gold px-4 py-3 text-lg text-gold-foreground"
+            disabled={!enabled}
+            className="btn-pop bg-gold px-4 py-3 text-lg text-gold-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             ▶️ Read to me
           </button>
           <button
             onClick={stopReading}
-            className="btn-pop bg-secondary px-4 py-3 text-lg text-secondary-foreground"
+            disabled={!enabled}
+            className="btn-pop bg-secondary px-4 py-3 text-lg text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             ⏹️ Stop
           </button>
+          {!enabled && (
+            <p className="text-sm text-muted-foreground">
+              App voice is off in this audio mode — switch to App Voice 🔊 above to let the app read.
+            </p>
+          )}
         </div>
+
 
         <div className="space-y-7 text-[1.4rem] leading-[1.85] tracking-[0.01em] sm:text-[1.75rem] sm:leading-[1.9]">
           {r.paragraphs.map((_, pi) => (

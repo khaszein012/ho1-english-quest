@@ -62,7 +62,8 @@ export function useSpeak() {
 
 export function openTeacherWindow(title: string, lines: string[]) {
   const win = window.open("", "teacher-script", "width=760,height=760");
-  if (!win) return;
+  if (!win) return false;
+
   win.document.write(`<!doctype html><html><head><title>Teacher script — ${title}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
@@ -76,7 +77,10 @@ export function openTeacherWindow(title: string, lines: string[]) {
   ${lines.map((l) => `<p>${l}</p>`).join("")}
   </body></html>`);
   win.document.close();
+  win.focus();
+  return true;
 }
+
 
 const MODES: { id: AudioMode; label: string }[] = [
   { id: "app", label: "App Voice 🔊" },
@@ -93,6 +97,8 @@ export function AudioModePanel({
 }) {
   const { state, setAudioMode } = useQuest();
   const [testAnswer, setTestAnswer] = useState<"none" | "yes" | "no">("none");
+  const [popupBlocked, setPopupBlocked] = useState(false);
+
 
   return (
     <div className="card-quest p-4 sm:p-5">
@@ -125,14 +131,22 @@ export function AudioModePanel({
           <p className="text-sm text-muted-foreground">App audio is off — the tutor reads aloud.</p>
           {scriptLines && scriptLines.length > 0 && (
             <button
-              onClick={() => openTeacherWindow(scriptTitle ?? "Script", scriptLines)}
+              onClick={() =>
+                setPopupBlocked(!openTeacherWindow(scriptTitle ?? "Script", scriptLines))
+              }
               className="btn-pop bg-berry px-3 py-2 text-sm text-primary-foreground"
             >
               Open tutor pop-out 🪟
             </button>
           )}
+          {popupBlocked && (
+            <p className="text-sm text-berry">
+              Your browser blocked the pop-up — allow pop-ups for this page, then tap again.
+            </p>
+          )}
         </div>
       )}
+
       {state.audioMode === "device" && (
         <p className="mt-3 rounded-xl bg-secondary/70 px-3 py-2 text-sm text-muted-foreground">
           Send Arsyad this page link so he plays the audio on his own device, then follow along together.
