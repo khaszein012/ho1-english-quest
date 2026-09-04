@@ -4,14 +4,22 @@ import { useQuest } from "@/lib/quest/store";
 import { SpeakerButton } from "@/lib/quest/audio";
 import { randomPraise, starBurst } from "@/lib/quest/fx";
 
+const NUDGES = [
+  "Almost! Try another one 🙂",
+  "Good try! Tap a different word 💛",
+  "Nice thinking — one more go! ✨",
+];
+
 export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars } = useQuest();
   const [solved, setSolved] = useState<number[]>([]);
   const [wrong, setWrong] = useState<string | null>(null);
+  const [nudge, setNudge] = useState<Record<number, string>>({});
   const g = lesson.grammar;
 
   function pick(itemIndex: number, option: string, answer: string) {
     if (option === answer) {
+      setNudge((n) => ({ ...n, [itemIndex]: "" }));
       if (!solved.includes(itemIndex)) {
         setSolved((s) => [...s, itemIndex]);
         addStars(lesson.id, 1);
@@ -19,7 +27,12 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         onComplete();
       }
     } else {
+      // Friendly nudge only — wrong taps never remove stars or lock the item.
       setWrong(`${itemIndex}-${option}`);
+      setNudge((n) => ({
+        ...n,
+        [itemIndex]: NUDGES[Math.floor(Math.random() * NUDGES.length)]!,
+      }));
       window.setTimeout(() => setWrong(null), 450);
     }
   }
@@ -33,19 +46,33 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
       </header>
 
       <div className="card-quest space-y-4 p-5">
+        <h3 className="font-display text-xl font-bold">The sentence pattern 🎨</h3>
+        <div className="flex flex-wrap gap-2 text-sm font-semibold">
+          <span className="rounded-full bg-sky/20 px-3 py-1 text-sky">💙 WHO — the person</span>
+          <span className="rounded-full bg-gold/20 px-3 py-1 text-gold">💛 DOING WORD — have / don't have</span>
+          <span className="rounded-full bg-secondary px-3 py-1 text-muted-foreground">
+            🤍 THE THING — what it is
+          </span>
+        </div>
         {g.patterns.map((p, i) => (
-          <div key={i} className="flex flex-wrap items-baseline gap-2 font-display text-2xl font-extrabold sm:text-3xl">
-            <span className="text-sky">{p.subject}</span>
-            <span className="text-gold">{p.verb}</span>
-            <span>{p.rest}</span>
+          <div
+            key={i}
+            className="flex flex-wrap items-center gap-2 rounded-2xl bg-secondary/50 px-4 py-3 font-display text-2xl font-extrabold sm:text-3xl"
+          >
+            {p.subject && (
+              <span className="rounded-xl bg-sky/20 px-3 py-1 text-sky">{p.subject}</span>
+            )}
+            {p.verb && <span className="rounded-xl bg-gold/20 px-3 py-1 text-gold">{p.verb}</span>}
+            {p.rest && <span className="px-1">{p.rest}</span>}
             {p.note && (
-              <span className="rounded-full bg-secondary px-3 py-1 font-sans text-sm font-semibold text-muted-foreground">
+              <span className="rounded-full bg-card px-3 py-1 font-sans text-sm font-semibold text-muted-foreground">
                 {p.note}
               </span>
             )}
           </div>
         ))}
       </div>
+
 
       <div className="card-quest space-y-3 p-5">
         <h3 className="font-display text-xl font-bold">Listen to the examples</h3>
@@ -57,11 +84,16 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         ))}
       </div>
 
-      <div className="card-quest space-y-4 p-5">
+      <div className="card-quest space-y-5 p-5">
         <h3 className="font-display text-xl font-bold">Your Turn ✍️</h3>
+        <p className="text-sm text-muted-foreground">
+          Tap the word that fits. Wrong taps are fine — you keep every star. ⭐
+        </p>
         {g.yourTurn.map((item, i) => (
-          <div key={item.question} className="space-y-2">
-            <p className="font-display text-2xl">{item.question}</p>
+          <div key={item.question} className="space-y-2 rounded-2xl bg-secondary/40 p-4">
+            <p className="font-display text-2xl">
+              {i + 1}. {item.question}
+            </p>
             <div className="flex flex-wrap gap-3">
               {item.options.map((o) => (
                 <button
@@ -70,15 +102,25 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                   className={`btn-pop px-4 py-3 text-lg ${
                     solved.includes(i) && o === item.answer
                       ? "bg-grass text-gold-foreground animate-glow"
-                      : "bg-secondary text-secondary-foreground"
+                      : "bg-card text-secondary-foreground"
                   } ${wrong === `${i}-${o}` ? "animate-shake" : ""}`}
                 >
                   {o}
                 </button>
               ))}
             </div>
+            {solved.includes(i) ? (
+              <p className="animate-pop-in font-display text-lg font-bold text-grass">
+                ✅ Yes! {item.question.replace("___", item.answer)}
+              </p>
+            ) : (
+              nudge[i] && (
+                <p className="animate-pop-in text-lg text-gold">{nudge[i]}</p>
+              )
+            )}
           </div>
         ))}
+
         {solved.length === g.yourTurn.length && (
           <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
             All correct! {randomPraise()} 🎉
