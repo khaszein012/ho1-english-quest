@@ -41,7 +41,7 @@ export function FlipCard({
         >
           {back}
         </div>
-      </button>
+      </div>
     </div>
   );
 }
