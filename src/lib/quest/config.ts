@@ -1,3 +1,22 @@
+/* =============================================================================
+ * ARSYAD'S ENGLISH QUEST — SINGLE LESSON CONFIG FILE
+ * -----------------------------------------------------------------------------
+ * EVERY piece of lesson content the app shows lives in the LESSONS array at the
+ * bottom of this file: one entry per lesson. Screens and components read from it
+ * and never hardcode content.
+ *
+ * TO ADD LESSON 2 (or 3...8):
+ *   1. Copy the `lesson1` object below, rename it `lesson2`.
+ *   2. Change `id`, `number`, `title`, `subtitle`, `emoji` and fill in the
+ *      content fields (vocabulary of ANY length, grammar, expressions,
+ *      practice, reading + questions + spotlight, rolePlay + homework,
+ *      selfCheck, boss, sticker).
+ *   3. Append it: `export const LESSONS: Lesson[] = [lesson1, lesson2];`
+ *   That is all. No layout or component changes are needed — the lesson picker,
+ *   star dashboard, sticker album, progress screen and Boss Challenge (which
+ *   automatically mixes in review questions from earlier lessons) all adapt.
+ * ============================================================================= */
+
 export const STORAGE_KEY = "arsyad-english-quest-v1";
 
 export type VocabWord = {
@@ -57,7 +76,24 @@ export const LEVELS = [
   { name: "Legend", min: 61, max: Infinity, emoji: "👑" },
 ] as const;
 
+/** A word counts as "learned" after this many correct interactions with it. */
 export const WORD_MASTERY_TARGET = 3;
+
+/** How many lesson slots the sticker album shows (empty ones read "Coming soon"). */
+export const PLANNED_LESSON_COUNT = 8;
+
+/**
+ * Game tuning. These are MAXIMUMS — every game clamps them to the actual number
+ * of words/questions in a lesson, so a lesson with 3 words works exactly as well
+ * as one with 12.
+ */
+export const GAME_TUNING = {
+  matchPairsPerRound: 5,
+  listenRounds: 6,
+  listenOptions: 4,
+  bossQuestions: 5,
+  bossReviewQuestions: 2,
+} as const;
 
 export const SCREENS = [
   { id: "vocabulary", label: "Vocabulary", emoji: "📚" },
@@ -277,4 +313,46 @@ const lesson1: Lesson = {
   sticker: { name: "Golden Backpack", emoji: "🎒" },
 };
 
-export const LESSONS: Lesson[] = [lesson1];
+
+const lesson2: Lesson = {
+  id: "lesson-2",
+  number: 2,
+  title: "My Family",
+  subtitle: "There is / There are",
+  emoji: "👨‍👩‍👧",
+  sentenceFrames: ["There is a ___.", "There are two ___."],
+  speedRoundSeconds: 12,
+  vocabulary: [
+    { word: "sister", meaning: "a girl with the same parents", example: "I have one sister.", emoji: "👧" },
+    { word: "cousin", meaning: "the child of your aunt or uncle", example: "My cousin is ten.", emoji: "🧒" },
+    { word: "grandmother", meaning: "the mother of your mother or father", example: "My grandmother cooks well.", emoji: "👵" },
+  ],
+  grammar: {
+    title: "There is / There are",
+    explanation: "Use 'there is' for one, 'there are' for more than one.",
+    patterns: [{ subject: "There is", verb: "a", rest: "sister" }],
+    examples: ["There is a baby.", "There are two cousins."],
+    yourTurn: [
+      { question: "There ___ three cousins.", options: ["are", "is"], answer: "are" },
+      { question: "There ___ one grandmother.", options: ["are", "is"], answer: "is" },
+    ],
+  },
+  expressions: [{ prompt: "How many people are in your family?", answer: "There are five people in my family." }],
+  practice: { title: "Family Speed Round", instructions: "Say a family word before time runs out!" },
+  reading: {
+    title: "A Big Family",
+    paragraphs: ["There are six people in my family.", "My grandmother lives with us too."],
+    questions: [{ question: "How many people?", options: ["six", "two"], answer: "six" }],
+    stretchQuestion: "Who lives with them?",
+    spotlight: { sound: "short a", exampleWord: "family", instruction: "Tap the words with the short a sound.", words: ["family"] },
+  },
+  rolePlay: { title: "Meet my family", prompts: ["Tell me about your family."], twists: ["I have ten cousins!"], homework: "Draw your family and describe it." },
+  selfCheck: ["Can I use there is / there are?"],
+  boss: [
+    { question: "There ___ two sisters.", options: ["are", "is"], answer: "are" },
+    { question: "Who is your mother's mother?", options: ["grandmother", "cousin"], answer: "grandmother" },
+  ],
+  sticker: { name: "Family Heart", emoji: "💖" },
+};
+
+export const LESSONS: Lesson[] = [lesson1, lesson2];

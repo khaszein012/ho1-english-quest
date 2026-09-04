@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Lesson, VocabWord } from "@/lib/quest/config";
-import { WORD_MASTERY_TARGET } from "@/lib/quest/config";
+import { GAME_TUNING, WORD_MASTERY_TARGET } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
 import { SpeakerButton, useSpeak } from "@/lib/quest/audio";
 import { randomPraise, shuffle, starBurst } from "@/lib/quest/fx";
@@ -81,7 +81,9 @@ function WordCards({ lesson, onComplete }: { lesson: Lesson; onComplete: () => v
 function MatchIt({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars, markWordCorrect } = useQuest();
   const [round, setRound] = useState(0);
-  const picks = useMemo(() => shuffle(lesson.vocabulary).slice(0, 5), [lesson, round]);
+  // Clamped to the lesson's own word count so any vocabulary length works.
+  const pairCount = Math.min(GAME_TUNING.matchPairsPerRound, lesson.vocabulary.length);
+  const picks = useMemo(() => shuffle(lesson.vocabulary).slice(0, pairCount), [lesson, pairCount, round]);
   const meanings = useMemo(() => shuffle(picks), [picks]);
   const [selected, setSelected] = useState<string | null>(null);
   const [matched, setMatched] = useState<string[]>([]);
@@ -166,16 +168,16 @@ function ListenAndPick({ lesson, onComplete }: { lesson: Lesson; onComplete: () 
   const [score, setScore] = useState(0);
   const [reveal, setReveal] = useState(false);
   const [wrong, setWrong] = useState<string | null>(null);
-  const total = 6;
+  const total = Math.min(GAME_TUNING.listenRounds, Math.max(1, lesson.vocabulary.length * 2));
 
   const rounds = useMemo(
     () =>
       Array.from({ length: total }, () => {
-        const options = shuffle(lesson.vocabulary).slice(0, 4);
+        const options = shuffle(lesson.vocabulary).slice(0, Math.min(GAME_TUNING.listenOptions, lesson.vocabulary.length));
         const target = options[Math.floor(Math.random() * options.length)]!;
         return { options, target };
       }),
-    [lesson],
+    [lesson, total],
   );
 
   const current = rounds[round];
