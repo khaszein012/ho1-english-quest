@@ -261,6 +261,7 @@ function ListenAndPick({ lesson, onComplete }: { lesson: Lesson; onComplete: () 
 
 function SayIt({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars, markWordCorrect, state } = useQuest();
+  const { speak } = useSpeak();
   const [index, setIndex] = useState(0);
   const word = lesson.vocabulary[index];
 
@@ -303,9 +304,7 @@ function SayIt({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void 
           I said it! ⭐
         </button>
         <button
-          onClick={() => {
-            /* hearing again keeps the same card */
-          }}
+          onClick={() => speak([word.word, word.example])}
           className="btn-pop bg-secondary px-5 py-3 text-lg text-secondary-foreground"
         >
           Let me hear it again 🔄
