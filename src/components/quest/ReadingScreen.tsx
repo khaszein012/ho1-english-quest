@@ -36,10 +36,23 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
   const [missTap, setMissTap] = useState<string | null>(null);
   const targets = r.spotlight.words.map((w) => w.toLowerCase());
 
+  const runIdRef = useRef(0);
+
+  function stopReading() {
+    runIdRef.current += 1;
+    cancelSpeech();
+    setSpeaking(null);
+  }
+
   function readAloud(from = 0) {
     if (!enabled) return;
+    // Invalidate any chain already running so a stopped/restarted read never
+    // resumes from the old sentence when its utterance fires onend/onerror.
+    runIdRef.current += 1;
+    const runId = runIdRef.current;
     cancelSpeech();
     const step = (i: number) => {
+      if (runId !== runIdRef.current) return;
       const s = sentences[i];
       if (!s) {
         setSpeaking(null);
@@ -47,10 +60,19 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
       }
       setSpeaking(i);
       sentenceRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "center" });
-      speakText(s.text, { rate: 0.72, onEnd: () => step(i + 1) });
+      speakText(s.text, {
+        rate: 0.7,
+        onEnd: () => {
+          if (runId !== runIdRef.current) return;
+          // Small breath between sentences keeps the pace A1-friendly.
+          window.setTimeout(() => step(i + 1), 400);
+        },
+      });
     };
-    step(from);
+    // Let the cancel above settle before queueing the first utterance.
+    window.setTimeout(() => step(from), 80);
   }
+
 
   function tapWord(token: Token) {
     const clean = token.clean.toLowerCase();
