@@ -17,7 +17,17 @@ export function speakText(text: string, opts: { rate?: number; onEnd?: () => voi
   utterance.lang = "en-US";
   utterance.rate = opts.rate ?? A1_RATE;
   utterance.pitch = 1.05;
-  if (opts.onEnd) utterance.onend = () => opts.onEnd?.();
+  if (opts.onEnd) {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      opts.onEnd?.();
+    };
+    utterance.onend = finish;
+    // Chrome fires onerror (not onend) when speech is cancelled/interrupted.
+    utterance.onerror = finish;
+  }
   window.speechSynthesis.speak(utterance);
 }
 
