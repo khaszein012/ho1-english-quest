@@ -16,16 +16,24 @@ export function FlipCard({
   const [flipped, setFlipped] = useState(false);
   return (
     <div className={`flip-scene ${height} ${className}`}>
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => {
           setFlipped((f) => !f);
           if (!flipped) onFirstFlip?.();
         }}
-        className="flip-inner h-full w-full text-left"
+        onKeyDown={(e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          e.preventDefault();
+          setFlipped((f) => !f);
+          if (!flipped) onFirstFlip?.();
+        }}
+        className="flip-inner h-full w-full cursor-pointer text-left"
         style={{ transform: flipped ? "rotateY(180deg)" : "none" }}
         aria-pressed={flipped}
       >
+
         <div className="flip-face card-quest flex flex-col items-center justify-center gap-2 p-4">{front}</div>
         <div
           className="flip-face card-quest flex flex-col items-center justify-center gap-2 p-4"
