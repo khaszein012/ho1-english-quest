@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
-import { LESSONS, type Lesson, type QuizItem } from "@/lib/quest/config";
+import { GAME_TUNING, LESSONS, type Lesson, type QuizItem } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
 import { SpeakerButton } from "@/lib/quest/audio";
 import { bigCelebration, randomPraise, shuffle, starBurst } from "@/lib/quest/fx";
 
-/** 3 current-lesson questions + 2 review questions from earlier lessons (spaced repetition). */
+/** Current-lesson questions + review questions from earlier lessons (spaced repetition). All sizes come from GAME_TUNING and clamp to what each lesson actually has. */
 function buildBossSet(lesson: Lesson): { item: QuizItem; review: boolean }[] {
   const earlier = LESSONS.filter((l) => l.number < lesson.number);
   const reviewPool = shuffle(earlier.flatMap((l) => l.boss));
-  const reviewCount = Math.min(2, reviewPool.length);
-  const currentCount = 5 - reviewCount;
+  const reviewCount = Math.min(GAME_TUNING.bossReviewQuestions, reviewPool.length);
+  const currentCount = Math.min(GAME_TUNING.bossQuestions - reviewCount, lesson.boss.length);
   const current = shuffle(lesson.boss).slice(0, currentCount);
   return shuffle([
     ...current.map((item) => ({ item, review: false })),

@@ -1,4 +1,4 @@
-import { LESSONS } from "@/lib/quest/config";
+import { LESSONS, PLANNED_LESSON_COUNT } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
 
 export function StickerAlbum({ onClose }: { onClose: () => void }) {
@@ -31,7 +31,7 @@ export function StickerAlbum({ onClose }: { onClose: () => void }) {
               </div>
             );
           })}
-          {Array.from({ length: Math.max(0, 8 - LESSONS.length) }).map((_, i) => (
+          {Array.from({ length: Math.max(0, PLANNED_LESSON_COUNT - LESSONS.length) }).map((_, i) => (
             <div key={i} className="card-quest flex flex-col items-center gap-2 p-5 text-center opacity-30">
               <span className="text-5xl">❓</span>
               <span className="font-display font-bold">Coming soon</span>

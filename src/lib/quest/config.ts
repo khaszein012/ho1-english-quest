@@ -1,3 +1,22 @@
+/* =============================================================================
+ * ARSYAD'S ENGLISH QUEST — SINGLE LESSON CONFIG FILE
+ * -----------------------------------------------------------------------------
+ * EVERY piece of lesson content the app shows lives in the LESSONS array at the
+ * bottom of this file: one entry per lesson. Screens and components read from it
+ * and never hardcode content.
+ *
+ * TO ADD LESSON 2 (or 3...8):
+ *   1. Copy the `lesson1` object below, rename it `lesson2`.
+ *   2. Change `id`, `number`, `title`, `subtitle`, `emoji` and fill in the
+ *      content fields (vocabulary of ANY length, grammar, expressions,
+ *      practice, reading + questions + spotlight, rolePlay + homework,
+ *      selfCheck, boss, sticker).
+ *   3. Append it: `export const LESSONS: Lesson[] = [lesson1, lesson2];`
+ *   That is all. No layout or component changes are needed — the lesson picker,
+ *   star dashboard, sticker album, progress screen and Boss Challenge (which
+ *   automatically mixes in review questions from earlier lessons) all adapt.
+ * ============================================================================= */
+
 export const STORAGE_KEY = "arsyad-english-quest-v1";
 
 export type VocabWord = {
@@ -57,7 +76,24 @@ export const LEVELS = [
   { name: "Legend", min: 61, max: Infinity, emoji: "👑" },
 ] as const;
 
+/** A word counts as "learned" after this many correct interactions with it. */
 export const WORD_MASTERY_TARGET = 3;
+
+/** How many lesson slots the sticker album shows (empty ones read "Coming soon"). */
+export const PLANNED_LESSON_COUNT = 8;
+
+/**
+ * Game tuning. These are MAXIMUMS — every game clamps them to the actual number
+ * of words/questions in a lesson, so a lesson with 3 words works exactly as well
+ * as one with 12.
+ */
+export const GAME_TUNING = {
+  matchPairsPerRound: 5,
+  listenRounds: 6,
+  listenOptions: 4,
+  bossQuestions: 5,
+  bossReviewQuestions: 2,
+} as const;
 
 export const SCREENS = [
   { id: "vocabulary", label: "Vocabulary", emoji: "📚" },
