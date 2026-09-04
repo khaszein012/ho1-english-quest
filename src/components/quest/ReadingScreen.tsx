@@ -36,6 +36,16 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
   const [missTap, setMissTap] = useState<string | null>(null);
   const targets = r.spotlight.words.map((w) => w.toLowerCase());
 
+  /**
+   * Matches a tapped word to a spotlight target, allowing simple inflections
+   * that appear in the passage (e.g. "Tuesdays" -> "Tuesday", "friend's").
+   */
+  function targetFor(clean: string) {
+    const w = clean.toLowerCase().replace(/'s$/, "");
+    const forms = [w, w.replace(/es$/, ""), w.replace(/s$/, "")];
+    return targets.find((t) => forms.includes(t)) ?? null;
+  }
+
   const runIdRef = useRef(0);
 
   function stopReading() {
@@ -74,17 +84,17 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
   }
 
 
-  function tapWord(token: Token) {
-    const clean = token.clean.toLowerCase();
-    if (targets.includes(clean) && !found.includes(clean)) {
-      const next = [...found, clean];
+  function tapWord(token: Token, tokenKey: string) {
+    const match = targetFor(token.clean);
+    if (match && !found.includes(match)) {
+      const next = [...found, match];
       setFound(next);
       addStars(lesson.id, 1);
       starBurst();
       onComplete();
       if (next.length === targets.length) bigCelebration();
-    } else if (!targets.includes(clean)) {
-      setMissTap(`${token.sentenceIndex}-${token.text}`);
+    } else if (!match) {
+      setMissTap(tokenKey);
       window.setTimeout(() => setMissTap(null), 400);
     }
   }
@@ -153,15 +163,17 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                       const clean = piece.replace(/[^A-Za-z']/g, "");
                       const token: Token = { text: piece, clean, sentenceIndex: si };
                       const id = `${si}-${piece}`;
-                      const isFound = found.includes(clean.toLowerCase());
                       tokenId += 1;
+                      const tokenKey = `${id}-${tokenId}`;
+                      const match = targetFor(clean);
+                      const isFound = !!match && found.includes(match);
                       return (
                         <span
-                          key={`${id}-${tokenId}`}
-                          onClick={() => tapWord(token)}
+                          key={tokenKey}
+                          onClick={() => tapWord(token, tokenKey)}
                           className={`cursor-pointer rounded px-0.5 ${
                             isFound ? "bg-gold font-bold text-gold-foreground" : "hover:bg-secondary"
-                          } ${missTap === id ? "animate-shake" : ""}`}
+                          } ${missTap === tokenKey ? "animate-shake" : ""}`}
                         >
                           {piece}
                         </span>
