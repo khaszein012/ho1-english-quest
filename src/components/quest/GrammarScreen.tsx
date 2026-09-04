@@ -84,11 +84,16 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         ))}
       </div>
 
-      <div className="card-quest space-y-4 p-5">
+      <div className="card-quest space-y-5 p-5">
         <h3 className="font-display text-xl font-bold">Your Turn ✍️</h3>
+        <p className="text-sm text-muted-foreground">
+          Tap the word that fits. Wrong taps are fine — you keep every star. ⭐
+        </p>
         {g.yourTurn.map((item, i) => (
-          <div key={item.question} className="space-y-2">
-            <p className="font-display text-2xl">{item.question}</p>
+          <div key={item.question} className="space-y-2 rounded-2xl bg-secondary/40 p-4">
+            <p className="font-display text-2xl">
+              {i + 1}. {item.question}
+            </p>
             <div className="flex flex-wrap gap-3">
               {item.options.map((o) => (
                 <button
@@ -97,15 +102,25 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                   className={`btn-pop px-4 py-3 text-lg ${
                     solved.includes(i) && o === item.answer
                       ? "bg-grass text-gold-foreground animate-glow"
-                      : "bg-secondary text-secondary-foreground"
+                      : "bg-card text-secondary-foreground"
                   } ${wrong === `${i}-${o}` ? "animate-shake" : ""}`}
                 >
                   {o}
                 </button>
               ))}
             </div>
+            {solved.includes(i) ? (
+              <p className="animate-pop-in font-display text-lg font-bold text-grass">
+                ✅ Yes! {item.question.replace("___", item.answer)}
+              </p>
+            ) : (
+              nudge[i] && (
+                <p className="animate-pop-in text-lg text-gold">{nudge[i]}</p>
+              )
+            )}
           </div>
         ))}
+
         {solved.length === g.yourTurn.length && (
           <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
             All correct! {randomPraise()} 🎉
