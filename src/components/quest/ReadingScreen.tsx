@@ -185,9 +185,10 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                         <span
                           key={tokenKey}
                           onClick={() => tapWord(token, tokenKey)}
-                          className={`cursor-pointer rounded px-0.5 ${
-                            isFound ? "bg-gold font-bold text-gold-foreground" : "hover:bg-secondary"
+                          className={`rounded px-0.5 ${soundSort ? "" : "cursor-pointer"} ${
+                            isFound ? "bg-gold font-bold text-gold-foreground" : soundSort ? "" : "hover:bg-secondary"
                           } ${missTap === tokenKey ? "animate-shake" : ""}`}
+
                         >
                           {piece}
                         </span>
