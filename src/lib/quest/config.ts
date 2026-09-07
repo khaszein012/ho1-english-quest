@@ -33,7 +33,29 @@ export type VocabWord = {
   example: string;
   emoji: string;
   imagePath?: string;
+  /** Small badge shown on the word card, e.g. "Always plural!". */
+  tag?: string;
 };
+
+/**
+ * Sound & Spelling Spotlight. Two modes:
+ *  - "word_hunt"  (default): tap the target words inside the reading passage.
+ *  - "sound_sort": tap word cards. `sortStyle: "confirm_all"` = every card is a
+ *    correct example (listen-and-confirm). `sortStyle: "two_buckets"` is
+ *    reserved for future lessons with mixed right/wrong words, using each
+ *    card's `isTarget` flag.
+ */
+export type Spotlight = {
+  sound: string;
+  exampleWord: string;
+  instruction: string;
+  words: string[];
+  mode?: "word_hunt" | "sound_sort";
+  sortStyle?: "confirm_all" | "two_buckets";
+  sortWords?: { word: string; isTarget?: boolean; emoji?: string }[];
+  note?: string;
+};
+
 
 export type QuizItem = {
   question: string;
@@ -64,7 +86,7 @@ export type Lesson = {
     paragraphs: string[];
     questions: QuizItem[];
     stretchQuestion: string;
-    spotlight: { sound: string; exampleWord: string; instruction: string; words: string[] };
+    spotlight: Spotlight;
   };
   rolePlay: {
     title: string;
@@ -321,4 +343,150 @@ const lesson1: Lesson = {
   sticker: { name: "Golden Backpack", emoji: "🎒" },
 };
 
-export const LESSONS: Lesson[] = [lesson1];
+const lesson2: Lesson = {
+  id: "lesson-2",
+  number: 2,
+  title: "My Things",
+  subtitle: "It Is / They Are + my / your",
+  emoji: "🛹",
+  sentenceFrames: ["It is a ___.", "They are ___.", "Is it your ___?"],
+  speedRoundSeconds: 10,
+  vocabulary: [
+    { word: "bicycle", meaning: "a two-wheel vehicle you ride", example: "It's my bicycle.", emoji: "🚲" },
+    { word: "skateboard", meaning: "a board with wheels you stand on", example: "Is it your skateboard?", emoji: "🛹" },
+    { word: "board game", meaning: "a game you play on a board with pieces", example: "It's a board game.", emoji: "🎲" },
+    {
+      word: "playing cards",
+      meaning: "a set of cards for games (always plural!)",
+      example: "They are my playing cards.",
+      emoji: "🃏",
+      tag: "Always plural!",
+    },
+    { word: "puzzle", meaning: "many small pieces you join to make a picture", example: "It's a puzzle.", emoji: "🧩" },
+    { word: "video game", meaning: "a game you play on a screen", example: "It's my favourite video game.", emoji: "🎮" },
+    {
+      word: "headphones",
+      meaning: "you wear them to listen (always plural!)",
+      example: "They are my headphones.",
+      emoji: "🎧",
+      tag: "Always plural!",
+    },
+    { word: "phone", meaning: "a device for calling and messaging", example: "It's my phone.", emoji: "📱" },
+    { word: "football", meaning: "a ball for playing football", example: "It's my football.", emoji: "⚽" },
+    { word: "badminton racket", meaning: "you hit a shuttlecock with it", example: "It's a badminton racket.", emoji: "🏸" },
+    { word: "backpack", meaning: "a bag for your back", example: "It's my backpack.", emoji: "🎒" },
+    { word: "watch", meaning: "you wear it to see the time", example: "Is it your watch?", emoji: "⌚" },
+    { word: "wallet", meaning: "you keep money and cards in it", example: "It's my wallet.", emoji: "👛" },
+    { word: "water bottle", meaning: "you drink water from it", example: "It's my water bottle.", emoji: "🧴" },
+  ],
+  grammar: {
+    title: "It Is / They Are + my / your",
+    explanation:
+      "Use It is for ONE thing. Use They are for MANY things. Say my for your own things, and ask with your. Careful: headphones and playing cards are always many!",
+    patterns: [
+      { subject: "What", verb: "is", rest: "it?", note: "It is a bicycle. (ONE thing)" },
+      { subject: "What", verb: "are", rest: "they?", note: "They are headphones. (MANY things)" },
+      { subject: "It", verb: "is", rest: "my phone.", note: "It's my phone." },
+      { subject: "Is it", verb: "", rest: "your watch?", note: "Yes, it's my watch. / No, it isn't." },
+      { subject: "They", verb: "are", rest: "my playing cards.", note: "always many → They are" },
+    ],
+    examples: [
+      "It is a skateboard.",
+      "They are my playing cards.",
+      "Is it your football?",
+      "No, it isn't. It's my brother's.",
+    ],
+    yourTurn: [
+      { question: "___ is it?", options: ["What", "What are", "Is"], answer: "What" },
+      { question: "They ___ my headphones.", options: ["is", "are", "am"], answer: "are" },
+      { question: "It ___ a bicycle.", options: ["are", "is", "am"], answer: "is" },
+    ],
+  },
+  expressions: [
+    { prompt: "What is it?", answer: "It is a bicycle." },
+    { prompt: "What are they?", answer: "They are my headphones." },
+    { prompt: "Is it your phone?", answer: "Yes, it's my phone." },
+    { prompt: "Are they your playing cards?", answer: "No, they aren't. They're my brother's." },
+    { prompt: "Is it your watch?", answer: "No, it isn't." },
+    { prompt: "What's your favourite thing?", answer: "My favourite thing is my video game." },
+  ],
+  practice: {
+    title: "What Is It?",
+    instructions:
+      "Flip a belongings card face-down, then reveal it. Ask the right question and answer it: What is it? → It is a ___. / What are they? → They are ___. Then the app asks: Is it your ___? Answer Yes, it's my ___. / No, it isn't.",
+  },
+  reading: {
+    title: "Grandpa's Toy Box",
+    paragraphs: [
+      "My grandfather has an old wooden toy box. Look at his old toys! Are they the same as your things today? How are they different?",
+      "It is an old toy airplane. It has two wings. One wing is a little broken. My grandfather says, 'It's my favourite old toy!'",
+      "They are old wooden blocks. There are ten blocks in a small bag. My grandfather likes to build towers with them.",
+      "It is an old rocking horse. It is small and grey. I like to sit on it every time I visit. My grandfather also has a small toy pony. It is brown and white.",
+      "My things today are different. I have a video game and headphones, not wooden blocks or a rocking horse. But old toys and new things are both fun. Let's play with Grandpa's toys together!",
+    ],
+    questions: [
+      {
+        question: "What toy has two wings?",
+        options: ["an airplane", "a rocking horse", "wooden blocks", "a toy pony"],
+        answer: "an airplane",
+      },
+      { question: "How many wooden blocks are in the bag?", options: ["ten", "five", "eight", "three"], answer: "ten" },
+      { question: "What colour is the rocking horse?", options: ["grey", "white", "brown", "black"], answer: "grey" },
+      {
+        question: "What does the writer have today instead of wooden blocks?",
+        options: ["a video game", "a toy monkey", "a rocking horse", "a puzzle"],
+        answer: "a video game",
+      },
+    ],
+    stretchQuestion: "How are Grandpa's old toys different from your things today?",
+    spotlight: {
+      sound: "long O",
+      exampleWord: "boat",
+      instruction: "Listen to each word. They all have the long O sound, like BOAT! Tap to confirm each one.",
+      words: ["boat", "coat", "cold", "nose", "pony", "video game"],
+      mode: "sound_sort",
+      sortStyle: "confirm_all",
+      sortWords: [
+        { word: "boat", isTarget: true, emoji: "⛵" },
+        { word: "coat", isTarget: true, emoji: "🧥" },
+        { word: "cold", isTarget: true, emoji: "❄️" },
+        { word: "nose", isTarget: true, emoji: "👃" },
+        { word: "pony", isTarget: true, emoji: "🐴" },
+        { word: "video game", isTarget: true, emoji: "🎮" },
+      ],
+      note: "You already know 'pony' and 'video game' from today's story!",
+    },
+  },
+  rolePlay: {
+    title: "Show and Tell: My Real Things",
+    prompts: [
+      "Show me 3 things you have. Say: 'It's my ___.'",
+      "Show me one thing that's always plural (headphones or playing cards). Say: 'They are my ___.'",
+      "Ask me: Is it your ___?",
+      "Ask me: What is it? / What are they?",
+    ],
+    twists: [
+      "It's not my phone — it's my sister's!",
+      "They aren't my headphones — I can't find them anywhere!",
+    ],
+    homework:
+      "Record a tour of 4 of your favourite things. Use 'It's my ___' for single items and 'They're my ___' for at least one plural item (like headphones or playing cards).",
+  },
+  selfCheck: [
+    "Can I say 'It is' for ONE thing?",
+    "Can I say 'They are' for MANY things?",
+    "Can I use 'my' and 'your' correctly?",
+    "Can I remember headphones and playing cards are always plural?",
+  ],
+  boss: [
+    { question: "What ___ they?", options: ["are", "is", "am", "be"], answer: "are" },
+    { question: "It ___ my skateboard.", options: ["is", "are", "am", "be"], answer: "is" },
+    { question: "Which word is ALWAYS plural?", options: ["headphones", "phone", "watch", "puzzle"], answer: "headphones" },
+    { question: "Is it your football? (say NO)", options: ["No, it isn't.", "No, they aren't.", "No, I don't.", "No, it don't."], answer: "No, it isn't." },
+    { question: "Which word means 'you wear it to see the time'?", options: ["watch", "wallet", "phone", "football"], answer: "watch" },
+  ],
+  sticker: { name: "Treasure Chest", emoji: "🧰" },
+};
+
+export const LESSONS: Lesson[] = [lesson1, lesson2];
+

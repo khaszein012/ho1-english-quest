@@ -3,6 +3,8 @@ import type { Lesson } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
 import { AudioModePanel, SpeakerButton, cancelSpeech, speakText, useSpeak } from "@/lib/quest/audio";
 import { bigCelebration, randomPraise, starBurst } from "@/lib/quest/fx";
+import { SoundSortSpotlight } from "./SoundSortSpotlight";
+
 
 type Token = { text: string; clean: string; sentenceIndex: number };
 
@@ -31,10 +33,12 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
   const [wrong, setWrong] = useState<string | null>(null);
   const [hint, setHint] = useState(false);
 
-  // Part C
+  // Part C — spotlight. Word Hunt taps words in the passage; Sound Sort uses cards.
+  const soundSort = r.spotlight.mode === "sound_sort";
   const [found, setFound] = useState<string[]>([]);
   const [missTap, setMissTap] = useState<string | null>(null);
-  const targets = r.spotlight.words.map((w) => w.toLowerCase());
+  const targets = soundSort ? [] : r.spotlight.words.map((w) => w.toLowerCase());
+
 
   /**
    * Matches a tapped word to a spotlight target, allowing simple inflections
@@ -85,7 +89,9 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
 
 
   function tapWord(token: Token, tokenKey: string) {
+    if (soundSort) return;
     const match = targetFor(token.clean);
+
     if (match && !found.includes(match)) {
       const next = [...found, match];
       setFound(next);
@@ -179,9 +185,10 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                         <span
                           key={tokenKey}
                           onClick={() => tapWord(token, tokenKey)}
-                          className={`cursor-pointer rounded px-0.5 ${
-                            isFound ? "bg-gold font-bold text-gold-foreground" : "hover:bg-secondary"
+                          className={`rounded px-0.5 ${soundSort ? "" : "cursor-pointer"} ${
+                            isFound ? "bg-gold font-bold text-gold-foreground" : soundSort ? "" : "hover:bg-secondary"
                           } ${missTap === tokenKey ? "animate-shake" : ""}`}
+
                         >
                           {piece}
                         </span>
@@ -195,18 +202,29 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         </div>
       </div>
 
-      <div className="card-quest space-y-4 p-5">
-        <h3 className="font-display text-xl font-bold">Sound &amp; Spelling Spotlight 🔤</h3>
-        <p className="text-lg">{r.spotlight.instruction}</p>
-        <p className="font-display text-lg text-gold">
-          Found {found.length} of {targets.length}!
-        </p>
-        {found.length === targets.length && (
-          <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
-            You found them all! {randomPraise()} 🎉
+      {soundSort ? (
+        <SoundSortSpotlight
+          spotlight={r.spotlight}
+          onStar={() => {
+            addStars(lesson.id, 1);
+            onComplete();
+          }}
+        />
+      ) : (
+        <div className="card-quest space-y-4 p-5">
+          <h3 className="font-display text-xl font-bold">Sound &amp; Spelling Spotlight 🔤</h3>
+          <p className="text-lg">{r.spotlight.instruction}</p>
+          <p className="font-display text-lg text-gold">
+            Found {found.length} of {targets.length}!
           </p>
-        )}
-      </div>
+          {found.length === targets.length && (
+            <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
+              You found them all! {randomPraise()} 🎉
+            </p>
+          )}
+        </div>
+      )}
+
 
       <div className="card-quest space-y-4 p-5">
         <h3 className="font-display text-xl font-bold">Comprehension Questions</h3>

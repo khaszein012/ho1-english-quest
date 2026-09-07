@@ -61,7 +61,13 @@ function WordCards({ lesson, onComplete }: { lesson: Lesson; onComplete: () => v
             <>
               <span className="text-6xl">{w.emoji}</span>
               <span className="font-display text-2xl font-extrabold">{w.word}</span>
+              {w.tag && (
+                <span className="rounded-full bg-gold px-3 py-1 text-xs font-extrabold text-gold-foreground">
+                  {w.tag}
+                </span>
+              )}
               <span className="text-xs text-muted-foreground">tap to flip</span>
+
             </>
           }
           back={
