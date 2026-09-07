@@ -195,18 +195,29 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         </div>
       </div>
 
-      <div className="card-quest space-y-4 p-5">
-        <h3 className="font-display text-xl font-bold">Sound &amp; Spelling Spotlight 🔤</h3>
-        <p className="text-lg">{r.spotlight.instruction}</p>
-        <p className="font-display text-lg text-gold">
-          Found {found.length} of {targets.length}!
-        </p>
-        {found.length === targets.length && (
-          <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
-            You found them all! {randomPraise()} 🎉
+      {soundSort ? (
+        <SoundSortSpotlight
+          spotlight={r.spotlight}
+          onStar={() => {
+            addStars(lesson.id, 1);
+            onComplete();
+          }}
+        />
+      ) : (
+        <div className="card-quest space-y-4 p-5">
+          <h3 className="font-display text-xl font-bold">Sound &amp; Spelling Spotlight 🔤</h3>
+          <p className="text-lg">{r.spotlight.instruction}</p>
+          <p className="font-display text-lg text-gold">
+            Found {found.length} of {targets.length}!
           </p>
-        )}
-      </div>
+          {found.length === targets.length && (
+            <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
+              You found them all! {randomPraise()} 🎉
+            </p>
+          )}
+        </div>
+      )}
+
 
       <div className="card-quest space-y-4 p-5">
         <h3 className="font-display text-xl font-bold">Comprehension Questions</h3>
