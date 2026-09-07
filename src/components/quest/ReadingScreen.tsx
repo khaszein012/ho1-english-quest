@@ -89,7 +89,9 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
 
 
   function tapWord(token: Token, tokenKey: string) {
+    if (soundSort) return;
     const match = targetFor(token.clean);
+
     if (match && !found.includes(match)) {
       const next = [...found, match];
       setFound(next);
