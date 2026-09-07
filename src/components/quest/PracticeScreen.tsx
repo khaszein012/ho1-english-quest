@@ -4,6 +4,11 @@ import { useQuest } from "@/lib/quest/store";
 import { SpeakerButton } from "@/lib/quest/audio";
 import { randomPraise, shuffle, starBurst, bigCelebration } from "@/lib/quest/fx";
 
+/** Words like "headphones" use "They are" — read from each word's own example sentence. */
+function startsPlural(example: string) {
+  return /^\s*(they\s+are|they're)\b/i.test(example);
+}
+
 export function PracticeScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars, markWordCorrect } = useQuest();
   const [round, setRound] = useState(0);
