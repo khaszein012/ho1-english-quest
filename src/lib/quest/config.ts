@@ -33,7 +33,29 @@ export type VocabWord = {
   example: string;
   emoji: string;
   imagePath?: string;
+  /** Small badge shown on the word card, e.g. "Always plural!". */
+  tag?: string;
 };
+
+/**
+ * Sound & Spelling Spotlight. Two modes:
+ *  - "word_hunt"  (default): tap the target words inside the reading passage.
+ *  - "sound_sort": tap word cards. `sortStyle: "confirm_all"` = every card is a
+ *    correct example (listen-and-confirm). `sortStyle: "two_buckets"` is
+ *    reserved for future lessons with mixed right/wrong words, using each
+ *    card's `isTarget` flag.
+ */
+export type Spotlight = {
+  sound: string;
+  exampleWord: string;
+  instruction: string;
+  words: string[];
+  mode?: "word_hunt" | "sound_sort";
+  sortStyle?: "confirm_all" | "two_buckets";
+  sortWords?: { word: string; isTarget?: boolean; emoji?: string }[];
+  note?: string;
+};
+
 
 export type QuizItem = {
   question: string;
