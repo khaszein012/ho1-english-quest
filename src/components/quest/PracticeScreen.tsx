@@ -100,6 +100,17 @@ export function PracticeScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
               )}
               <div className="text-7xl">{card.emoji}</div>
               <p className="font-display text-3xl font-extrabold">{card.word}</p>
+              {card.tag && (
+                <p className="mx-auto w-fit rounded-full bg-gold px-4 py-1 font-display text-base font-extrabold text-gold-foreground">
+                  {card.tag}
+                </p>
+              )}
+              <p className="font-display text-xl">
+                Say:{" "}
+                <span className="font-extrabold text-gold">
+                  {startsPlural(card.example) ? "They are" : "It is"} my {card.word}.
+                </span>
+              </p>
               <SpeakerButton text={card.example} label="Hear an example" />
               <div className="flex flex-wrap justify-center gap-3">
                 <button
