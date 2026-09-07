@@ -3,6 +3,8 @@ import type { Lesson } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
 import { AudioModePanel, SpeakerButton, cancelSpeech, speakText, useSpeak } from "@/lib/quest/audio";
 import { bigCelebration, randomPraise, starBurst } from "@/lib/quest/fx";
+import { SoundSortSpotlight } from "./SoundSortSpotlight";
+
 
 type Token = { text: string; clean: string; sentenceIndex: number };
 
