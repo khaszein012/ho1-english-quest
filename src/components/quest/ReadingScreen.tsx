@@ -33,10 +33,12 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
   const [wrong, setWrong] = useState<string | null>(null);
   const [hint, setHint] = useState(false);
 
-  // Part C
+  // Part C — spotlight. Word Hunt taps words in the passage; Sound Sort uses cards.
+  const soundSort = r.spotlight.mode === "sound_sort";
   const [found, setFound] = useState<string[]>([]);
   const [missTap, setMissTap] = useState<string | null>(null);
-  const targets = r.spotlight.words.map((w) => w.toLowerCase());
+  const targets = soundSort ? [] : r.spotlight.words.map((w) => w.toLowerCase());
+
 
   /**
    * Matches a tapped word to a spotlight target, allowing simple inflections
