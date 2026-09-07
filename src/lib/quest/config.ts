@@ -86,7 +86,7 @@ export type Lesson = {
     paragraphs: string[];
     questions: QuizItem[];
     stretchQuestion: string;
-    spotlight: { sound: string; exampleWord: string; instruction: string; words: string[] };
+    spotlight: Spotlight;
   };
   rolePlay: {
     title: string;
