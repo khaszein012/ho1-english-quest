@@ -40,10 +40,10 @@ export type VocabWord = {
 /**
  * Sound & Spelling Spotlight. Two modes:
  *  - "word_hunt"  (default): tap the target words inside the reading passage.
- *  - "sound_sort": tap word cards. `sortStyle: "confirm_all"` = every card is a
- *    correct example (listen-and-confirm). `sortStyle: "two_buckets"` is
- *    reserved for future lessons with mixed right/wrong words, using each
- *    card's `isTarget` flag.
+ *  - "sound_sort": word cards.
+ *      `sortStyle: "confirm_all"` = every card is a correct example (listen-and-confirm).
+ *      `sortStyle: "two_buckets"` = one card at a time, sorted into one of the two
+ *      `buckets`; each card's `bucket` names the bucket id it belongs in.
  */
 export type Spotlight = {
   sound: string;
@@ -52,9 +52,12 @@ export type Spotlight = {
   words: string[];
   mode?: "word_hunt" | "sound_sort";
   sortStyle?: "confirm_all" | "two_buckets";
-  sortWords?: { word: string; isTarget?: boolean; emoji?: string }[];
+  sortWords?: { word: string; isTarget?: boolean; emoji?: string; bucket?: string }[];
+  /** Two labelled buckets, used only by `sortStyle: "two_buckets"`. */
+  buckets?: { id: string; label: string }[];
   note?: string;
 };
+
 
 
 export type QuizItem = {
