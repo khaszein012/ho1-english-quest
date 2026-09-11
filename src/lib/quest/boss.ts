@@ -110,14 +110,15 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
 
     // (d) find-the-error — same pattern with the wrong doing word, pick the good sentence
     const good = `${p.subject} ${p.verb} ${p.rest}`;
-    const badVerbs = pick([...verbs.filter((v) => v !== p.verb), ...FALLBACK_VERBS], 3);
-    if (badVerbs.length >= 2) {
+    const badVerbs = pick([...verbs.filter((v) => v !== p.verb), ...FALLBACK_VERBS], 4);
+    const [shown, ...others] = badVerbs;
+    if (shown && others.length >= 2) {
       out.push({
         key: `${tag}-error-${p.subject}-${p.rest}`,
         kind: "error",
         label: LABELS.error,
-        prompt: `Oops! "${p.subject} ${badVerbs[0]} ${p.rest}" has one mistake. Which sentence is correct?`,
-        options: optionSet(good, badVerbs.map((v) => `${p.subject} ${v} ${p.rest}`)),
+        prompt: `Oops! "${p.subject} ${shown} ${p.rest}" has one mistake. Which sentence is correct?`,
+        options: optionSet(good, others.map((v) => `${p.subject} ${v} ${p.rest}`)),
         answer: good,
         hint: `Only the middle word changes. ${firstLetterHint(p.verb)}`,
         review,
