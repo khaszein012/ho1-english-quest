@@ -146,7 +146,9 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
             </div>
             <div className="rounded-2xl bg-secondary/70 p-4">
               <p className="font-display text-xl font-extrabold">
-                {best ? `${best.hits} hits, ${best.misses} misses` : "no record yet"}
+                {best
+                  ? `${best.hits} ${best.hits === 1 ? "hit" : "hits"}, ${best.misses} ${best.misses === 1 ? "miss" : "misses"}`
+                  : "no record yet"}
               </p>
               <p className="text-sm text-muted-foreground">best fight</p>
             </div>
@@ -168,10 +170,11 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
           {surrendered ? "The boss surrenders! 😅" : "Boss Defeated!"}
         </p>
         <p className="text-lg text-muted-foreground">
-          {surrendered ? "You never gave up, so the boss did! " : ""}{hits} hits, {misses} misses. You unlocked the {lesson.sticker.name} sticker {lesson.sticker.emoji}
+          {surrendered ? "You never gave up, so the boss did! " : ""}
+          {hits} {hits === 1 ? "hit" : "hits"}, {misses} {misses === 1 ? "miss" : "misses"}. You unlocked the {lesson.sticker.name} sticker {lesson.sticker.emoji}
         </p>
         <p className="font-display text-lg text-gold">
-          {best && best.hits === hits && best.misses === misses ? "New personal record! 🏅" : `Best: ${best?.hits} hits, ${best?.misses} misses`}
+          {best && best.hits === hits && best.misses === misses ? "New personal record! 🏅" : `Best: ${best?.hits} ${best?.hits === 1 ? "hit" : "hits"}, ${best?.misses} ${best?.misses === 1 ? "miss" : "misses"}`}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <button onClick={start} className="btn-pop bg-gold px-4 py-3 text-lg text-gold-foreground">
