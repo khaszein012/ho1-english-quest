@@ -9,6 +9,49 @@ function startsPlural(example: string) {
   return /^\s*(they\s+are|they're)\b/i.test(example);
 }
 
+/** Sentence opener for a card: near/far cue lessons use this/that/these/those. */
+function sayFrame(card: { word: string; example: string; cue?: "near" | "far"; many?: boolean }) {
+  if (card.cue) {
+    if (card.cue === "near") return card.many ? "These are" : "This is a";
+    return card.many ? "Those are" : "That is a";
+  }
+  return startsPlural(card.example) ? "They are" : "It is";
+}
+
+/**
+ * Unambiguous distance picture for near/far lessons: NEAR = zoomed-in, filling
+ * the frame with a hand touching it; FAR = zoomed-out, the thing tiny at the
+ * end of a long pointing arrow. The learner must read the distance at a glance.
+ */
+function DistanceFrame({ emoji, cue }: { emoji: string; cue: "near" | "far" }) {
+  if (cue === "near") {
+    return (
+      <div className="mx-auto w-full max-w-sm space-y-2">
+        <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-3xl border-4 border-grass bg-secondary">
+          <span className="text-9xl leading-none">{emoji}</span>
+          <span className="absolute bottom-2 right-3 text-5xl">🖐️</span>
+        </div>
+        <p className="mx-auto w-fit rounded-full bg-grass px-5 py-2 font-display text-xl font-extrabold text-gold-foreground">
+          NEAR — right here! 🖐️
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto w-full max-w-sm space-y-2">
+      <div className="flex h-40 items-center justify-between gap-2 rounded-3xl border-4 border-gold bg-secondary px-6">
+        <span className="text-6xl">🧍</span>
+        <span aria-hidden className="flex-1 border-t-8 border-dashed border-gold" />
+        <span className="text-5xl">👉</span>
+        <span className="text-4xl">{emoji}</span>
+      </div>
+      <p className="mx-auto w-fit rounded-full bg-gold px-5 py-2 font-display text-xl font-extrabold text-gold-foreground">
+        FAR — over there! 👉
+      </p>
+    </div>
+  );
+}
+
 export function PracticeScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars, markWordCorrect } = useQuest();
   const [round, setRound] = useState(0);
