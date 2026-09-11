@@ -163,7 +163,9 @@ export function PracticeScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
               <p className="font-display text-xl">
                 Say:{" "}
                 <span className="font-extrabold text-gold">
-                  {startsPlural(card.example) ? "They are" : "It is"} my {card.word}.
+                  {sayFrame(card)} {card.cue && !card.many ? "" : "my "}
+                  {card.word}
+                  {card.cue && card.many ? "s" : ""}.
                 </span>
               </p>
               <SpeakerButton text={card.example} label="Hear an example" />
