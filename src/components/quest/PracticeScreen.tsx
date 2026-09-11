@@ -41,7 +41,7 @@ function DistanceFrame({ emoji, cue }: { emoji: string; cue: "near" | "far" }) {
   return (
     <div className="mx-auto w-full max-w-sm space-y-2">
       <div className="flex h-40 items-center justify-between gap-2 rounded-3xl border-4 border-gold bg-secondary px-6">
-        <span className="text-6xl">🧍</span>
+        <span className="text-6xl">🙋</span>
         <span aria-hidden className="flex-1 border-t-8 border-dashed border-gold" />
         <span className="text-5xl">👉</span>
         <span className="text-4xl">{emoji}</span>
