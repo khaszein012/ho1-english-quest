@@ -32,9 +32,16 @@ const LABELS: Record<BossQuestionKind, string> = {
   listen: "Listen and pick 👂",
 };
 
+/**
+ * Clues NARROW the choice, they never hand over the answer. Short answers (like
+ * "is" / "are") would be given away by a letter count, so they get a
+ * say-it-out-loud nudge instead of spelling information.
+ */
 function firstLetterHint(answer: string) {
   const clean = answer.trim();
-  return `It starts with "${clean[0]?.toUpperCase()}" and has ${clean.replace(/[^a-zA-Z]/g, "").length} letters.`;
+  const letters = clean.replace(/[^a-zA-Z]/g, "").length;
+  if (letters <= 4) return "Say each choice out loud with the whole sentence — only one of them sounds right.";
+  return `It starts with "${clean[0]?.toUpperCase()}" and has ${letters} letters.`;
 }
 
 function pick<T>(items: T[], count: number, exclude: (i: T) => boolean = () => false): T[] {
@@ -104,7 +111,7 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
       prompt: `${p.subject} ___ ${p.rest}`,
       options: optionSet(p.verb, [...shuffle(verbs.filter((v) => v !== p.verb)), ...FALLBACK_VERBS]),
       answer: p.verb,
-      hint: `Say the whole sentence out loud — which one sounds right? ${firstLetterHint(p.verb)}`,
+      hint: "Say the whole sentence out loud with each choice — which one sounds right?",
       review,
     });
 
@@ -120,7 +127,7 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
         prompt: `Oops! "${p.subject} ${shown} ${p.rest}" has one mistake. Which sentence is correct?`,
         options: optionSet(good, others.map((v) => `${p.subject} ${v} ${p.rest}`)),
         answer: good,
-        hint: `Only the middle word changes. ${firstLetterHint(p.verb)}`,
+        hint: "Only the middle word changes. Read each sentence out loud and listen for the one that sounds right.",
         review,
       });
     }
