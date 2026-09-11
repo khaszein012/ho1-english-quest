@@ -146,8 +146,15 @@ export function PracticeScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
               {speed && (
                 <p className="font-display text-2xl font-extrabold text-gold">⏱️ {timeLeft}s</p>
               )}
-              <div className="text-7xl">{card.emoji}</div>
-              <p className="font-display text-3xl font-extrabold">{card.word}</p>
+              {card.cue ? (
+                <DistanceFrame emoji={card.emoji} cue={card.cue} />
+              ) : (
+                <div className="text-7xl">{card.emoji}</div>
+              )}
+              <p className="font-display text-3xl font-extrabold">
+                {card.word}
+                {card.cue && card.many ? "s" : ""}
+              </p>
               {card.tag && (
                 <p className="mx-auto w-fit rounded-full bg-gold px-4 py-1 font-display text-base font-extrabold text-gold-foreground">
                   {card.tag}
