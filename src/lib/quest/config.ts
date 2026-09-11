@@ -35,6 +35,10 @@ export type VocabWord = {
   imagePath?: string;
   /** Small badge shown on the word card, e.g. "Always plural!". */
   tag?: string;
+  /** Optional near/far distance cue for the Practice Game zoom frame (e.g. this/that lessons). */
+  cue?: "near" | "far";
+  /** True when the Practice Game should treat this word as MANY (these/those). */
+  many?: boolean;
 };
 
 /**
