@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { LESSONS, type Lesson } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
-import { SpeakerButton } from "@/lib/quest/audio";
+import { AudioModePanel, SpeakerButton, useSpeak } from "@/lib/quest/audio";
 import { bigCelebration, randomPraise, shuffle, starBurst } from "@/lib/quest/fx";
 import { bossConfig, buildFight, type BossQuestion } from "@/lib/quest/boss";
 
@@ -10,6 +10,7 @@ type Phase = "intro" | "fight" | "won";
 export function BossChallenge({ lesson }: { lesson: Lesson }) {
   const { addStars, defeatBoss, finishBossFight, bossUnlocked, state } = useQuest();
   const cfg = bossConfig(lesson);
+  const { enabled: appVoice, mode: audioMode } = useSpeak();
   const best = state.bossBest[lesson.id];
   const defeated = state.bossDefeated.includes(lesson.id);
   const unlocked = bossUnlocked(lesson.id);
@@ -218,6 +219,24 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
         </button>
       </header>
 
+      {/* Same three-mode audio system as every other screen. In Teacher Reads mode
+          the pop-out carries this question's script so the tutor can voice it in a
+          window the student never sees. */}
+      {current && (
+        <AudioModePanel
+          scriptTitle={`Boss fight — ${cfg.name}`}
+          scriptLines={[
+            `<strong>${current.label}</strong>`,
+            current.speak
+              ? `Read this sentence aloud (twice, slowly): <strong>“${current.speak}”</strong>`
+              : `Read the question aloud: <strong>“${current.prompt}”</strong>`,
+            `Choices on Arsyad's screen: ${current.options.join(" · ")}`,
+            `Answer (tutor only — keep this window hidden): <strong>${current.answer}</strong>`,
+            `Clue if he is stuck twice: ${current.hint}`,
+          ]}
+        />
+      )}
+
       {current && (
         <div className="card-quest space-y-4 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -232,6 +251,13 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
             <p className="font-display text-2xl font-bold">{current.prompt}</p>
             <SpeakerButton text={current.speak ?? current.prompt} />
           </div>
+          {current.kind === "listen" && !appVoice && (
+            <p className="rounded-2xl bg-secondary/70 px-4 py-3 text-base text-muted-foreground">
+              {audioMode === "teacher"
+                ? "App voice is off — ask your tutor to read the sentence out loud."
+                : "App voice is off — play the sentence on your own device, or switch to App Voice."}
+            </p>
+          )}
           <div className="grid gap-3 sm:grid-cols-2">
             {current.options.map((o) => (
               <button
