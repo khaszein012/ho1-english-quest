@@ -18,7 +18,7 @@ export function SoundSortSpotlight({
   spotlight: Spotlight;
   onStar: () => void;
 }) {
-  const cards = spotlight.sortWords ?? spotlight.words.map((word) => ({ word, isTarget: true, emoji: undefined, bucket: undefined }));
+  const cards: Card[] = spotlight.sortWords ?? spotlight.words.map((word) => ({ word, isTarget: true }));
   const twoBuckets = spotlight.sortStyle === "two_buckets" && (spotlight.buckets?.length ?? 0) === 2;
 
   if (twoBuckets) return <TwoBucketSort spotlight={spotlight} cards={cards} onStar={onStar} />;
