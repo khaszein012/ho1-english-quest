@@ -117,7 +117,11 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
 
     // (d) find-the-error — same pattern with the wrong doing word, pick the good sentence
     const good = `${p.subject} ${p.verb} ${p.rest}`;
-    const badVerbs = pick([...verbs.filter((v) => v !== p.verb), ...FALLBACK_VERBS], 4);
+    // Wrong choices come from THIS lesson's own doing words first, so the mistake
+    // is always a mix-up inside the lesson's grammar target. Generic fallbacks are
+    // only used when the lesson itself doesn't offer enough alternatives.
+    const ownWrong = shuffle(verbs.filter((v) => v !== p.verb));
+    const badVerbs = [...ownWrong, ...FALLBACK_VERBS.filter((v) => v !== p.verb && !verbs.includes(v))].slice(0, 4);
     const [shown, ...others] = badVerbs;
     if (shown && others.length >= 2) {
       out.push({
