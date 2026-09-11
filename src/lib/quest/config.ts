@@ -491,5 +491,152 @@ const lesson2: Lesson = {
   sticker: { name: "Treasure Chest", emoji: "🧰" },
 };
 
-export const LESSONS: Lesson[] = [lesson1, lesson2];
+const lesson3: Lesson = {
+  id: "lesson-3",
+  number: 3,
+  title: "My Classroom",
+  subtitle: "This / That / These / Those",
+  emoji: "🏫",
+  sentenceFrames: ["This is a ___.", "That is a ___.", "These are ___.", "Those are ___."],
+  speedRoundSeconds: 10,
+  vocabulary: [
+    { word: "bookcase", meaning: "a piece of furniture that holds books", example: "That is a big bookcase.", emoji: "📚" },
+    { word: "calendar", meaning: "shows the days and months on a wall", example: "The calendar is on the wall.", emoji: "📅" },
+    { word: "chair", meaning: "you sit on it", example: "This is my chair.", emoji: "🪑" },
+    { word: "clock", meaning: "shows the time", example: "The clock is red.", emoji: "🕐" },
+    { word: "computer", meaning: "a machine for work and games", example: "There is a computer on the desk.", emoji: "💻" },
+    { word: "cupboard", meaning: "furniture with doors for keeping things", example: "Those are cupboards.", emoji: "🗄️" },
+    { word: "desk", meaning: "the table where you study", example: "This is my desk.", emoji: "🪑" },
+    { word: "drawer", meaning: "a part that slides out of a desk", example: "My pens are in the drawer.", emoji: "🗃️" },
+    { word: "map", meaning: "a picture of countries or the world", example: "That map shows Indonesia.", emoji: "🗺️" },
+    { word: "poster", meaning: "a big picture on the wall", example: "Those are new posters.", emoji: "🖼️" },
+    { word: "shelf", meaning: "a flat board on the wall for keeping things", example: "The books are on the shelf.", emoji: "📚" },
+    { word: "whiteboard", meaning: "a big white board the teacher writes on", example: "The whiteboard is clean.", emoji: "⬜" },
+    { word: "projector", meaning: "shows the teacher's screen on the wall", example: "The projector is on.", emoji: "📽️" },
+    { word: "air conditioner", meaning: "keeps the classroom cool", example: "The air conditioner is on the wall.", emoji: "❄️" },
+  ],
+  grammar: {
+    title: "This / That / These / Those",
+    explanation:
+      "Near you → this (ONE) and these (MANY). Far away → that (ONE) and those (MANY). To say a colour, use: The ___ is ___.",
+    patterns: [
+      { subject: "This", verb: "is", rest: "a pen.", note: "NEAR + ONE → What is this?" },
+      { subject: "That", verb: "is", rest: "a clock.", note: "FAR + ONE → What is that?" },
+      { subject: "These", verb: "are", rest: "pencils.", note: "NEAR + MANY → What are these?" },
+      { subject: "Those", verb: "are", rest: "posters.", note: "FAR + MANY → What are those?" },
+      { subject: "The clock", verb: "is", rest: "red.", note: "The ___ is ___. (colour)" },
+    ],
+    examples: [
+      "This is my desk.",
+      "That is a whiteboard.",
+      "These are my pencils.",
+      "Those are posters.",
+      "The clock is red.",
+    ],
+    yourTurn: [
+      { question: "___ is my pen. (it is close, in my hand)", options: ["This", "That", "Those"], answer: "This" },
+      { question: "___ are the posters. (far away, on the wall)", options: ["These", "Those", "This"], answer: "Those" },
+      { question: "The whiteboard ___ white.", options: ["are", "is", "am"], answer: "is" },
+    ],
+  },
+  expressions: [
+    { prompt: "What is this?", answer: "This is my chair." },
+    { prompt: "What is that?", answer: "That is a whiteboard." },
+    { prompt: "What are these?", answer: "These are my pencils." },
+    { prompt: "What are those?", answer: "Those are posters." },
+    { prompt: "What colour is the clock?", answer: "The clock is red." },
+    { prompt: "What colour are those cupboards?", answer: "They are brown." },
+  ],
+  practice: {
+    title: "Near or Far?",
+    instructions:
+      "Look at the card: is the thing NEAR you or FAR away? One thing or many? Say it: This is a ___. / That is a ___. / These are ___. / Those are ___. Then answer the colour question: What colour is it? → The ___ is ___.",
+  },
+  reading: {
+    title: "A School With One Room",
+    paragraphs: [
+      "This is a photo of an old school in the United States. It is from 1930. Look — that is the school building. It is small and red, with a white porch.",
+      "This is Margaret. She lives in a small town, and she goes to a one-room school. All the students are in one room together. That is her teacher — she is the only teacher in the school. These are Margaret's classmates, and those are their desks. Her older brother William is in the same class!",
+      "Margaret doesn't have a notebook or a pencil case. Look at her desk — this is a slate. It is black, and she writes on it with chalk. And those books on the shelf? They are not Margaret's. Only the teacher has a textbook.",
+      "Margaret likes history the best, because her teacher tells good stories about the past. When she grows up, Margaret wants to be a teacher, too.",
+    ],
+    questions: [
+      {
+        question: "Where does Margaret live?",
+        options: ["a small town", "a big city", "a village", "a farm"],
+        answer: "a small town",
+      },
+      {
+        question: "What does Margaret write on instead of a notebook?",
+        options: ["a slate", "paper", "a tablet", "a whiteboard"],
+        answer: "a slate",
+      },
+      {
+        question: "Who has the only textbook?",
+        options: ["the teacher", "Margaret", "William", "nobody"],
+        answer: "the teacher",
+      },
+      {
+        question: "What is Margaret's favourite subject?",
+        options: ["history", "math", "science", "English"],
+        answer: "history",
+      },
+    ],
+    stretchQuestion: "What does Margaret want to be when she grows up, and why?",
+    spotlight: {
+      sound: "long E and short E",
+      exampleWord: "bee",
+      instruction:
+        "Listen to each word, then drop it in the right basket: long E like BEE, or short E like DESK. Use the speaker first — this is about hearing, not spelling!",
+      words: ["bee", "eraser", "leaf", "desk", "pen", "pencil"],
+      mode: "sound_sort",
+      sortStyle: "two_buckets",
+      buckets: [
+        { id: "long-e", label: "Long E — like BEE" },
+        { id: "short-e", label: "Short E — like DESK" },
+      ],
+      sortWords: [
+        { word: "bee", emoji: "🐝", bucket: "long-e" },
+        { word: "eraser", emoji: "🧽", bucket: "long-e" },
+        { word: "leaf", emoji: "🍃", bucket: "long-e" },
+        { word: "desk", emoji: "🪑", bucket: "short-e" },
+        { word: "pen", emoji: "🖊️", bucket: "short-e" },
+        { word: "pencil", emoji: "✏️", bucket: "short-e" },
+      ],
+      note: "You already knew desk, pen, and pencil — and 'desk' appeared in today's story!",
+    },
+  },
+  rolePlay: {
+    title: "Describe Your Study Space",
+    prompts: [
+      "Point near you: 'This is my ___.'",
+      "Point far from you: 'That is a ___.'",
+      "Say the colour of two things: 'The ___ is ___.'",
+      "Ask me about my room: 'What is that?' / 'What are those?'",
+    ],
+    twists: [
+      "That is my cat — she sleeps on my desk!",
+      "These are not my books — they're my brother's!",
+    ],
+    homework:
+      "Record a tour of your study space: name 5 objects with this/that/these/those, and say the colour of at least 2 of them.",
+  },
+  selfCheck: [
+    "Can I use 'this' for near and 'that' for far?",
+    "Can I use 'these' and 'those' for many things?",
+    "Can I say the colour of something ('The clock is red')?",
+    "Can I hear the difference between long E and short E?",
+  ],
+  boss: [
+    { question: "___ is my pen. (near me)", options: ["This", "Those", "These", "That"], answer: "This" },
+    { question: "___ are the posters on the far wall.", options: ["Those", "This", "These", "That"], answer: "Those" },
+    { question: "The whiteboard ___ white.", options: ["is", "are", "am", "be"], answer: "is" },
+    { question: "Which word means 'shows the time'?", options: ["clock", "map", "shelf", "drawer"], answer: "clock" },
+    { question: "What are these? (many pencils, near you)", options: ["These are pencils.", "This is pencils.", "Those is pencils.", "That are pencils."], answer: "These are pencils." },
+  ],
+  sticker: { name: "Golden Whiteboard", emoji: "🏫" },
+};
+
+export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3];
+
 
