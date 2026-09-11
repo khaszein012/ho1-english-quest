@@ -24,6 +24,7 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
   const [reaction, setReaction] = useState<"none" | "hit" | "regen">("none");
   const [message, setMessage] = useState<string | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [surrendered, setSurrendered] = useState(false);
   const missCounts = useRef<Record<string, number>>({});
   const plannedQuestions = useMemo(() => buildFight(lesson, LESSONS).length, [lesson]);
 
@@ -39,6 +40,7 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
     setMisses(0);
     setMessage(null);
     setShowHint(false);
+    setSurrendered(false);
     setReaction("none");
     setPhase("fight");
   }, [lesson, cfg.maxHp]);
@@ -55,6 +57,15 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
     );
   }
 
+  /** Win the fight (HP at 0, or the surrender safety net). */
+  function finish(totalHits: number, totalMisses: number, gaveUp: boolean) {
+    finishBossFight(lesson.id, totalHits, totalMisses);
+    defeatBoss(lesson.id);
+    bigCelebration();
+    setSurrendered(gaveUp);
+    setPhase("won");
+  }
+
   function answer(option: string) {
     if (!current) return;
     if (option === current.answer) {
@@ -69,12 +80,8 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
       addStars(lesson.id, 1);
       starBurst();
       window.setTimeout(() => setReaction("none"), 450);
-      if (nextHp === 0) {
-        finishBossFight(lesson.id, hits + 1, misses);
-        defeatBoss(lesson.id);
-        bigCelebration();
-        setPhase("won");
-      }
+      if (nextHp === 0) finish(hits + 1, misses, false);
+      else if (hits + 1 + misses >= cfg.surrenderAfter) finish(hits + 1, misses, true);
       return;
     }
 
@@ -89,6 +96,13 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
     setMessage("The boss is tough! Try again! 💪");
     window.setTimeout(() => setWrongKey(null), 450);
     window.setTimeout(() => setReaction("none"), 700);
+    // Safety net: the boss can heal as fast as it takes damage, so a long unlucky
+    // run could in theory never reach 0 HP. After `surrenderAfter` attempts the
+    // boss gives up — the learner always finishes the fight a winner.
+    if (hits + misses + 1 >= cfg.surrenderAfter) {
+      finish(hits, misses + 1, true);
+      return;
+    }
     setQueue((q) => {
       const [missed, ...rest] = q;
       if (!missed) return q;
@@ -150,9 +164,11 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
     return (
       <div className="card-quest animate-pop-in space-y-3 p-8 text-center">
         <p className="text-7xl">🎉</p>
-        <p className="font-display text-3xl font-extrabold">Boss Defeated!</p>
+        <p className="font-display text-3xl font-extrabold">
+          {surrendered ? "The boss surrenders! 😅" : "Boss Defeated!"}
+        </p>
         <p className="text-lg text-muted-foreground">
-          {hits} hits, {misses} misses. You unlocked the {lesson.sticker.name} sticker {lesson.sticker.emoji}
+          {surrendered ? "You never gave up, so the boss did! " : ""}{hits} hits, {misses} misses. You unlocked the {lesson.sticker.name} sticker {lesson.sticker.emoji}
         </p>
         <p className="font-display text-lg text-gold">
           {best && best.hits === hits && best.misses === misses ? "New personal record! 🏅" : `Best: ${best?.hits} hits, ${best?.misses} misses`}

@@ -81,6 +81,8 @@ export type BossFightConfig = {
   bossRegen?: number;
   reviewQuestions?: number;
   maxHp?: number;
+  /** Safety net: after this many total attempts the boss simply surrenders. */
+  surrenderAfter?: number;
   /** Friendly (never scary!) boss character. */
   name?: string;
   emoji?: string;
@@ -92,6 +94,7 @@ export const BOSS_FIGHT_DEFAULTS = {
   bossRegen: 10,
   reviewQuestions: 2,
   maxHp: 100,
+  surrenderAfter: 25,
   name: "Grammar Gremlin",
   emoji: "\u{1F479}",
 } as const;
