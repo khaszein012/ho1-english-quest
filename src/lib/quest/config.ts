@@ -378,7 +378,7 @@ const lesson1: Lesson = {
     { question: "Which word means 'a bright marker for important words'?", options: ["highlighter", "eraser", "stapler", "notebook"], answer: "highlighter" },
     { question: "___ you have a pencil case?", options: ["Do", "Does", "Is", "Have"], answer: "Do" },
   ],
-  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Backpack Bandit", emoji: "🧹" },
+  bossFight: { minQuestions: 12, hpPerHit: 100, bossRegen: 0, name: "Backpack Bandit", emoji: "🧹" },
   sticker: { name: "Golden Backpack", emoji: "🎒" },
 };
 

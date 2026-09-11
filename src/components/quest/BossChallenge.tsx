@@ -93,9 +93,10 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
       const [missed, ...rest] = q;
       if (!missed) return q;
       const comeback = shuffle(seen).slice(0, seen.length > 2 ? 2 : 1);
-      const pool = [...rest, missed, ...comeback];
-      // Missed question returns later, not immediately.
-      return pool.length > 1 ? [pool[pool.length - 1]!, ...pool.slice(0, -1)] : pool;
+      const pool = [...rest, ...comeback];
+      // The missed question comes back later in the fight, never immediately.
+      const at = Math.min(2, pool.length);
+      return [...pool.slice(0, at), missed, ...pool.slice(at)];
     });
   }
 
