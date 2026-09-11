@@ -1,7 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { BOSS_REQUIRED, LEGACY_STORAGE_KEYS, LESSONS, STORAGE_KEY, WORD_MASTERY_TARGET, levelFor, type ScreenId } from "./config";
+import { BOSS_REQUIRED, BOSS_WIN_BONUS, LEGACY_STORAGE_KEYS, LESSONS, STORAGE_KEY, WORD_MASTERY_TARGET, levelFor, type ScreenId } from "./config";
 
 export type AudioMode = "app" | "teacher" | "device";
+
+/** Best boss fight per lesson: fewest misses, then fewest hits needed. */
+export type BossRecord = { hits: number; misses: number };
 
 export type SelfCheckEntry = { date: string; lessonId: string; answers: number[] };
 
@@ -13,6 +16,8 @@ export type QuestState = {
   stickers: string[];
   selfChecks: SelfCheckEntry[];
   audioMode: AudioMode;
+  bossBest: Record<string, BossRecord>;
+  bossBonusAwarded: string[];
 };
 
 const emptyState: QuestState = {
@@ -23,6 +28,8 @@ const emptyState: QuestState = {
   stickers: [],
   selfChecks: [],
   audioMode: "app",
+  bossBest: {},
+  bossBonusAwarded: [],
 };
 
 function load(): QuestState {
@@ -63,6 +70,8 @@ type QuestContextValue = {
   isScreenDone: (lessonId: string, screen: ScreenId) => boolean;
   bossUnlocked: (lessonId: string) => boolean;
   defeatBoss: (lessonId: string) => void;
+  /** Records a won fight: best-record update + one-time star bonus. */
+  finishBossFight: (lessonId: string, hits: number, misses: number) => void;
   unlockSticker: (lessonId: string) => void;
   saveSelfCheck: (lessonId: string, answers: number[]) => void;
   setAudioMode: (mode: AudioMode) => void;
@@ -153,6 +162,22 @@ export function QuestProvider({ children }: { children: ReactNode }) {
         bossDefeated: prev.bossDefeated.includes(lessonId) ? prev.bossDefeated : [...prev.bossDefeated, lessonId],
         stickers: prev.stickers.includes(lessonId) ? prev.stickers : [...prev.stickers, lessonId],
       })),
+    finishBossFight: (lessonId, hits, misses) =>
+      setState((prev) => {
+        const best = prev.bossBest[lessonId];
+        const better = !best || misses < best.misses || (misses === best.misses && hits < best.hits);
+        const bonus = prev.bossBonusAwarded.includes(lessonId) ? 0 : BOSS_WIN_BONUS;
+        return {
+          ...prev,
+          bossBest: better ? { ...prev.bossBest, [lessonId]: { hits, misses } } : prev.bossBest,
+          bossBonusAwarded: bonus
+            ? [...prev.bossBonusAwarded, lessonId]
+            : prev.bossBonusAwarded,
+          starsByLesson: bonus
+            ? { ...prev.starsByLesson, [lessonId]: (prev.starsByLesson[lessonId] ?? 0) + bonus }
+            : prev.starsByLesson,
+        };
+      }),
     unlockSticker,
     saveSelfCheck: (lessonId, answers) =>
       setState((prev) => ({

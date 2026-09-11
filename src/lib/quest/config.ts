@@ -70,6 +70,35 @@ export type QuizItem = {
   answer: string;
 };
 
+/**
+ * Boss fight tuning, per lesson (all fields optional — see BOSS_FIGHT_DEFAULTS).
+ * The boss has HP; a correct answer deals `hpPerHit`, a miss lets the boss
+ * recover `bossRegen`. The fight ends only when HP reaches 0.
+ */
+export type BossFightConfig = {
+  minQuestions?: number;
+  hpPerHit?: number;
+  bossRegen?: number;
+  reviewQuestions?: number;
+  maxHp?: number;
+  /** Friendly (never scary!) boss character. */
+  name?: string;
+  emoji?: string;
+};
+
+export const BOSS_FIGHT_DEFAULTS = {
+  minQuestions: 12,
+  hpPerHit: 10,
+  bossRegen: 10,
+  reviewQuestions: 2,
+  maxHp: 100,
+  name: "Grammar Gremlin",
+  emoji: "\u{1F479}",
+} as const;
+
+/** One-time star bonus for defeating a lesson boss. */
+export const BOSS_WIN_BONUS = 5;
+
 export type Lesson = {
   id: string;
   number: number;
@@ -103,6 +132,8 @@ export type Lesson = {
   };
   selfCheck: string[];
   boss: QuizItem[];
+  /** Optional per-lesson boss fight tuning; omit to use BOSS_FIGHT_DEFAULTS. */
+  bossFight?: BossFightConfig;
   sticker: { name: string; emoji: string };
 };
 
@@ -347,6 +378,7 @@ const lesson1: Lesson = {
     { question: "Which word means 'a bright marker for important words'?", options: ["highlighter", "eraser", "stapler", "notebook"], answer: "highlighter" },
     { question: "___ you have a pencil case?", options: ["Do", "Does", "Is", "Have"], answer: "Do" },
   ],
+  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Backpack Bandit", emoji: "🧹" },
   sticker: { name: "Golden Backpack", emoji: "🎒" },
 };
 
@@ -492,6 +524,7 @@ const lesson2: Lesson = {
     { question: "Is it your football? (say NO)", options: ["No, it isn't.", "No, they aren't.", "No, I don't.", "No, it don't."], answer: "No, it isn't." },
     { question: "Which word means 'you wear it to see the time'?", options: ["watch", "wallet", "phone", "football"], answer: "watch" },
   ],
+  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Mix-Up Monster", emoji: "👽" },
   sticker: { name: "Treasure Chest", emoji: "🧰" },
 };
 
@@ -639,6 +672,7 @@ const lesson3: Lesson = {
     { question: "Which word means 'shows the time'?", options: ["clock", "map", "shelf", "drawer"], answer: "clock" },
     { question: "What are these? (many pencils, near you)", options: ["These are pencils.", "This is pencils.", "Those is pencils.", "That are pencils."], answer: "These are pencils." },
   ],
+  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Chalk Dust Dragon", emoji: "🐉" },
   sticker: { name: "Golden Whiteboard", emoji: "🏫" },
 };
 
