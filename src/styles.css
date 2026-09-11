@@ -219,3 +219,37 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+
+@keyframes quest-ouch {
+  0%,
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translateY(6px) scale(0.9) rotate(-7deg);
+  }
+  60% {
+    transform: translateY(-8px) scale(1.08) rotate(6deg);
+  }
+}
+
+@keyframes quest-regen {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.14) rotate(-4deg);
+  }
+  65% {
+    transform: scale(1.14) rotate(4deg);
+  }
+}
+
+@utility animate-ouch {
+  animation: quest-ouch 420ms ease;
+}
+
+@utility animate-regen {
+  animation: quest-regen 700ms ease-in-out;
+}
