@@ -12,8 +12,9 @@ function startsPlural(example: string) {
 /** Sentence opener for a card: near/far cue lessons use this/that/these/those. */
 function sayFrame(card: { word: string; example: string; cue?: "near" | "far"; many?: boolean }) {
   if (card.cue) {
-    if (card.cue === "near") return card.many ? "These are" : "This is a";
-    return card.many ? "Those are" : "That is a";
+    const article = /^[aeiou]/i.test(card.word) ? "an" : "a";
+    if (card.cue === "near") return card.many ? "These are" : `This is ${article}`;
+    return card.many ? "Those are" : `That is ${article}`;
   }
   return startsPlural(card.example) ? "They are" : "It is";
 }
