@@ -1,34 +1,146 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuest, type AudioMode } from "./store";
 
 const A1_RATE = 0.8;
 
+/* ---------------------------------------------------------------------------
+   Shared browser text-to-speech engine.
+
+   Chrome quirks this handles:
+   - getVoices() is empty on the first call and only fills after "voiceschanged",
+     so we cache voices when they arrive and NEVER block playback waiting for
+     them (no voice set => the browser uses its own default).
+   - speechSynthesis silently stalls after idle time, so we cancel() before every
+     utterance and nudge resume() with a watchdog if nothing starts/ends.
+   - Speech needs a user gesture, so the first tap anywhere "unlocks" the engine.
+--------------------------------------------------------------------------- */
+
+export function speechSupported() {
+  return typeof window !== "undefined" && "speechSynthesis" in window && !!window.speechSynthesis;
+}
+
+let voices: SpeechSynthesisVoice[] = [];
+let engineReady = false;
+const errorListeners = new Set<() => void>();
+
+function reportSpeechError() {
+  errorListeners.forEach((l) => l());
+}
+
+/** Subscribe to "the browser hiccuped" events so a button can offer a retry. */
+export function onSpeechError(listener: () => void) {
+  errorListeners.add(listener);
+  return () => errorListeners.delete(listener);
+}
+
+function refreshVoices() {
+  if (!speechSupported()) return;
+  const list = window.speechSynthesis.getVoices();
+  if (list && list.length) voices = list;
+}
+
+export function initSpeech() {
+  if (!speechSupported() || engineReady) return;
+  engineReady = true;
+  refreshVoices();
+  window.speechSynthesis.addEventListener?.("voiceschanged", refreshVoices);
+  // First real gesture unlocks Chrome's audio pipeline with a silent utterance.
+  const unlock = () => {
+    try {
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    } catch {
+      /* ignore — playback still works from the button itself */
+    }
+    refreshVoices();
+    window.removeEventListener("pointerdown", unlock);
+    window.removeEventListener("keydown", unlock);
+  };
+  window.addEventListener("pointerdown", unlock, { once: true });
+  window.addEventListener("keydown", unlock, { once: true });
+}
+
+function pickVoice() {
+  if (!voices.length) return undefined; // browser default — never block on this
+  return (
+    voices.find((v) => v.lang === "en-US" && v.localService) ??
+    voices.find((v) => v.lang === "en-US") ??
+    voices.find((v) => v.lang?.startsWith("en")) ??
+    undefined
+  );
+}
+
 export function cancelSpeech() {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  if (!speechSupported()) return;
   window.speechSynthesis.cancel();
 }
 
 export function speakText(text: string, opts: { rate?: number; onEnd?: () => void } = {}) {
-  if (typeof window === "undefined" || !window.speechSynthesis) {
+  if (!speechSupported()) {
     opts.onEnd?.();
     return;
   }
+  initSpeech();
+  refreshVoices();
+  const synth = window.speechSynthesis;
+  // Clear any stuck queue first — Chrome otherwise ignores new utterances.
+  synth.cancel();
+
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
+  const voice = pickVoice();
+  if (voice) utterance.voice = voice;
+  utterance.lang = voice?.lang ?? "en-US";
   utterance.rate = opts.rate ?? A1_RATE;
   utterance.pitch = 1.05;
-  if (opts.onEnd) {
-    let done = false;
-    const finish = () => {
+
+  let done = false;
+  let watchdog = 0;
+  let retried = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    window.clearTimeout(watchdog);
+    opts.onEnd?.();
+  };
+  utterance.onend = finish;
+  utterance.onerror = (e) => {
+    // "interrupted"/"canceled" are normal when the user stops or restarts audio.
+    const reason = (e as SpeechSynthesisErrorEvent).error;
+    if (reason && reason !== "interrupted" && reason !== "canceled") reportSpeechError();
+    finish();
+  };
+
+  const arm = () => {
+    watchdog = window.setTimeout(() => {
       if (done) return;
-      done = true;
-      opts.onEnd?.();
-    };
-    utterance.onend = finish;
-    // Chrome fires onerror (not onend) when speech is cancelled/interrupted.
-    utterance.onerror = finish;
+      // Chrome's known stall: nudge, then retry the utterance once.
+      synth.resume();
+      if (!retried) {
+        retried = true;
+        try {
+          synth.speak(utterance);
+        } catch {
+          reportSpeechError();
+          finish();
+          return;
+        }
+        arm();
+        return;
+      }
+      reportSpeechError();
+      finish();
+    }, 15000);
+  };
+
+  try {
+    synth.resume();
+    synth.speak(utterance);
+    arm();
+  } catch {
+    reportSpeechError();
+    finish();
   }
-  window.speechSynthesis.speak(utterance);
 }
 
 export function speakSequence(parts: string[], onDone?: () => void) {
@@ -48,6 +160,9 @@ export function speakSequence(parts: string[], onDone?: () => void) {
 export function useSpeak() {
   const { state } = useQuest();
   const enabled = state.audioMode === "app";
+  useEffect(() => {
+    initSpeech();
+  }, []);
   const speak = useCallback(
     (text: string | string[]) => {
       if (!enabled) return;
@@ -57,7 +172,7 @@ export function useSpeak() {
     },
     [enabled],
   );
-  return { speak, enabled, mode: state.audioMode };
+  return { speak, enabled, mode: state.audioMode, supported: speechSupported() };
 }
 
 export function openTeacherWindow(title: string, lines: string[]) {
@@ -198,20 +313,36 @@ export function SpeakerButton({
   label?: string;
   className?: string;
 }) {
-  const { speak, enabled } = useSpeak();
+  const { speak, enabled, supported } = useSpeak();
+  const [hiccup, setHiccup] = useState(false);
+  useEffect(() => {
+    const off = onSpeechError(() => setHiccup(true));
+    return () => {
+      off();
+    };
+  }, []);
   return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        speak(text);
-      }}
-      aria-label={`${label}: ${Array.isArray(text) ? text.join(" ") : text}`}
-      title={enabled ? label : "App audio is off in this mode"}
-      className={`btn-pop bg-gold px-3 py-2 text-sm text-gold-foreground ${
-        enabled ? "" : "opacity-50"
-      } ${className}`}
-    >
-      🔊
-    </button>
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setHiccup(false);
+          speak(text);
+        }}
+        aria-label={`${label}: ${Array.isArray(text) ? text.join(" ") : text}`}
+        title={enabled ? label : "App audio is off in this mode"}
+        className={`btn-pop bg-gold px-3 py-2 text-sm text-gold-foreground ${
+          enabled ? "" : "opacity-50"
+        } ${className}`}
+      >
+        🔊
+      </button>
+      {!supported && (
+        <span className="text-xs text-muted-foreground">
+          Audio isn't available in this browser — ask your teacher to read it aloud!
+        </span>
+      )}
+      {supported && hiccup && <span className="text-xs text-berry">Audio hiccup — tap again 🔁</span>}
+    </span>
   );
 }
