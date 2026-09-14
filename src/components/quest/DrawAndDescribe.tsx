@@ -62,7 +62,13 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
     drawing.current = false;
   }
 
+  /* Clear all asks once first: one accidental tap can never wipe a drawing. */
   function clearAll() {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      return;
+    }
+    setConfirmClear(false);
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
