@@ -11,15 +11,17 @@ import { bigCelebration, randomPraise, starBurst } from "@/lib/quest/fx";
  * attributes — answers are NEVER randomised.
  * ========================================================================== */
 
-type Ask = {
+export type Ask = {
   id: string;
   group: string;
   option: string;
   /** Full question read aloud, e.g. "Is she your mother?" */
   text: (f?: DetectiveFace) => string;
-  /** Truthful test against the chosen face. */
-  test: (f: DetectiveFace) => boolean;
-  /** How the app answers: subject form depends on the face. */
+  /** The attribute being asked about — gender-free, so it can never contradict. */
+  attr: (f: DetectiveFace) => boolean;
+  /** Set when the question itself names a gender ("Is she…?" / "Is he…?"). */
+  gender?: "female" | "male";
+  /** How the app answers: "they" questions use "Yes, they are!" */
   form: "she" | "he" | "they";
 };
 
@@ -27,30 +29,55 @@ const isChild = (f: DetectiveFace) => f.age < 13;
 const isYoung = (f: DetectiveFace) => f.age < 30;
 const isOld = (f: DetectiveFace) => f.age >= 60;
 
-const ASKS: Ask[] = [
-  { id: "she-woman", group: "Is she...?", option: "a woman?", text: () => "Is she a woman?", test: (f) => f.gender === "female", form: "she" },
-  { id: "she-mother", group: "Is she...?", option: "your mother?", text: () => "Is she your mother?", test: (f) => f.relation === "mother", form: "she" },
-  { id: "she-young", group: "Is she...?", option: "young?", text: () => "Is she young?", test: (f) => f.gender === "female" && isYoung(f), form: "she" },
-  { id: "she-old", group: "Is she...?", option: "old?", text: () => "Is she old?", test: (f) => f.gender === "female" && isOld(f), form: "she" },
-  { id: "he-man", group: "Is he...?", option: "a man?", text: () => "Is he a man?", test: (f) => f.gender === "male", form: "he" },
-  { id: "he-father", group: "Is he...?", option: "your father?", text: () => "Is he your father?", test: (f) => f.relation === "father", form: "he" },
-  { id: "he-young", group: "Is he...?", option: "young?", text: () => "Is he young?", test: (f) => f.gender === "male" && isYoung(f), form: "he" },
-  { id: "he-old", group: "Is he...?", option: "old?", text: () => "Is he old?", test: (f) => f.gender === "male" && isOld(f), form: "he" },
+export const ASKS: Ask[] = [
+  { id: "she-woman", group: "Is she...?", option: "a woman?", text: () => "Is she a woman?", attr: (f) => f.gender === "female", form: "she" },
+  { id: "she-mother", group: "Is she...?", option: "your mother?", text: () => "Is she your mother?", attr: (f) => f.relation === "mother", gender: "female", form: "she" },
+  { id: "she-young", group: "Is she...?", option: "young?", text: () => "Is she young?", attr: isYoung, gender: "female", form: "she" },
+  { id: "she-old", group: "Is she...?", option: "old?", text: () => "Is she old?", attr: isOld, gender: "female", form: "she" },
+  { id: "she-aunt", group: "Is she...?", option: "your aunt?", text: () => "Is she your aunt?", attr: (f) => f.relation === "aunt", gender: "female", form: "she" },
+  { id: "she-cousin", group: "Is she...?", option: "your cousin?", text: () => "Is she your cousin?", attr: (f) => f.relation === "cousin", gender: "female", form: "she" },
+  { id: "she-neighbor", group: "Is she...?", option: "your neighbor?", text: () => "Is she your neighbor?", attr: (f) => f.relation === "neighbor", gender: "female", form: "she" },
+  { id: "he-man", group: "Is he...?", option: "a man?", text: () => "Is he a man?", attr: (f) => f.gender === "male", form: "he" },
+  { id: "he-father", group: "Is he...?", option: "your father?", text: () => "Is he your father?", attr: (f) => f.relation === "father", gender: "male", form: "he" },
+  { id: "he-young", group: "Is he...?", option: "young?", text: () => "Is he young?", attr: isYoung, gender: "male", form: "he" },
+  { id: "he-old", group: "Is he...?", option: "old?", text: () => "Is he old?", attr: isOld, gender: "male", form: "he" },
+  { id: "he-uncle", group: "Is he...?", option: "your uncle?", text: () => "Is he your uncle?", attr: (f) => f.relation === "uncle", gender: "male", form: "he" },
+  { id: "he-cousin", group: "Is he...?", option: "your cousin?", text: () => "Is he your cousin?", attr: (f) => f.relation === "cousin", gender: "male", form: "he" },
+  { id: "he-neighbor", group: "Is he...?", option: "your neighbor?", text: () => "Is he your neighbor?", attr: (f) => f.relation === "neighbor", gender: "male", form: "he" },
   {
     id: "they-grandparents",
     group: "Are they...?",
     option: "your grandparents?",
     text: () => "Are they your grandparents?",
-    test: (f) => f.relation === "grandparent",
+    attr: (f) => f.relation === "grandparent",
     form: "they",
   },
-  { id: "they-children", group: "Are they...?", option: "children?", text: () => "Are they children?", test: isChild, form: "they" },
-  { id: "age-30", group: "Age", option: "over 30 years old?", text: (f) => (f && f.gender === "female" ? "Is she over 30 years old?" : "Is he over 30 years old?"), test: (f) => f.age > 30, form: "she" },
+  { id: "they-children", group: "Are they...?", option: "children?", text: () => "Are they children?", attr: isChild, form: "they" },
+  {
+    id: "age-30",
+    group: "Age",
+    option: "over 30 years old?",
+    text: (f) => (f && f.gender === "male" ? "Is he over 30 years old?" : "Is she over 30 years old?"),
+    attr: (f) => f.age > 30,
+    form: "she",
+  },
 ];
 
-/** Truthful spoken answer, matching the mystery person's own pronoun. */
-function answerFor(ask: Ask, face: DetectiveFace) {
-  const yes = ask.test(face);
+/** True only when BOTH the named gender (if any) and the attribute fit the face. */
+export const applies = (ask: Ask, f: DetectiveFace) => (!ask.gender || f.gender === ask.gender) && ask.attr(f);
+
+/**
+ * Truthful spoken answer. A gendered question about the wrong gender is never
+ * answered with a plain "No" about the attribute — that would mislead (a 70-year-old
+ * man is old even though "Is SHE old?" is No). Instead the app corrects the pronoun.
+ */
+export function answerFor(ask: Ask, face: DetectiveFace) {
+  if (ask.gender && face.gender !== ask.gender) {
+    return face.gender === "female"
+      ? "No — the mystery person is a girl or a woman! 👧"
+      : "No — the mystery person is a boy or a man! 👦";
+  }
+  const yes = ask.attr(face);
   if (ask.form === "they") return yes ? "Yes, they are!" : "No, they aren't!";
   const pronoun = face.gender === "female" ? "she" : "he";
   return yes ? `Yes, ${pronoun} is!` : `No, ${pronoun} isn't!`;
@@ -280,26 +307,47 @@ export function FamilyDetective({ lesson, onComplete }: { lesson: Lesson; onComp
  * "Your turn to hide!" — the learner secretly picks a face and answers the app's
  * Yes/No questions, so they practise both asking and answering the target forms.
  */
+/**
+ * Chooses the next question so the round can never contradict itself:
+ * - a gendered question ("Is she…?") is only asked once every remaining candidate
+ *   shares that gender, so the pronoun always matches the hidden person;
+ * - the question must split the remaining candidates, so every answer really
+ *   narrows things down and no answer can be "wrong" for the whole set.
+ */
+function nextAsk(candidates: DetectiveFace[], askedIds: string[]): Ask | null {
+  const genders = new Set(candidates.map((f) => f.gender));
+  const known = genders.size === 1 ? [...genders][0] : null;
+  return (
+    ASKS.find(
+      (a) =>
+        !askedIds.includes(a.id) &&
+        (!a.gender || a.gender === known) &&
+        candidates.some((f) => applies(a, f)) &&
+        candidates.some((f) => !applies(a, f)),
+    ) ?? null
+  );
+}
+
 function ReverseRound({ faces, onDone }: { faces: DetectiveFace[]; onDone: () => void }) {
   const { speak } = useSpeak();
-  const [step, setStep] = useState(0);
   const [candidates, setCandidates] = useState<DetectiveFace[]>(faces);
+  const [askedIds, setAskedIds] = useState<string[]>([]);
   const [guess, setGuess] = useState<DetectiveFace | null>(null);
-  const spoken = useRef<number>(-1);
+  const spoken = useRef<string>("");
 
-  const question = ASKS[step];
+  const question = useMemo(() => nextAsk(candidates, askedIds), [candidates, askedIds]);
 
   useEffect(() => {
     if (guess) return;
-    if (question && spoken.current !== step) {
-      spoken.current = step;
+    if (question && spoken.current !== question.id) {
+      spoken.current = question.id;
       speak(question.text(candidates[0]));
     }
-  }, [step, question, guess, speak, candidates]);
+  }, [question, guess, speak, candidates]);
 
   useEffect(() => {
-    if (!guess && (candidates.length === 1 || !ASKS[step])) setGuess(candidates[0] ?? null);
-  }, [candidates, step, guess]);
+    if (!guess && (candidates.length === 1 || !question)) setGuess(candidates[0] ?? null);
+  }, [candidates, question, guess]);
 
   if (guess) {
     return (
@@ -316,11 +364,8 @@ function ReverseRound({ faces, onDone }: { faces: DetectiveFace[]; onDone: () =>
 
   function reply(yes: boolean) {
     if (!question) return;
-    setCandidates((list) => {
-      const next = list.filter((f) => question.test(f) === yes);
-      return next.length ? next : list;
-    });
-    setStep((s) => s + 1);
+    setCandidates((list) => list.filter((f) => applies(question, f) === yes));
+    setAskedIds((ids) => [...ids, question.id]);
   }
 
   return (
