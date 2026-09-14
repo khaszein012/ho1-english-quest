@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import type { Lesson } from "@/lib/quest/config";
 import { AudioModePanel, SpeakerButton } from "@/lib/quest/audio";
 import { starBurst } from "@/lib/quest/fx";
+import { DrawAndDescribe } from "./DrawAndDescribe";
 
 export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const rp = lesson.rolePlay;
@@ -89,6 +90,10 @@ export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
           </p>
         )}
       </div>
+
+      {rp.drawAndDescribe && <DrawAndDescribe checklist={rp.drawChecklist ?? rp.prompts} />}
+
+
 
       <div className="card-quest space-y-3 p-5">
         <h3 className="font-display text-xl font-bold">Homework 🏠</h3>

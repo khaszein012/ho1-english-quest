@@ -102,6 +102,26 @@ export const BOSS_FIGHT_DEFAULTS = {
 /** One-time star bonus for defeating a lesson boss. */
 export const BOSS_WIN_BONUS = 5;
 
+/**
+ * One face in the "Family Detective 🕵️" practice game. All answers the app gives
+ * are derived truthfully from these attributes — nothing is randomised.
+ */
+export type DetectiveFace = {
+  id: string;
+  name: string;
+  age: number;
+  emoji: string;
+  gender: "female" | "male";
+  /** Relation used by "Is she your mother?" style questions. */
+  relation: "mother" | "father" | "grandparent" | "aunt" | "uncle" | "cousin" | "neighbor";
+};
+
+export type DetectiveConfig = {
+  title: string;
+  instructions: string;
+  faces: DetectiveFace[];
+};
+
 export type Lesson = {
   id: string;
   number: number;
@@ -111,6 +131,11 @@ export type Lesson = {
   sentenceFrames: string[];
   speedRoundSeconds: number;
   vocabulary: VocabWord[];
+  /**
+   * Words taught in an earlier course. They join the Match It / Listen & Pick
+   * pools but never count toward this lesson's words-learned bar or sticker.
+   */
+  reviewVocabulary?: VocabWord[];
   grammar: {
     title: string;
     explanation: string;
@@ -120,11 +145,18 @@ export type Lesson = {
   };
   expressions: { prompt: string; answer: string }[];
   practice: { title: string; instructions: string };
+  /** Which practice game this lesson uses. Omit for the classic flip-card game. */
+  practiceGame?: "flip_and_say" | "detective";
+  /** Required when practiceGame is "detective". */
+  detective?: DetectiveConfig;
   reading: {
     title: string;
+    /** Leave empty and set `placeholder` while the passage is still pending. */
     paragraphs: string[];
     questions: QuizItem[];
-    stretchQuestion: string;
+    stretchQuestion?: string;
+    /** Shown instead of the passage when `paragraphs` is empty. */
+    placeholder?: string;
     spotlight: Spotlight;
   };
   rolePlay: {
@@ -132,6 +164,10 @@ export type Lesson = {
     prompts: string[];
     twists: string[];
     homework: string;
+    /** Set true to show the "Draw & Describe ✏️" sketchpad on this lesson. */
+    drawAndDescribe?: boolean;
+    /** Checklist shown beside the sketchpad. */
+    drawChecklist?: string[];
   };
   selfCheck: string[];
   boss: QuizItem[];
@@ -679,6 +715,167 @@ const lesson3: Lesson = {
   sticker: { name: "Golden Whiteboard", emoji: "🏫" },
 };
 
-export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3];
+const lesson4: Lesson = {
+  id: "lesson-4",
+  number: 4,
+  title: "Family, Friends & Neighbors",
+  subtitle: "Is she? / Is he? / Are they?",
+  emoji: "👨‍👩‍👧‍👦",
+  sentenceFrames: ["Is she your ___?", "Is he your ___?", "Are they your ___?", "___ is ___ years old."],
+  speedRoundSeconds: 10,
+  vocabulary: [
+    { word: "aunt", meaning: "your mother's or father's sister", example: "She is my aunt.", emoji: "👩" },
+    { word: "uncle", meaning: "your mother's or father's brother", example: "Is he your uncle?", emoji: "🧔" },
+    { word: "cousin", meaning: "your aunt's or uncle's child", example: "My cousin is 14 years old.", emoji: "🧒" },
+    {
+      word: "grandparents",
+      meaning: "grandmother + grandfather together (always plural!)",
+      example: "They are my grandparents.",
+      emoji: "👴👵",
+      tag: "Always plural!",
+    },
+    { word: "neighbor", meaning: "someone who lives near your house", example: "Our neighbor is kind.", emoji: "🏠" },
+    {
+      word: "children",
+      meaning: "more than one child (always plural!)",
+      example: "They have three children.",
+      emoji: "🧒🧒",
+      tag: "Always plural!",
+    },
+  ],
+  // Taught in an earlier course: they join the games, but not the words-learned bar.
+  reviewVocabulary: [
+    { word: "mother", meaning: "your female parent", example: "Is she your mother?", emoji: "👩" },
+    { word: "father", meaning: "your male parent", example: "He is my father.", emoji: "👨" },
+    { word: "brother", meaning: "a boy with the same parents as you", example: "My brother is 15.", emoji: "👦" },
+    { word: "sister", meaning: "a girl with the same parents as you", example: "She is my sister.", emoji: "👧" },
+    { word: "grandmother", meaning: "your mother's or father's mother", example: "My grandmother is kind.", emoji: "👵" },
+    { word: "grandfather", meaning: "your mother's or father's father", example: "My grandfather is 72.", emoji: "👴" },
+    { word: "parents", meaning: "your mother and father together", example: "They are my parents.", emoji: "👫" },
+  ],
+  grammar: {
+    title: "Is she? / Is he? / Are they?",
+    explanation:
+      "To ask about ONE girl or woman, start with Is she. For ONE boy or man, start with Is he. For MANY people, start with Are they. To say an age: ___ is ___ years old.",
+    patterns: [
+      { subject: "Is she", verb: "", rest: "your mother?", note: "Yes, she is. / No, she isn't." },
+      { subject: "Is he", verb: "", rest: "your uncle?", note: "Yes, he is. / No, he isn't." },
+      { subject: "Are they", verb: "", rest: "your grandparents?", note: "Yes, they are. / No, they aren't." },
+      { subject: "My cousin", verb: "is", rest: "14 years old.", note: "___ is ___ years old." },
+    ],
+    examples: [
+      "Is she your aunt?",
+      "No, she isn't. She's my mother.",
+      "Are they your grandparents?",
+      "My uncle is 35 years old.",
+    ],
+    yourTurn: [
+      { question: "___ she your aunt?", options: ["Is", "Are", "Am"], answer: "Is" },
+      {
+        question: "Are they your ___? (two older people)",
+        options: ["grandparents", "grandfather", "cousin"],
+        answer: "grandparents",
+      },
+      { question: "My uncle ___ 35 years old.", options: ["are", "is", "am"], answer: "is" },
+    ],
+  },
+  expressions: [
+    { prompt: "Is she your mother?", answer: "Yes, she is." },
+    { prompt: "Is he your uncle?", answer: "No, he isn't. He's my father." },
+    { prompt: "Are they your grandparents?", answer: "Yes, they are." },
+    { prompt: "How old is your cousin?", answer: "She is 14 years old." },
+    { prompt: "Who is your neighbor?", answer: "Our neighbor is Mr. Budi. He is kind." },
+    { prompt: "Do you have any cousins?", answer: "Yes, I have two cousins." },
+  ],
+  practice: {
+    title: "Family Detective 🕵️",
+    instructions:
+      "I picked one secret person from the family. Ask Yes/No questions — Is she...? Is he...? Are they...? — then tap the faces you can cross out. When you're sure, tap I know who! Fewer questions = more stars!",
+  },
+  practiceGame: "detective",
+  detective: {
+    title: "The Santoso Family",
+    instructions: "Tap a question to ask it out loud. Grey out the people it can't be.",
+    faces: [
+      { id: "f1", name: "Grandpa Hasan", age: 72, emoji: "👴", gender: "male", relation: "grandparent" },
+      { id: "f2", name: "Grandma Siti", age: 70, emoji: "👵", gender: "female", relation: "grandparent" },
+      { id: "f3", name: "Mrs. Dewi", age: 41, emoji: "👩", gender: "female", relation: "mother" },
+      { id: "f4", name: "Mr. Rudi", age: 44, emoji: "👨", gender: "male", relation: "father" },
+      { id: "f5", name: "Aunt Lina", age: 36, emoji: "👩‍🦰", gender: "female", relation: "aunt" },
+      { id: "f6", name: "Uncle Bayu", age: 38, emoji: "🧔", gender: "male", relation: "uncle" },
+      { id: "f7", name: "Nadia", age: 14, emoji: "👧", gender: "female", relation: "cousin" },
+      { id: "f8", name: "Tomi", age: 11, emoji: "👦", gender: "male", relation: "cousin" },
+      { id: "f9", name: "Rina", age: 8, emoji: "🧒", gender: "female", relation: "cousin" },
+      { id: "f10", name: "Mr. Budi", age: 58, emoji: "👨‍🦳", gender: "male", relation: "neighbor" },
+    ],
+  },
+  reading: {
+    title: "Different Kinds of Families",
+    // Passage, questions and in-passage word hunt are pure config — fill them in later.
+    paragraphs: [],
+    placeholder: "Reading passage coming soon — the tutor will add the text.",
+    questions: [],
+    spotlight: {
+      sound: "soft C and hard C",
+      exampleWord: "city",
+      instruction:
+        "Listen to each word, then drop it in the right basket: soft C like CITY (ssss) or hard C like CAR (k). Use the speaker first — this is about hearing, not spelling!",
+      words: ["bicycle", "cell phone", "city", "car", "color", "computer", "cupboard"],
+      mode: "sound_sort",
+      sortStyle: "two_buckets",
+      buckets: [
+        { id: "soft-c", label: "Soft C — like CITY (ssss sound)" },
+        { id: "hard-c", label: "Hard C — like CAR (k sound)" },
+      ],
+      sortWords: [
+        { word: "bicycle", emoji: "🚲", bucket: "soft-c" },
+        { word: "cell phone", emoji: "📱", bucket: "soft-c" },
+        { word: "city", emoji: "🏙️", bucket: "soft-c" },
+        { word: "car", emoji: "🚗", bucket: "hard-c" },
+        { word: "color", emoji: "🎨", bucket: "hard-c" },
+        { word: "computer", emoji: "💻", bucket: "hard-c" },
+        { word: "cupboard", emoji: "🗄️", bucket: "hard-c" },
+      ],
+      note: "You already knew bicycle (Lesson 2), computer and cupboard (Lesson 3), and city from before — the soft/hard C sounds were hiding in words you already own!",
+    },
+  },
+  rolePlay: {
+    title: "Draw My Family",
+    prompts: [
+      "Draw and describe 3 people in your family.",
+      "Say each one's name and age: 'This is my ___. He/She is ___ years old.'",
+      "Ask your teacher 2 Yes/No questions about THEIR family.",
+    ],
+    twists: [
+      "My cousin is only 2 years old — she's a baby!",
+      "My uncle lives in a different city — I never see him!",
+    ],
+    homework:
+      "Interview someone at home in English! Ask their name and age, and one thing they like. Then record your report: 'This is my ___. He/She is ___ years old. He/She likes ___.' If nobody can answer in English, that's OK — ask the questions and answer them for that person yourself.",
+    drawAndDescribe: true,
+    drawChecklist: [
+      "Draw 3 family members (stick figures are perfect!)",
+      "Describe each one: 'This is my ___. He/She is ___ years old.'",
+      "Let your teacher guess who is who!",
+    ],
+  },
+  selfCheck: [
+    "Can I ask 'Is she/he your ___?' correctly?",
+    "Can I ask 'Are they your ___?' for plural people?",
+    "Can I say someone's age: 'He is ___ years old'?",
+    "Can I guess a mystery person using Yes/No questions?",
+  ],
+  boss: [
+    { question: "___ she your aunt?", options: ["Is", "Are", "Am", "Do"], answer: "Is" },
+    { question: "Are they your grandparents? (say YES)", options: ["Yes, they are.", "Yes, she is.", "Yes, he is.", "Yes, it is."], answer: "Yes, they are." },
+    { question: "My cousin ___ 14 years old.", options: ["is", "are", "am", "be"], answer: "is" },
+    { question: "Which word means 'someone who lives near your house'?", options: ["neighbor", "cousin", "uncle", "aunt"], answer: "neighbor" },
+    { question: "Which word is ALWAYS plural?", options: ["children", "child", "cousin", "aunt"], answer: "children" },
+  ],
+  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Question Kraken", emoji: "🐙" },
+  sticker: { name: "Family Photo Frame", emoji: "🖼️" },
+};
+
+export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3, lesson4];
 
 

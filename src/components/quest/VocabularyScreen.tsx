@@ -15,6 +15,15 @@ const MODES: { id: Mode; label: string }[] = [
   { id: "say", label: "Say It 🗣️" },
 ];
 
+/**
+ * Match It and Listen & Pick mix the lesson's new words with its optional review
+ * words (taught in an earlier course). Review words never change the
+ * words-learned bar, which counts `lesson.vocabulary` only.
+ */
+function gamePool(lesson: Lesson): VocabWord[] {
+  return [...lesson.vocabulary, ...(lesson.reviewVocabulary ?? [])];
+}
+
 export function VocabularyScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const [mode, setMode] = useState<Mode>("cards");
   const { wordsLearned } = useQuest();
@@ -87,9 +96,11 @@ function WordCards({ lesson, onComplete }: { lesson: Lesson; onComplete: () => v
 function MatchIt({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars, markWordCorrect } = useQuest();
   const [round, setRound] = useState(0);
+  // New words + any earlier-course review words for this lesson.
+  const pool = gamePool(lesson);
   // Clamped to the lesson's own word count so any vocabulary length works.
-  const pairCount = Math.min(GAME_TUNING.matchPairsPerRound, lesson.vocabulary.length);
-  const picks = useMemo(() => shuffle(lesson.vocabulary).slice(0, pairCount), [lesson, pairCount, round]);
+  const pairCount = Math.min(GAME_TUNING.matchPairsPerRound, pool.length);
+  const picks = useMemo(() => shuffle(pool).slice(0, pairCount), [lesson, pairCount, round]);
   const meanings = useMemo(() => shuffle(picks), [picks]);
   const [selected, setSelected] = useState<string | null>(null);
   const [matched, setMatched] = useState<string[]>([]);
@@ -174,12 +185,13 @@ function ListenAndPick({ lesson, onComplete }: { lesson: Lesson; onComplete: () 
   const [score, setScore] = useState(0);
   const [reveal, setReveal] = useState(false);
   const [wrong, setWrong] = useState<string | null>(null);
-  const total = Math.min(GAME_TUNING.listenRounds, Math.max(1, lesson.vocabulary.length * 2));
+  const pool = gamePool(lesson);
+  const total = Math.min(GAME_TUNING.listenRounds, Math.max(1, pool.length * 2));
 
   const rounds = useMemo(
     () =>
       Array.from({ length: total }, () => {
-        const options = shuffle(lesson.vocabulary).slice(0, Math.min(GAME_TUNING.listenOptions, lesson.vocabulary.length));
+        const options = shuffle(pool).slice(0, Math.min(GAME_TUNING.listenOptions, pool.length));
         const target = options[Math.floor(Math.random() * options.length)]!;
         return { options, target };
       }),
