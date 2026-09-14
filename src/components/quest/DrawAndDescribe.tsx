@@ -17,6 +17,7 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
   const [eraser, setEraser] = useState(false);
   const [big, setBig] = useState(false);
   const [done, setDone] = useState<number[]>([]);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,7 +63,13 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
     drawing.current = false;
   }
 
+  /* Clear all asks once first: one accidental tap can never wipe a drawing. */
   function clearAll() {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      return;
+    }
+    setConfirmClear(false);
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -109,9 +116,23 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
         >
           Eraser 🧽
         </button>
-        <button onClick={clearAll} className="btn-pop bg-secondary px-3 py-2 text-base text-secondary-foreground">
-          Clear all 🗑️
-        </button>
+        {confirmClear ? (
+          <>
+            <button onClick={clearAll} className="btn-pop bg-destructive px-3 py-2 text-base text-destructive-foreground">
+              Yes, erase everything 🗑️
+            </button>
+            <button
+              onClick={() => setConfirmClear(false)}
+              className="btn-pop bg-secondary px-3 py-2 text-base text-secondary-foreground"
+            >
+              Keep my drawing 💚
+            </button>
+          </>
+        ) : (
+          <button onClick={clearAll} className="btn-pop bg-secondary px-3 py-2 text-base text-secondary-foreground">
+            Clear all 🗑️
+          </button>
+        )}
       </div>
       <canvas
         ref={canvasRef}
