@@ -3,6 +3,7 @@ import type { Lesson } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
 import { SpeakerButton } from "@/lib/quest/audio";
 import { randomPraise, shuffle, starBurst, bigCelebration } from "@/lib/quest/fx";
+import { FamilyDetective } from "./FamilyDetective";
 
 /** Words like "headphones" use "They are" — read from each word's own example sentence. */
 function startsPlural(example: string) {
@@ -53,7 +54,13 @@ function DistanceFrame({ emoji, cue }: { emoji: string; cue: "near" | "far" }) {
   );
 }
 
+/** Each lesson chooses its practice game in config: "flip_and_say" (default) or "detective". */
 export function PracticeScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
+  if (lesson.practiceGame === "detective") return <FamilyDetective lesson={lesson} onComplete={onComplete} />;
+  return <FlipAndSay lesson={lesson} onComplete={onComplete} />;
+}
+
+function FlipAndSay({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars, markWordCorrect } = useQuest();
   const [round, setRound] = useState(0);
   const cards = useMemo(() => shuffle(lesson.vocabulary), [lesson, round]);

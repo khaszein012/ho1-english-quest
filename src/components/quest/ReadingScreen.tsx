@@ -134,6 +134,15 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
 
       <AudioModePanel scriptTitle={r.title} scriptLines={r.paragraphs} />
 
+      {/* A lesson may ship without its passage yet: config-only placeholder, no component change. */}
+      {r.paragraphs.length === 0 ? (
+        <div className="card-quest space-y-2 border-dashed p-6 text-center">
+          <p className="text-5xl">📖</p>
+          <p className="font-display text-xl font-bold">
+            {r.placeholder ?? "Reading passage coming soon — the tutor will add the text."}
+          </p>
+        </div>
+      ) : (
       <div className="card-quest space-y-4 p-5 sm:p-7">
         <div className="flex flex-wrap items-center gap-3">
           <button
@@ -201,6 +210,7 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
           ))}
         </div>
       </div>
+      )}
 
       {soundSort ? (
         <SoundSortSpotlight
@@ -228,7 +238,11 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
 
       <div className="card-quest space-y-4 p-5">
         <h3 className="font-display text-xl font-bold">Comprehension Questions</h3>
-        {!question ? (
+        {r.questions.length === 0 ? (
+          <p className="rounded-2xl bg-secondary/70 px-4 py-3 text-lg text-muted-foreground">
+            Questions coming soon — they arrive with the passage.
+          </p>
+        ) : !question ? (
           <p className="animate-pop-in rounded-2xl bg-grass px-4 py-3 font-display text-xl font-bold text-gold-foreground">
             All {r.questions.length} questions done! ⭐ {randomPraise()}
           </p>
@@ -277,11 +291,13 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         )}
       </div>
 
-      <div className="card-quest space-y-2 border-dashed p-5">
-        <h3 className="font-display text-xl font-bold">Stretch question 🌱 (tutor asks aloud)</h3>
-        <p className="text-xl">{r.stretchQuestion}</p>
-        <p className="text-sm text-muted-foreground">No score here — just talk about it together.</p>
-      </div>
+      {r.stretchQuestion && (
+        <div className="card-quest space-y-2 border-dashed p-5">
+          <h3 className="font-display text-xl font-bold">Stretch question 🌱 (tutor asks aloud)</h3>
+          <p className="text-xl">{r.stretchQuestion}</p>
+          <p className="text-sm text-muted-foreground">No score here — just talk about it together.</p>
+        </div>
+      )}
     </div>
   );
 }
