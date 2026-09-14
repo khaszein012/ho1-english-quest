@@ -17,6 +17,7 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
   const [eraser, setEraser] = useState(false);
   const [big, setBig] = useState(false);
   const [done, setDone] = useState<number[]>([]);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
