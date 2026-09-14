@@ -315,7 +315,12 @@ export function SpeakerButton({
 }) {
   const { speak, enabled, supported } = useSpeak();
   const [hiccup, setHiccup] = useState(false);
-  useEffect(() => onSpeechError(() => setHiccup(true)), []);
+  useEffect(() => {
+    const off = onSpeechError(() => setHiccup(true));
+    return () => {
+      off();
+    };
+  }, []);
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
       <button
