@@ -313,20 +313,31 @@ export function SpeakerButton({
   label?: string;
   className?: string;
 }) {
-  const { speak, enabled } = useSpeak();
+  const { speak, enabled, supported } = useSpeak();
+  const [hiccup, setHiccup] = useState(false);
+  useEffect(() => onSpeechError(() => setHiccup(true)), []);
   return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        speak(text);
-      }}
-      aria-label={`${label}: ${Array.isArray(text) ? text.join(" ") : text}`}
-      title={enabled ? label : "App audio is off in this mode"}
-      className={`btn-pop bg-gold px-3 py-2 text-sm text-gold-foreground ${
-        enabled ? "" : "opacity-50"
-      } ${className}`}
-    >
-      🔊
-    </button>
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setHiccup(false);
+          speak(text);
+        }}
+        aria-label={`${label}: ${Array.isArray(text) ? text.join(" ") : text}`}
+        title={enabled ? label : "App audio is off in this mode"}
+        className={`btn-pop bg-gold px-3 py-2 text-sm text-gold-foreground ${
+          enabled ? "" : "opacity-50"
+        } ${className}`}
+      >
+        🔊
+      </button>
+      {!supported && (
+        <span className="text-xs text-muted-foreground">
+          Audio isn't available in this browser — ask your teacher to read it aloud!
+        </span>
+      )}
+      {supported && hiccup && <span className="text-xs text-berry">Audio hiccup — tap again 🔁</span>}
+    </span>
   );
 }
