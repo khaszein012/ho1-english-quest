@@ -116,9 +116,23 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
         >
           Eraser 🧽
         </button>
-        <button onClick={clearAll} className="btn-pop bg-secondary px-3 py-2 text-base text-secondary-foreground">
-          Clear all 🗑️
-        </button>
+        {confirmClear ? (
+          <>
+            <button onClick={clearAll} className="btn-pop bg-flame px-3 py-2 text-base text-gold-foreground">
+              Yes, erase everything 🗑️
+            </button>
+            <button
+              onClick={() => setConfirmClear(false)}
+              className="btn-pop bg-secondary px-3 py-2 text-base text-secondary-foreground"
+            >
+              Keep my drawing 💚
+            </button>
+          </>
+        ) : (
+          <button onClick={clearAll} className="btn-pop bg-secondary px-3 py-2 text-base text-secondary-foreground">
+            Clear all 🗑️
+          </button>
+        )}
       </div>
       <canvas
         ref={canvasRef}
