@@ -118,7 +118,7 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
         </button>
         {confirmClear ? (
           <>
-            <button onClick={clearAll} className="btn-pop bg-flame px-3 py-2 text-base text-gold-foreground">
+            <button onClick={clearAll} className="btn-pop bg-destructive px-3 py-2 text-base text-destructive-foreground">
               Yes, erase everything 🗑️
             </button>
             <button
