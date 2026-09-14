@@ -301,26 +301,47 @@ export function FamilyDetective({ lesson, onComplete }: { lesson: Lesson; onComp
  * "Your turn to hide!" — the learner secretly picks a face and answers the app's
  * Yes/No questions, so they practise both asking and answering the target forms.
  */
+/**
+ * Chooses the next question so the round can never contradict itself:
+ * - a gendered question ("Is she…?") is only asked once every remaining candidate
+ *   shares that gender, so the pronoun always matches the hidden person;
+ * - the question must split the remaining candidates, so every answer really
+ *   narrows things down and no answer can be "wrong" for the whole set.
+ */
+function nextAsk(candidates: DetectiveFace[], askedIds: string[]): Ask | null {
+  const genders = new Set(candidates.map((f) => f.gender));
+  const known = genders.size === 1 ? [...genders][0] : null;
+  return (
+    ASKS.find(
+      (a) =>
+        !askedIds.includes(a.id) &&
+        (!a.gender || a.gender === known) &&
+        candidates.some((f) => applies(a, f)) &&
+        candidates.some((f) => !applies(a, f)),
+    ) ?? null
+  );
+}
+
 function ReverseRound({ faces, onDone }: { faces: DetectiveFace[]; onDone: () => void }) {
   const { speak } = useSpeak();
-  const [step, setStep] = useState(0);
   const [candidates, setCandidates] = useState<DetectiveFace[]>(faces);
+  const [askedIds, setAskedIds] = useState<string[]>([]);
   const [guess, setGuess] = useState<DetectiveFace | null>(null);
-  const spoken = useRef<number>(-1);
+  const spoken = useRef<string>("");
 
-  const question = ASKS[step];
+  const question = useMemo(() => nextAsk(candidates, askedIds), [candidates, askedIds]);
 
   useEffect(() => {
     if (guess) return;
-    if (question && spoken.current !== step) {
-      spoken.current = step;
+    if (question && spoken.current !== question.id) {
+      spoken.current = question.id;
       speak(question.text(candidates[0]));
     }
-  }, [step, question, guess, speak, candidates]);
+  }, [question, guess, speak, candidates]);
 
   useEffect(() => {
-    if (!guess && (candidates.length === 1 || !ASKS[step])) setGuess(candidates[0] ?? null);
-  }, [candidates, step, guess]);
+    if (!guess && (candidates.length === 1 || !question)) setGuess(candidates[0] ?? null);
+  }, [candidates, question, guess]);
 
   if (guess) {
     return (
@@ -337,11 +358,8 @@ function ReverseRound({ faces, onDone }: { faces: DetectiveFace[]; onDone: () =>
 
   function reply(yes: boolean) {
     if (!question) return;
-    setCandidates((list) => {
-      const next = list.filter((f) => question.test(f) === yes);
-      return next.length ? next : list;
-    });
-    setStep((s) => s + 1);
+    setCandidates((list) => list.filter((f) => applies(question, f) === yes));
+    setAskedIds((ids) => [...ids, question.id]);
   }
 
   return (
