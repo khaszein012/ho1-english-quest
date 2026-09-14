@@ -11,15 +11,17 @@ import { bigCelebration, randomPraise, starBurst } from "@/lib/quest/fx";
  * attributes — answers are NEVER randomised.
  * ========================================================================== */
 
-type Ask = {
+export type Ask = {
   id: string;
   group: string;
   option: string;
   /** Full question read aloud, e.g. "Is she your mother?" */
   text: (f?: DetectiveFace) => string;
-  /** Truthful test against the chosen face. */
-  test: (f: DetectiveFace) => boolean;
-  /** How the app answers: subject form depends on the face. */
+  /** The attribute being asked about — gender-free, so it can never contradict. */
+  attr: (f: DetectiveFace) => boolean;
+  /** Set when the question itself names a gender ("Is she…?" / "Is he…?"). */
+  gender?: "female" | "male";
+  /** How the app answers: "they" questions use "Yes, they are!" */
   form: "she" | "he" | "they";
 };
 
@@ -27,30 +29,49 @@ const isChild = (f: DetectiveFace) => f.age < 13;
 const isYoung = (f: DetectiveFace) => f.age < 30;
 const isOld = (f: DetectiveFace) => f.age >= 60;
 
-const ASKS: Ask[] = [
-  { id: "she-woman", group: "Is she...?", option: "a woman?", text: () => "Is she a woman?", test: (f) => f.gender === "female", form: "she" },
-  { id: "she-mother", group: "Is she...?", option: "your mother?", text: () => "Is she your mother?", test: (f) => f.relation === "mother", form: "she" },
-  { id: "she-young", group: "Is she...?", option: "young?", text: () => "Is she young?", test: (f) => f.gender === "female" && isYoung(f), form: "she" },
-  { id: "she-old", group: "Is she...?", option: "old?", text: () => "Is she old?", test: (f) => f.gender === "female" && isOld(f), form: "she" },
-  { id: "he-man", group: "Is he...?", option: "a man?", text: () => "Is he a man?", test: (f) => f.gender === "male", form: "he" },
-  { id: "he-father", group: "Is he...?", option: "your father?", text: () => "Is he your father?", test: (f) => f.relation === "father", form: "he" },
-  { id: "he-young", group: "Is he...?", option: "young?", text: () => "Is he young?", test: (f) => f.gender === "male" && isYoung(f), form: "he" },
-  { id: "he-old", group: "Is he...?", option: "old?", text: () => "Is he old?", test: (f) => f.gender === "male" && isOld(f), form: "he" },
+export const ASKS: Ask[] = [
+  { id: "she-woman", group: "Is she...?", option: "a woman?", text: () => "Is she a woman?", attr: (f) => f.gender === "female", form: "she" },
+  { id: "she-mother", group: "Is she...?", option: "your mother?", text: () => "Is she your mother?", attr: (f) => f.relation === "mother", gender: "female", form: "she" },
+  { id: "she-young", group: "Is she...?", option: "young?", text: () => "Is she young?", attr: isYoung, gender: "female", form: "she" },
+  { id: "she-old", group: "Is she...?", option: "old?", text: () => "Is she old?", attr: isOld, gender: "female", form: "she" },
+  { id: "he-man", group: "Is he...?", option: "a man?", text: () => "Is he a man?", attr: (f) => f.gender === "male", form: "he" },
+  { id: "he-father", group: "Is he...?", option: "your father?", text: () => "Is he your father?", attr: (f) => f.relation === "father", gender: "male", form: "he" },
+  { id: "he-young", group: "Is he...?", option: "young?", text: () => "Is he young?", attr: isYoung, gender: "male", form: "he" },
+  { id: "he-old", group: "Is he...?", option: "old?", text: () => "Is he old?", attr: isOld, gender: "male", form: "he" },
   {
     id: "they-grandparents",
     group: "Are they...?",
     option: "your grandparents?",
     text: () => "Are they your grandparents?",
-    test: (f) => f.relation === "grandparent",
+    attr: (f) => f.relation === "grandparent",
     form: "they",
   },
-  { id: "they-children", group: "Are they...?", option: "children?", text: () => "Are they children?", test: isChild, form: "they" },
-  { id: "age-30", group: "Age", option: "over 30 years old?", text: (f) => (f && f.gender === "female" ? "Is she over 30 years old?" : "Is he over 30 years old?"), test: (f) => f.age > 30, form: "she" },
+  { id: "they-children", group: "Are they...?", option: "children?", text: () => "Are they children?", attr: isChild, form: "they" },
+  {
+    id: "age-30",
+    group: "Age",
+    option: "over 30 years old?",
+    text: (f) => (f && f.gender === "male" ? "Is he over 30 years old?" : "Is she over 30 years old?"),
+    attr: (f) => f.age > 30,
+    form: "she",
+  },
 ];
 
-/** Truthful spoken answer, matching the mystery person's own pronoun. */
-function answerFor(ask: Ask, face: DetectiveFace) {
-  const yes = ask.test(face);
+/** True only when BOTH the named gender (if any) and the attribute fit the face. */
+export const applies = (ask: Ask, f: DetectiveFace) => (!ask.gender || f.gender === ask.gender) && ask.attr(f);
+
+/**
+ * Truthful spoken answer. A gendered question about the wrong gender is never
+ * answered with a plain "No" about the attribute — that would mislead (a 70-year-old
+ * man is old even though "Is SHE old?" is No). Instead the app corrects the pronoun.
+ */
+export function answerFor(ask: Ask, face: DetectiveFace) {
+  if (ask.gender && face.gender !== ask.gender) {
+    return face.gender === "female"
+      ? "No — the mystery person is a girl or a woman! 👧"
+      : "No — the mystery person is a boy or a man! 👦";
+  }
+  const yes = ask.attr(face);
   if (ask.form === "they") return yes ? "Yes, they are!" : "No, they aren't!";
   const pronoun = face.gender === "female" ? "she" : "he";
   return yes ? `Yes, ${pronoun} is!` : `No, ${pronoun} isn't!`;
