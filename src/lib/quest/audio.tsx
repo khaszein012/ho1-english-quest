@@ -264,7 +264,7 @@ export function AudioModePanel({
 
       {state.audioMode === "device" && (
         <p className="mt-3 rounded-xl bg-secondary/70 px-3 py-2 text-sm text-muted-foreground">
-          Send Arsyad this page link so he plays the audio on his own device, then follow along together.
+          Send {state.studentName} this page link to play the audio on their own device, then follow along together.
         </p>
       )}
 
@@ -297,7 +297,7 @@ export function AudioModePanel({
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
           <li>Re-share your screen with "Share sound" ticked.</li>
           <li>Switch to Teacher Reads mode and read aloud yourself.</li>
-          <li>Send Arsyad the link so he plays audio on his own device.</li>
+          <li>Send {state.studentName} the link to play audio on their own device.</li>
         </ul>
       )}
     </div>

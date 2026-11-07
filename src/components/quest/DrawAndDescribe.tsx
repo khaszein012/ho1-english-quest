@@ -142,7 +142,7 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
         onPointerMove={move}
         onPointerUp={up}
         onPointerLeave={up}
-        className="w-full touch-none rounded-2xl bg-white"
+        className="drawing-canvas w-full touch-none rounded-2xl bg-canvas"
         style={{ aspectRatio: "8 / 5" }}
       />
       <div className="flex flex-wrap gap-3">
@@ -178,7 +178,7 @@ export function DrawAndDescribe({ checklist }: { checklist: string[] }) {
       </div>
       {/* One single canvas element in both views: switching to the big view only
           changes this wrapper's classes, so the drawing is never wiped. */}
-      <div className={big ? "fixed inset-0 z-50 overflow-auto bg-background/95 p-3" : ""}>{pad}</div>
+      <div className={big ? "drawing-expanded fixed inset-0 z-50 overflow-auto bg-background/95 p-3" : ""}>{pad}</div>
       <p className="rounded-2xl bg-secondary/70 px-4 py-2 text-sm font-bold text-gold">
         Your drawing stays on this device only.
       </p>

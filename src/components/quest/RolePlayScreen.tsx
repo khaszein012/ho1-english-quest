@@ -3,9 +3,11 @@ import type { Lesson } from "@/lib/quest/config";
 import { AudioModePanel, SpeakerButton } from "@/lib/quest/audio";
 import { starBurst } from "@/lib/quest/fx";
 import { DrawAndDescribe } from "./DrawAndDescribe";
+import { useQuest } from "@/lib/quest/store";
 
 export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const rp = lesson.rolePlay;
+  const { state } = useQuest();
   const [checked, setChecked] = useState<number[]>([]);
   const [twist, setTwist] = useState<string | null>(null);
 
@@ -101,7 +103,7 @@ export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
         <p className="rounded-2xl bg-secondary/70 px-4 py-2 text-sm font-bold text-gold">
           Your recording stays on this device only.
         </p>
-        <video ref={livePreview} muted playsInline className="w-full max-w-md rounded-2xl bg-black/40" />
+        <video ref={livePreview} muted playsInline className="w-full max-w-md rounded-2xl bg-background" />
         <div className="flex flex-wrap gap-3">
           {!recording ? (
             <button onClick={startRecording} className="btn-pop bg-berry px-4 py-3 text-lg text-primary-foreground">
@@ -115,7 +117,7 @@ export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
           {videoUrl && (
             <a
               href={videoUrl}
-              download="arsyad-english-quest-recording.webm"
+              download={`${state.studentName.replace(/[^\p{L}\p{N}-]+/gu, "-")}-english-quest-recording.webm`}
               className="btn-pop inline-block bg-grass px-4 py-3 text-lg text-gold-foreground"
             >
               ⬇️ Download my recording
