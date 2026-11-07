@@ -4,10 +4,14 @@ import { AudioModePanel, SpeakerButton } from "@/lib/quest/audio";
 import { starBurst } from "@/lib/quest/fx";
 import { DrawAndDescribe } from "./DrawAndDescribe";
 import { useQuest } from "@/lib/quest/store";
+import { ConversationPractice } from "./ConversationPractice";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const rp = lesson.rolePlay;
   const { state } = useQuest();
+  const [stage, setStage] = useState<"conversation" | "roleplay">("conversation");
   const [checked, setChecked] = useState<number[]>([]);
   const [twist, setTwist] = useState<string | null>(null);
 
@@ -51,13 +55,25 @@ export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
   }
 
   return (
-    <div className="space-y-5">
+    <div className="roleplay-flow space-y-5">
       <header className="card-quest p-5">
         <h2 className="font-display text-2xl font-extrabold">Role-Play 🎭</h2>
         <p className="mt-1 font-display text-xl text-gold">{rp.title}</p>
       </header>
 
-      <AudioModePanel scriptTitle={`Role-play: ${rp.title}`} scriptLines={rp.prompts} />
+      <AudioModePanel
+        scriptTitle={stage === "conversation" ? `Conversation: ${rp.conversation.title}` : `Role-play: ${rp.title}`}
+        scriptLines={stage === "conversation" ? rp.conversation.lines.map((line) => `${rp.conversation.roles[line.role]}: ${line.text}`) : rp.prompts}
+      />
+
+      {stage === "conversation" ? (
+        <ConversationPractice conversation={rp.conversation} onRolePlay={() => setStage("roleplay")} />
+      ) : (
+        <>
+          <div className="roleplay-stage-heading flex flex-wrap items-center justify-between gap-3">
+            <h3 className="section-kicker">02 · YOUR ROLE-PLAY</h3>
+            <Button variant="ghost" size="auto" onClick={() => setStage("conversation")} className="gap-2 py-2"><ArrowLeft /> Conversation practice</Button>
+          </div>
 
       <div className="card-quest space-y-3 p-5">
         {rp.prompts.map((p, i) => (
@@ -127,6 +143,8 @@ export function RolePlayScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
         {error && <p className="text-sm text-destructive">{error}</p>}
         {videoUrl && <video src={videoUrl} controls className="w-full max-w-md rounded-2xl" />}
       </div>
+        </>
+      )}
     </div>
   );
 }

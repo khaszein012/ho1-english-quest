@@ -17,6 +17,11 @@
  *   automatically mixes in review questions from earlier lessons) all adapt.
  * ============================================================================= */
 
+import schoolConversationImage from "@/assets/conversation-school.jpg";
+import thingsConversationImage from "@/assets/conversation-things.jpg";
+import classroomConversationImage from "@/assets/conversation-classroom.jpg";
+import familyConversationImage from "@/assets/conversation-family.jpg";
+
 /**
  * The ONLY browser-storage key this app touches. The "quest_" prefix keeps it in
  * its own namespace, so the app can never read or overwrite data written by any
@@ -161,6 +166,15 @@ export type Lesson = {
   };
   rolePlay: {
     title: string;
+    /** Guided conversation always comes before the independent role-play. */
+    conversation: {
+      title: string;
+      scene: string;
+      image: string;
+      imageAlt: string;
+      roles: [string, string];
+      lines: { role: 0 | 1; text: string }[];
+    };
     prompts: string[];
     twists: string[];
     homework: string;
@@ -391,6 +405,23 @@ const lesson1: Lesson = {
   },
   rolePlay: {
     title: "What's In My Bag?",
+    conversation: {
+      title: "Ready for school",
+      scene: "Dito and Sari check their bags before class.",
+      image: schoolConversationImage,
+      imageAlt: "Two schoolchildren talking about pencils, notebooks and a ruler in a red backpack.",
+      roles: ["Dito", "Sari"],
+      lines: [
+        { role: 1, text: "Hi, Dito! What do you have in your bag?" },
+        { role: 0, text: "I have a notebook, a ruler and a pencil case." },
+        { role: 1, text: "How many pencils do you have?" },
+        { role: 0, text: "I have three pencils. Do you have a ruler?" },
+        { role: 1, text: "No, I don't. Can I borrow your ruler, please?" },
+        { role: 0, text: "Yes, of course. Here you are!" },
+        { role: 1, text: "Thank you! Do you have a calculator?" },
+        { role: 0, text: "No, I don't. I don't need one today." },
+      ],
+    },
     prompts: [
       "Tell me three things you have in your bag.",
       "Tell me one thing you don't have.",
@@ -537,6 +568,23 @@ const lesson2: Lesson = {
   },
   rolePlay: {
     title: "Show and Tell: My Real Things",
+    conversation: {
+      title: "Whose things are these?",
+      scene: "Sari and Dito meet in the park with their favorite things.",
+      image: thingsConversationImage,
+      imageAlt: "Two children identifying a blue bottle, headphones, playing cards and a red bicycle at a park table.",
+      roles: ["Dito", "Sari"],
+      lines: [
+        { role: 1, text: "Is it your water bottle, Dito?" },
+        { role: 0, text: "Yes, it is. It's my blue water bottle." },
+        { role: 1, text: "What are they?" },
+        { role: 0, text: "They are my headphones. I use them to listen to music." },
+        { role: 1, text: "Are they your playing cards, too?" },
+        { role: 0, text: "No, they aren't. They're my brother's playing cards." },
+        { role: 0, text: "Is it your bicycle, Sari?" },
+        { role: 1, text: "Yes, it is! It's red. Let's ride to the playground." },
+      ],
+    },
     prompts: [
       "Show me 3 things you have. Say: 'It's my ___.'",
       "Show me one thing that's always plural (headphones or playing cards). Say: 'They are my ___.'",
@@ -685,6 +733,23 @@ const lesson3: Lesson = {
   },
   rolePlay: {
     title: "Describe Your Study Space",
+    conversation: {
+      title: "A look around our classroom",
+      scene: "Dito and Sari look at things near their desk and across the room.",
+      image: classroomConversationImage,
+      imageAlt: "A boy pointing to a nearby pencil and books while a girl shows a whiteboard and distant posters.",
+      roles: ["Dito", "Sari"],
+      lines: [
+        { role: 0, text: "This is my pencil. It's yellow." },
+        { role: 1, text: "What are these on the desk?" },
+        { role: 0, text: "These are my books. I read them after class." },
+        { role: 1, text: "What is that over there?" },
+        { role: 0, text: "That is our whiteboard. It's next to the cupboard." },
+        { role: 1, text: "And what are those on the far wall?" },
+        { role: 0, text: "Those are posters. My favorite poster is green." },
+        { role: 1, text: "I like it, too. Our classroom is a nice place to learn!" },
+      ],
+    },
     prompts: [
       "Point near you: 'This is my ___.'",
       "Point far from you: 'That is a ___.'",
@@ -841,6 +906,23 @@ const lesson4: Lesson = {
   },
   rolePlay: {
     title: "Draw My Family",
+    conversation: {
+      title: "Meet my family",
+      scene: "Sari shows Dito some photos in her family album.",
+      image: familyConversationImage,
+      imageAlt: "Two children looking at family photos of grandparents, an aunt and a cousin in an album.",
+      roles: ["Dito", "Sari"],
+      lines: [
+        { role: 0, text: "Are they your grandparents?" },
+        { role: 1, text: "Yes, they are. They live near our house." },
+        { role: 0, text: "Is she your mother?" },
+        { role: 1, text: "No, she isn't. She's my aunt. She is 35 years old." },
+        { role: 0, text: "Is he your cousin?" },
+        { role: 1, text: "Yes, he is. His name is Rafi." },
+        { role: 0, text: "How old is he?" },
+        { role: 1, text: "He is 14 years old. We like playing football together." },
+      ],
+    },
     prompts: [
       "Draw and describe 3 people in your family.",
       "Say each one's name and age: 'This is my ___. He/She is ___ years old.'",
