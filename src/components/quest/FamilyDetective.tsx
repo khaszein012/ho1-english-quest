@@ -212,7 +212,7 @@ export function FamilyDetective({ lesson, onComplete }: { lesson: Lesson; onComp
         </div>
       ) : (
         <>
-          <div className="card-quest space-y-4 p-5">
+          <div className="card-quest detective-board space-y-4 p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="font-display text-lg font-bold">
                 Questions used: {asked.length} · Stars if you're right now: {starsFor(asked.length)} ⭐
@@ -259,7 +259,7 @@ export function FamilyDetective({ lesson, onComplete }: { lesson: Lesson; onComp
             </p>
           )}
 
-          <div className="card-quest space-y-4 p-5">
+          <div className="card-quest detective-questions space-y-4 p-5">
             <h3 className="font-display text-xl font-bold">Ask a question 💬</h3>
             {grouped.map((g) => (
               <div key={g} className="space-y-2">
