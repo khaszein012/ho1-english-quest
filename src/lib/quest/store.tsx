@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { BOSS_REQUIRED, BOSS_WIN_BONUS, LEGACY_STORAGE_KEYS, LESSONS, STORAGE_KEY, WORD_MASTERY_TARGET, levelFor, type ScreenId } from "./config";
+import { DEFAULT_STUDENT_NAME, normalizeStudentName } from "./profile";
 
 export type AudioMode = "app" | "teacher" | "device";
 
@@ -9,6 +10,7 @@ export type BossRecord = { hits: number; misses: number };
 export type SelfCheckEntry = { date: string; lessonId: string; answers: number[] };
 
 export type QuestState = {
+  studentName: string;
   starsByLesson: Record<string, number>;
   wordCounts: Record<string, number>;
   screensDone: Record<string, ScreenId[]>;
@@ -21,6 +23,7 @@ export type QuestState = {
 };
 
 const emptyState: QuestState = {
+  studentName: DEFAULT_STUDENT_NAME,
   starsByLesson: {},
   wordCounts: {},
   screensDone: {},
@@ -52,7 +55,8 @@ function load(): QuestState {
     const parsed = JSON.parse(raw) as unknown;
     // Only accept our own shape — never trust a stray key from another app.
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return emptyState;
-    return { ...emptyState, ...(parsed as Partial<QuestState>) };
+    const saved = parsed as Partial<QuestState>;
+    return { ...emptyState, ...saved, studentName: normalizeStudentName(saved.studentName) };
   } catch {
     return emptyState;
   }
@@ -75,6 +79,7 @@ type QuestContextValue = {
   unlockSticker: (lessonId: string) => void;
   saveSelfCheck: (lessonId: string, answers: number[]) => void;
   setAudioMode: (mode: AudioMode) => void;
+  setStudentName: (name: string) => void;
 };
 
 const QuestContext = createContext<QuestContextValue | null>(null);
@@ -188,6 +193,7 @@ export function QuestProvider({ children }: { children: ReactNode }) {
         ],
       })),
     setAudioMode: (mode) => setState((prev) => ({ ...prev, audioMode: mode })),
+    setStudentName: (name) => setState((prev) => ({ ...prev, studentName: normalizeStudentName(name) })),
   };
 
   return <QuestContext.Provider value={value}>{children}</QuestContext.Provider>;
