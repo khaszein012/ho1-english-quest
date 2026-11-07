@@ -44,6 +44,7 @@
   --color-sky: var(--sky);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-canvas: var(--canvas);
   --font-display: "Nunito", "Trebuchet MS", sans-serif;
   --font-sans: "Nunito", system-ui, sans-serif;
   --shadow-pop: 0 10px 0 0 var(--shadow-pop-color), 0 18px 30px -12px oklch(0.15 0.09 275 / 0.55);
@@ -51,6 +52,7 @@
 }
 
 :root {
+  --canvas: oklch(1 0 0);
   --radius: 0.5rem;
   --background: oklch(0.205 0.035 277);
   --foreground: oklch(0.97 0.012 280);
@@ -397,4 +399,20 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--r
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.quest-content .drawing-expanded .drawing-canvas { display: block; width: min(100%, calc((100dvh - 190px) * 1.6)); margin-inline: auto; }
+.quest-content .drawing-expanded > div { max-width: 1400px; margin-inline: auto; }
+@media (min-width: 1101px) {
+  .screen-practice:has(.detective-board) > div { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .screen-practice:has(.detective-board) > div > * { margin-top: 0; min-width: 0; }
+  .screen-practice:has(.detective-board) > div > header, .screen-practice:has(.detective-board) > div > p { grid-column: 1 / -1; }
+  .detective-board { grid-column: 1; }
+  .detective-board .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .detective-questions { grid-column: 2; grid-row: 3; }
+  .screen-practice:has(.detective-board) > div > .card-quest:last-child:not(.detective-questions) { grid-column: 1 / -1; }
+  .quest-content .reading-passage { font-size: 28px; }
+}
+@media (max-width: 374px) {
+  .screen-vocabulary > div > .grid, .screen-learn > div > .grid { grid-template-columns: minmax(0, 1fr); }
 }
