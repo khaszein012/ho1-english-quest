@@ -3,3 +3,8 @@
 - [x] Add a locally saved editable student name without changing progress.
 - [x] Verify every screen across five device sizes and the name-edit flow; 165 layout checks passed, with active-game and drawing checks on desktop and phones.
 - [x] Apply required package security update; preview build passed.
+
+# Conversation warm-ups
+- [ ] Add a conversation before role-play in each of the four units.
+- [ ] Add cohesive illustrations suitable for 10-year-olds and A2 learners.
+- [ ] Verify conversation audio controls, role switching and role-play transition across devices.

@@ -11,3 +11,4 @@
 
 - Student profile labels live in the existing quest state and never partition or reset progress, so renaming is safe for older saves.
 - Shared quest presentation tokens and responsive screen layouts live in src/styles.css; the quest shell owns desktop navigation, leaving lesson content config-driven.
+- Each lesson config owns its conversation script and illustration; RolePlayScreen starts with the shared conversation stage and keeps the existing role-play and local recorder in the second stage.
