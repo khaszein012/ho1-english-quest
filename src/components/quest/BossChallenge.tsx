@@ -230,7 +230,7 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
             current.speak
               ? `Read this sentence aloud (twice, slowly): <strong>“${current.speak}”</strong>`
               : `Read the question aloud: <strong>“${current.prompt}”</strong>`,
-            `Choices on Arsyad's screen: ${current.options.join(" · ")}`,
+            `Choices on ${state.studentName}'s screen: ${current.options.join(" · ")}`,
             `Answer (tutor only — keep this window hidden): <strong>${current.answer}</strong>`,
             `Clue if he is stuck twice: ${current.hint}`,
           ]}

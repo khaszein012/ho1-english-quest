@@ -167,7 +167,7 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         </div>
 
 
-        <div className="space-y-7 text-[1.4rem] leading-[1.85] tracking-[0.01em] sm:text-[1.75rem] sm:leading-[1.9]">
+        <div className="reading-passage space-y-7">
           {r.paragraphs.map((_, pi) => (
             <p key={pi}>
               {sentences.map((s, si) =>
