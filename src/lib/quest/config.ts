@@ -21,6 +21,10 @@ import schoolConversationImage from "@/assets/conversation-school.jpg";
 import thingsConversationImage from "@/assets/conversation-things.jpg";
 import classroomConversationImage from "@/assets/conversation-classroom.jpg";
 import familyConversationImage from "@/assets/conversation-family.jpg";
+import futureSchoolReadingImage from "@/assets/reading-future-school.jpg";
+import grandpaToysReadingImage from "@/assets/reading-grandpa-toys.jpg";
+import oneRoomSchoolReadingImage from "@/assets/reading-one-room-school.jpg";
+import familiesReadingImage from "@/assets/reading-families.jpg";
 
 /**
  * The ONLY browser-storage key this app touches. The "quest_" prefix keeps it in
@@ -156,6 +160,8 @@ export type Lesson = {
   detective?: DetectiveConfig;
   reading: {
     title: string;
+    /** Optional story illustration; the passage and exercises stay independent. */
+    illustration?: { image: string; alt: string };
     /** Leave empty and set `placeholder` while the passage is still pending. */
     paragraphs: string[];
     questions: QuizItem[];
@@ -368,6 +374,10 @@ const lesson1: Lesson = {
   },
   reading: {
     title: "Students of the Future",
+    illustration: {
+      image: futureSchoolReadingImage,
+      alt: "Dito uses a tablet and stylus at school, with a blue notebook, ruler, highlighter and pizza lunchbox nearby.",
+    },
     paragraphs: [
       "My name is Dito. I study at a special school in the city. I don't have a paper textbook — I have a tablet instead. I read my lessons on the screen, and I watch short videos to learn new topics.",
       "I don't use a pencil case full of pens; I have just one stylus for writing. My little sister thinks the stylus is cute! In Math class, I have a calculator app, so I don't carry a real calculator.",
@@ -526,6 +536,10 @@ const lesson2: Lesson = {
   },
   reading: {
     title: "Grandpa's Toy Box",
+    illustration: {
+      image: grandpaToysReadingImage,
+      alt: "A grandfather and child explore a wooden toy airplane, blocks, a grey rocking horse and a brown-and-white pony beside modern games and headphones.",
+    },
     paragraphs: [
       "My grandfather has an old wooden toy box. Look at his old toys! Are they the same as your things today? How are they different?",
       "It is an old toy airplane. It has two wings. One wing is a little broken. My grandfather says, 'It's my favourite old toy!'",
@@ -679,6 +693,10 @@ const lesson3: Lesson = {
   },
   reading: {
     title: "A School With One Room",
+    illustration: {
+      image: oneRoomSchoolReadingImage,
+      alt: "An illustrated 1930 one-room school with a red building, white porch, one teacher and Margaret writing with chalk on a slate.",
+    },
     paragraphs: [
       "This is a photo of an old school in the United States. It is from 1930. Look — that is the school building. It is small and red, with a white porch.",
       "This is Margaret. She lives in a small town, and she goes to a one-room school. All the students are in one room together. That is her teacher — she is the only teacher in the school. These are Margaret's classmates, and those are their desks. Her older brother William is in the same class!",
@@ -876,6 +894,10 @@ const lesson4: Lesson = {
   },
   reading: {
     title: "Different Kinds of Families",
+    illustration: {
+      image: familiesReadingImage,
+      alt: "Different families enjoy a picnic: a child with two parents, a child with a mother, and children with grandparents.",
+    },
     // Passage, questions and in-passage word hunt are pure config — fill them in later.
     paragraphs: [],
     placeholder: "Reading passage coming soon — the tutor will add the text.",

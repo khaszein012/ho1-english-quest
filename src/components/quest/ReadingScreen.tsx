@@ -134,16 +134,28 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
 
       <AudioModePanel scriptTitle={r.title} scriptLines={r.paragraphs} />
 
+      {r.illustration && (
+        <figure className="reading-illustration">
+          <img
+            src={r.illustration.image}
+            alt={r.illustration.alt}
+            width={1200}
+            height={800}
+            loading="lazy"
+          />
+        </figure>
+      )}
+
       {/* A lesson may ship without its passage yet: config-only placeholder, no component change. */}
       {r.paragraphs.length === 0 ? (
-        <div className="card-quest space-y-2 border-dashed p-6 text-center">
+        <div className="reading-story card-quest space-y-2 border-dashed p-6 text-center">
           <p className="text-5xl">📖</p>
           <p className="font-display text-xl font-bold">
             {r.placeholder ?? "Reading passage coming soon — the tutor will add the text."}
           </p>
         </div>
       ) : (
-      <div className="card-quest space-y-4 p-5 sm:p-7">
+      <div className="reading-story card-quest space-y-4 p-5 sm:p-7">
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => readAloud(0)}
