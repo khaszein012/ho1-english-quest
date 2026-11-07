@@ -8,3 +8,7 @@
 - [x] Add a conversation before role-play in each of the four units.
 - [x] Add four cohesive illustrations suitable for 10-year-olds and A2 learners.
 - [x] Verify images, audio controls, role switching, hidden-line practice, tutor pop-out scripts and role-play transition across five screen sizes. Actual audible speech remains unavailable in sandbox Chromium.
+
+# Reading illustrations
+- [x] Add a story-matched illustration to all four Reading sections without changing passages or exercises; Lesson 4 keeps its pending passage.
+- [x] Verify all four images across five screen sizes, plus word-hunt, comprehension and sound-sort interactions; no runtime errors.
