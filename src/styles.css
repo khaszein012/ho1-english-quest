@@ -420,9 +420,10 @@ button:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--r
 .screen-roleplay .conversation-practice, .screen-roleplay .roleplay-stage-heading { grid-column: 1 / -1; }
 .conversation-practice { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); align-items: start; gap: 28px; }
 .conversation-image { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; border-radius: 8px; }
-.conversation-line { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
+.conversation-line { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
 .conversation-line-mine { border-left: 3px solid var(--gold); background: var(--surface-2); }
 .conversation-line > span { flex-shrink: 0; }
+.conversation-line > span:has(.text-berry), .conversation-line > span:has(.text-muted-foreground) { flex-basis: 100%; }
 .conversation-line p { overflow-wrap: anywhere; }
 .screen-roleplay .roleplay-flow > header { grid-column: 1 / -1; }
 @media (max-width: 1100px) {
