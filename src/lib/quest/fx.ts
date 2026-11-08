@@ -25,6 +25,18 @@ export function bigCelebration() {
   );
 }
 
+/** Gold-heavy blast for COMBO and ⚡ Super Move hits — bigger than a star, smaller than a win. */
+export function comboBurst() {
+  confetti({
+    particleCount: 90,
+    spread: 100,
+    startVelocity: 42,
+    origin: { y: 0.65 },
+    colors: ["#f5b942", "#ffd977", "#ff7ab8"],
+    scalar: 1.1,
+  });
+}
+
 export function shuffle<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -37,7 +49,14 @@ export function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
-export const PRAISE = ["Nice one!", "You've got this!", "Awesome!", "Great job!", "Brilliant!", "Keep going!"];
+export const PRAISE = [
+  "Nice one!",
+  "You've got this!",
+  "Awesome!",
+  "Great job!",
+  "Brilliant!",
+  "Keep going!",
+];
 
 export function randomPraise() {
   return PRAISE[Math.floor(Math.random() * PRAISE.length)]!;

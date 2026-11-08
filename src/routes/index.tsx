@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowUpRight, BookOpen, Sparkles, Ticket } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { StudentProfile } from "@/components/quest/StudentProfile";
 import { ThemeToggle } from "@/components/quest/ThemeToggle";
+import { TeacherModeToggle } from "@/components/quest/TeacherModeToggle";
 import { LESSONS, SCREENS, type Lesson, type ScreenId } from "@/lib/quest/config";
 import { QuestProvider, useQuest } from "@/lib/quest/store";
 import { VocabularyScreen } from "@/components/quest/VocabularyScreen";
@@ -117,6 +118,7 @@ function Home({
         </div>
         <div className="flex items-center gap-3">
           <StudentProfile />
+          <TeacherModeToggle />
           <ThemeToggle />
         </div>
       </header>
@@ -279,6 +281,7 @@ function LessonView({
           >
             <Ticket />
           </Button>
+          <TeacherModeToggle />
           <ThemeToggle />
         </div>
       </header>

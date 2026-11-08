@@ -88,8 +88,11 @@ export type QuizItem = {
 
 /**
  * Boss fight tuning, per lesson (all fields optional — see BOSS_FIGHT_DEFAULTS).
- * The boss has HP; a correct answer deals `hpPerHit`, a miss lets the boss
- * recover `bossRegen`. The fight ends only when HP reaches 0.
+ * The boss has HP; a correct answer deals `hpPerHit` (more on combos and when
+ * the ⚡ Super Move is armed), a miss lets the boss recover `bossRegen`
+ * (`criticalRegen` while the boss is in its final third of health). The fight
+ * ends only when HP reaches 0 — or the boss surrenders after `surrenderAfter`
+ * attempts, so it can never be lost.
  */
 export type BossFightConfig = {
   minQuestions?: number;
@@ -99,9 +102,27 @@ export type BossFightConfig = {
   maxHp?: number;
   /** Safety net: after this many total attempts the boss simply surrenders. */
   surrenderAfter?: number;
+  /** Every Nth correct answer IN A ROW is a COMBO worth +`comboBonus` damage. */
+  comboEvery?: number;
+  comboBonus?: number;
+  /** Correct answers that charge the ⚡ Super Move; an armed hit deals `superDamage`. */
+  superEvery?: number;
+  superDamage?: number;
+  /** Boss heal on a miss while the boss is in its final third of health. */
+  criticalRegen?: number;
   /** Friendly (never scary!) boss character. */
   name?: string;
   emoji?: string;
+};
+
+/** Per-boss fight personality. All lines must stay funny and friendly — never scary. */
+export type BossPersona = {
+  /** Shown after a correct answer (the boss just got hit). */
+  hurt: string[];
+  /** Shown after a miss (the boss gloats). */
+  taunt: string[];
+  /** Shown once when the boss weakens: [two-thirds health left, one-third left]. */
+  phases: string[];
 };
 
 /** A2 fights are longer and mix in more review than the A1 course did. */
@@ -112,6 +133,11 @@ export const BOSS_FIGHT_DEFAULTS = {
   reviewQuestions: 3,
   maxHp: 100,
   surrenderAfter: 30,
+  comboEvery: 3,
+  comboBonus: 5,
+  superEvery: 3,
+  superDamage: 20,
+  criticalRegen: 15,
   name: "Grammar Gremlin",
   emoji: "\u{1F479}",
 } as const;
@@ -203,6 +229,8 @@ export type Lesson = {
   boss: QuizItem[];
   /** Optional per-lesson boss fight tuning; omit to use BOSS_FIGHT_DEFAULTS. */
   bossFight?: BossFightConfig;
+  /** Optional boss personality lines; fights fall back to generic praise without them. */
+  bossPersona?: BossPersona;
   sticker: { name: string; emoji: string };
 };
 
@@ -530,6 +558,18 @@ const lesson1: Lesson = {
     },
   ],
   bossFight: { name: "Backpack Bandit", emoji: "🧹" },
+  bossPersona: {
+    hurt: ["Oof! My supplies! 🧹", "Hey, that was my favorite ruler!", "Not the homework! NOOOO!"],
+    taunt: [
+      "You'll never find your pencil case now! 🎒",
+      "I've hidden ALL the glue! Hehe!",
+      "So messy! So sneaky! 🧹",
+    ],
+    phases: [
+      "Backpack Bandit is digging around frantically! 🎒",
+      "Backpack Bandit is out of breath! 😤",
+    ],
+  },
   sticker: { name: "Golden Backpack", emoji: "🎒" },
 };
 
@@ -874,6 +914,19 @@ const lesson2: Lesson = {
     },
   ],
   bossFight: { name: "Mix-Up Monster", emoji: "👽" },
+  bossPersona: {
+    hurt: [
+      "Bzzzt! My mix-ups! 👽",
+      "Error! Error! Does not compute! 🤖",
+      "That answer was TOO correct!",
+    ],
+    taunt: [
+      "Let me scramble that for you! 🔀",
+      "Bigger? Smaller? Who knows! 👽",
+      "My puzzles puzzle everyone!",
+    ],
+    phases: ["Mix-Up Monster is glitching! ⚡", "Mix-Up Monster is out of mix-ups! 🤖"],
+  },
   sticker: { name: "Treasure Chest", emoji: "🧰" },
 };
 
@@ -1235,6 +1288,19 @@ const lesson3: Lesson = {
     },
   ],
   bossFight: { name: "Chalk Dust Dragon", emoji: "🐉" },
+  bossPersona: {
+    hurt: [
+      "Rawr! Watch the dust! 🐉",
+      "My chalk armor! It crumbles!",
+      "Achoo! That one went up my nose!",
+    ],
+    taunt: [
+      "Cough cough! CHALK CLOUD! 💨",
+      "You can't read the board through my dust!",
+      "Dragons never erase!",
+    ],
+    phases: ["Chalk Dust Dragon is losing its dust! 💨", "Chalk Dust Dragon is almost erased! 😵"],
+  },
   sticker: { name: "Golden Whiteboard", emoji: "🏫" },
 };
 
@@ -1665,6 +1731,18 @@ const lesson4: Lesson = {
     },
   ],
   bossFight: { name: "Question Kraken", emoji: "🐙" },
+  bossPersona: {
+    hurt: [
+      "Blub! Good hit! 🐙",
+      "My tentacles are all tangled!",
+      "Eight arms and I still couldn't block that!",
+    ],
+    taunt: ["Ink incoming! 🦑", "Splash! You're soaked in questions!", "This question is MINE! 🐙"],
+    phases: [
+      "Question Kraken is splashing wildly! 🌊",
+      "Question Kraken is deflating like a balloon! 🎈",
+    ],
+  },
   sticker: { name: "Family Photo Frame", emoji: "🖼️" },
 };
 

@@ -20,3 +20,13 @@
 - [x] Harden boss fights for A2: 15 questions, 3 spaced-repetition review items, surrender after 30 attempts.
 - [x] Fresh-start save under `quest_arsyad_english_v2` (the A1 `v1` save stays in the browser untouched); rebrand title/meta from "Course 2 / A1" to "A2" and bump TTS rate to 0.85.
 - [x] Verify with tsc, eslint and a full browser walkthrough of every screen and boss fight.
+
+# Boss Challenge 2.0
+- [x] Add combo streaks (every 3rd consecutive correct = +5 damage), a chargeable ⚡ Super Move (tap to arm, next hit deals 20) and a finish-line moment with a berry ring on the last hit.
+- [x] Give each boss a personality: per-boss hurt lines, taunts and two phase-change shouts; the HP bar turns berry in the boss's critical final third, where misses heal it 15 instead of 10 (still impossible to lose).
+- [x] Add "Story check 📖" questions so the boss now draws from the reading section too — fights cover every part of a lesson; add `comboBurst()` confetti for combo/super hits.
+- [x] Make boss tuning and personalities fully config-driven (`BossFightConfig` combo/super/critical fields, `Lesson.bossPersona`); disable option buttons during hit/regen animations to prevent double taps.
+- [x] Verify the whole loop in the browser: combo, charge → arm → super hit, phase lines, critical regen, story questions, win flow and best records; tsc + eslint clean.
+
+# Teacher mode
+- [x] Add a 🎓 tutor switch in both headers that unlocks every lesson's boss while active (gold-lit button, persisted in the quest save), so any lesson and boss can be tested without a play-through; bosses lock again when it is turned off.

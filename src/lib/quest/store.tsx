@@ -39,6 +39,8 @@ export type QuestState = {
   selfChecks: SelfCheckEntry[];
   audioMode: AudioMode;
   theme: ThemeMode;
+  /** Tutor switch: when on, every boss is unlocked so any lesson can be tested instantly. */
+  teacherMode: boolean;
   bossBest: Record<string, BossRecord>;
   bossBonusAwarded: string[];
 };
@@ -53,6 +55,7 @@ const emptyState: QuestState = {
   selfChecks: [],
   audioMode: "app",
   theme: "dark",
+  teacherMode: false,
   bossBest: {},
   bossBonusAwarded: [],
 };
@@ -102,6 +105,7 @@ type QuestContextValue = {
   saveSelfCheck: (lessonId: string, answers: number[]) => void;
   setAudioMode: (mode: AudioMode) => void;
   setTheme: (theme: ThemeMode) => void;
+  setTeacherMode: (on: boolean) => void;
   setStudentName: (name: string) => void;
 };
 
@@ -187,6 +191,8 @@ export function QuestProvider({ children }: { children: ReactNode }) {
       }),
     isScreenDone: (lessonId, screen) => (state.screensDone[lessonId] ?? []).includes(screen),
     bossUnlocked: (lessonId) => {
+      // Teacher mode lifts the gate for every lesson — testing needs no play-through.
+      if (state.teacherMode) return true;
       const done = state.screensDone[lessonId] ?? [];
       return BOSS_REQUIRED.every((s) => done.includes(s));
     },
@@ -226,6 +232,7 @@ export function QuestProvider({ children }: { children: ReactNode }) {
       })),
     setAudioMode: (mode) => setState((prev) => ({ ...prev, audioMode: mode })),
     setTheme: (theme) => setState((prev) => ({ ...prev, theme })),
+    setTeacherMode: (on) => setState((prev) => ({ ...prev, teacherMode: on })),
     setStudentName: (name) =>
       setState((prev) => ({ ...prev, studentName: normalizeStudentName(name) })),
   };

@@ -2,14 +2,16 @@
  * BOSS FIGHT ENGINE
  * -----------------------------------------------------------------------------
  * Builds each lesson's boss question pool from that lesson's own config content
- * (vocabulary, grammar patterns/examples and the `boss` array) plus review
- * questions from earlier lessons. Five question TYPES are generated so the fight
- * mixes recall, grammar and listening. No lesson content is hardcoded here.
+ * (vocabulary, grammar patterns/examples, the `boss` array and the reading
+ * comprehension questions) plus review questions from earlier lessons. Six
+ * question TYPES are generated so the fight mixes recall, grammar, listening
+ * and story understanding — every section of the lesson shows up in the fight.
+ * No lesson content is hardcoded here.
  * ============================================================================= */
 import { shuffle } from "./fx";
 import { BOSS_FIGHT_DEFAULTS, type Lesson, type BossFightConfig } from "./config";
 
-export type BossQuestionKind = "meaning" | "reverse" | "fill" | "error" | "listen";
+export type BossQuestionKind = "meaning" | "reverse" | "fill" | "error" | "listen" | "story";
 
 export type BossQuestion = {
   key: string;
@@ -30,6 +32,7 @@ const LABELS: Record<BossQuestionKind, string> = {
   fill: "Fill the gap 🧩",
   error: "Spot the fix 🔧",
   listen: "Listen and pick 👂",
+  story: "Story check 📖",
 };
 
 /**
@@ -40,7 +43,8 @@ const LABELS: Record<BossQuestionKind, string> = {
 function firstLetterHint(answer: string) {
   const clean = answer.trim();
   const letters = clean.replace(/[^a-zA-Z]/g, "").length;
-  if (letters <= 4) return "Say each choice out loud with the whole sentence — only one of them sounds right.";
+  if (letters <= 4)
+    return "Say each choice out loud with the whole sentence — only one of them sounds right.";
   return `It starts with "${clean[0]?.toUpperCase()}" and has ${letters} letters.`;
 }
 
@@ -109,7 +113,10 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
       kind: "fill",
       label: LABELS.fill,
       prompt: `${p.subject} ___ ${p.rest}`,
-      options: optionSet(p.verb, [...shuffle(verbs.filter((v) => v !== p.verb)), ...FALLBACK_VERBS]),
+      options: optionSet(p.verb, [
+        ...shuffle(verbs.filter((v) => v !== p.verb)),
+        ...FALLBACK_VERBS,
+      ]),
       answer: p.verb,
       hint: "Say the whole sentence out loud with each choice — which one sounds right?",
       review,
@@ -121,7 +128,10 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
     // is always a mix-up inside the lesson's grammar target. Generic fallbacks are
     // only used when the lesson itself doesn't offer enough alternatives.
     const ownWrong = shuffle(verbs.filter((v) => v !== p.verb));
-    const badVerbs = [...ownWrong, ...FALLBACK_VERBS.filter((v) => v !== p.verb && !verbs.includes(v))].slice(0, 4);
+    const badVerbs = [
+      ...ownWrong,
+      ...FALLBACK_VERBS.filter((v) => v !== p.verb && !verbs.includes(v)),
+    ].slice(0, 4);
     const [shown, ...others] = badVerbs;
     if (shown && others.length >= 2) {
       out.push({
@@ -129,7 +139,10 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
         kind: "error",
         label: LABELS.error,
         prompt: `Oops! "${p.subject} ${shown} ${p.rest}" has one mistake. Which sentence is correct?`,
-        options: optionSet(good, others.map((v) => `${p.subject} ${v} ${p.rest}`)),
+        options: optionSet(
+          good,
+          others.map((v) => `${p.subject} ${v} ${p.rest}`),
+        ),
         answer: good,
         hint: "Only the middle word changes. Read each sentence out loud and listen for the one that sounds right.",
         review,
@@ -146,7 +159,10 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
       kind: "listen",
       label: LABELS.listen,
       prompt: "Tap 🔊, then choose the sentence you heard.",
-      options: optionSet(sentence, pick(examples, 3, (s) => s === sentence)),
+      options: optionSet(
+        sentence,
+        pick(examples, 3, (s) => s === sentence),
+      ),
       answer: sentence,
       speak: sentence,
       hint: "Tap 🔊 again — listen for the first two words.",
@@ -164,6 +180,24 @@ function poolFor(lesson: Lesson, review: boolean): BossQuestion[] {
       options: shuffle(item.options),
       answer: item.answer,
       hint: firstLetterHint(item.answer),
+      review,
+    });
+  }
+
+  // (g) story check — the reading section joins the fight too, so the boss
+  // draws from every part of the lesson, comprehension included.
+  for (const q of lesson.reading.questions) {
+    out.push({
+      key: `${tag}-story-${q.question}`,
+      kind: "story",
+      label: LABELS.story,
+      prompt: q.question,
+      options: optionSet(
+        q.answer,
+        q.options.filter((o) => o !== q.answer),
+      ),
+      answer: q.answer,
+      hint: firstLetterHint(q.answer),
       review,
     });
   }
