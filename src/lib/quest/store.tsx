@@ -21,7 +21,10 @@ import { DEFAULT_STUDENT_NAME, normalizeStudentName } from "./profile";
 
 export type AudioMode = "app" | "teacher" | "device";
 
-/** Which palette the app shows. Light is opt-in; the deep-indigo default is "dark". */
+/**
+ * Which palette the app shows: "light" is the bright Play theme (the default
+ * kids land in), "dark" is the deep-indigo Night room for evening tutoring.
+ */
 export type ThemeMode = "light" | "dark";
 
 /** Best boss fight per lesson: fewest misses, then fewest hits needed. */
@@ -54,7 +57,7 @@ const emptyState: QuestState = {
   stickers: [],
   selfChecks: [],
   audioMode: "app",
-  theme: "dark",
+  theme: "light",
   teacherMode: false,
   bossBest: {},
   bossBonusAwarded: [],

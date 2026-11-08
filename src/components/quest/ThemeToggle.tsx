@@ -2,7 +2,7 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuest } from "@/lib/quest/store";
 
-/** Sun/moon switch between the deep-indigo default and the paper-white light palette. */
+/** Sun/moon switch between the bright Play theme (default) and the deep-indigo Night mode. */
 export function ThemeToggle() {
   const { state, setTheme } = useQuest();
   const light = state.theme === "light";

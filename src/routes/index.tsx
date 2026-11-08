@@ -52,8 +52,9 @@ function QuestApp() {
   const { state } = useQuest();
 
   // The palette is a class on <html>; every CSS token switches with it.
+  // :root is the bright Play theme, html.dark the deep-indigo Night room.
   useEffect(() => {
-    document.documentElement.classList.toggle("light", state.theme === "light");
+    document.documentElement.classList.toggle("dark", state.theme === "dark");
   }, [state.theme]);
 
   const lesson = LESSONS.find((l) => l.id === view?.lessonId);
