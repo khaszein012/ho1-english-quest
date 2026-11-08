@@ -30,3 +30,9 @@
 
 # Teacher mode
 - [x] Add a 🎓 tutor switch in both headers that unlocks every lesson's boss while active (gold-lit button, persisted in the quest save), so any lesson and boss can be tested without a play-through; bosses lock again when it is turned off.
+
+# Scope alignment with the course book
+- [x] Re-align all four lessons to the book's Units 1-4 after reviewing the official scope: grammar targets reverted to the book structures (have / It is-They are + my-your / this-that-these-those + colour adjectives / Is she-Is he-Are they + ages); the out-of-scope A1→A2 grammar experiment (present continuous, comparatives, there is/there are, past simple) was removed.
+- [x] Vocabulary lists now follow the book's unit word lists (16/16/16/9 words, e.g. crayon, glue stick, lunchbox, paintbrush, pencil sharpener, tape; kite, doll, hula hoop, rollerblades, soccer ball; easel, mat, wastebasket, drawing; family, friend, teacher, children).
+- [x] Lesson titles match the book ("School Things", "My Toys", "My Classroom", "Family and Friends"); reading titles match ("Students of the Future", "Old Toys", "One-room School", "Different Kinds of Families"); phonics sets extended to the book's lists (long u adds boots + glue stick, long o adds jump rope, long e adds easel).
+- [x] The A2 depth stays: richer meanings and examples, fuller reading passages, harder boss tuning, per-boss personalities, story-check questions — all within the book's grammar.
