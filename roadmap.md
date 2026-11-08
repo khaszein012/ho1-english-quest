@@ -12,3 +12,11 @@
 # Reading illustrations
 - [x] Add a story-matched illustration to all four Reading sections without changing passages or exercises; Lesson 4 keeps its pending passage.
 - [x] Verify all four images across five screen sizes, plus word-hunt, comprehension and sound-sort interactions; no runtime errors.
+
+# A2 content upgrade
+- [x] Raise all four lessons from A1 to A2 for a 10-year-old learner: lesson 1 present continuous, lesson 2 comparatives & superlatives, lesson 3 there is/there are + prepositions, lesson 4 past simple.
+- [x] Rewrite vocabulary examples, grammar blocks, expressions, role-play conversations and self-checks for the new grammar; add a config-driven `grammar.tip` chip to the Grammar screen.
+- [x] Write the missing Lesson 4 reading passage ("Different Kinds of Families") plus its comprehension questions; rewrite the other three passages at A2.
+- [x] Harden boss fights for A2: 15 questions, 3 spaced-repetition review items, surrender after 30 attempts.
+- [x] Fresh-start save under `quest_arsyad_english_v2` (the A1 `v1` save stays in the browser untouched); rebrand title/meta from "Course 2 / A1" to "A2" and bump TTS rate to 0.85.
+- [x] Verify with tsc, eslint and a full browser walkthrough of every screen and boss fight.

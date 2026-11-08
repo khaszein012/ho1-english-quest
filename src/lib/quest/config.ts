@@ -1,17 +1,25 @@
 /* =============================================================================
- * ARSYAD'S ENGLISH QUEST — SINGLE LESSON CONFIG FILE
+ * ARSYAD'S ENGLISH QUEST — SINGLE LESSON CONFIG FILE (COURSE LEVEL: A2)
  * -----------------------------------------------------------------------------
  * EVERY piece of lesson content the app shows lives in the LESSONS array at the
  * bottom of this file: one entry per lesson. Screens and components read from it
  * and never hardcode content.
  *
- * TO ADD LESSON 2 (or 3...8):
- *   1. Copy the `lesson1` object below, rename it `lesson2`.
+ * LEVEL A2 (2026 rewrite, 10-year-old learner). The grammar climbs lesson by
+ * lesson and every boss mixes in review questions from earlier lessons:
+ *   lesson 1 — present continuous (happening now)
+ *   lesson 2 — comparatives & superlatives
+ *   lesson 3 — there is / there are + prepositions of place
+ *              (this/that/these/those stay as the near/far practice game)
+ *   lesson 4 — past simple (was/were + -ed + common irregulars)
+ *
+ * TO ADD LESSON 5 (or 6...8):
+ *   1. Copy the `lesson4` object below, rename it `lesson5`.
  *   2. Change `id`, `number`, `title`, `subtitle`, `emoji` and fill in the
  *      content fields (vocabulary of ANY length, grammar, expressions,
  *      practice, reading + questions + spotlight, rolePlay + homework,
  *      selfCheck, boss, sticker).
- *   3. Append it: `export const LESSONS: Lesson[] = [lesson1, lesson2];`
+ *   3. Append it: `export const LESSONS: Lesson[] = [lesson1, ...lesson5];`
  *   That is all. No layout or component changes are needed — the lesson picker,
  *   star dashboard, sticker album, progress screen and Boss Challenge (which
  *   automatically mixes in review questions from earlier lessons) all adapt.
@@ -30,8 +38,9 @@ import familiesReadingImage from "@/assets/reading-families.jpg";
  * The ONLY browser-storage key this app touches. The "quest_" prefix keeps it in
  * its own namespace, so the app can never read or overwrite data written by any
  * other app on the same browser. Bump the version suffix if the saved shape changes.
+ * v1 held the finished A1 course; v2 starts the A2 course from zero stars.
  */
-export const STORAGE_KEY = "quest_arsyad_english_v1";
+export const STORAGE_KEY = "quest_arsyad_english_v2";
 
 /** Older key from before the namespace prefix — read once, then migrated. */
 export const LEGACY_STORAGE_KEYS = ["arsyad-english-quest-v1"];
@@ -71,8 +80,6 @@ export type Spotlight = {
   note?: string;
 };
 
-
-
 export type QuizItem = {
   question: string;
   options: string[];
@@ -97,13 +104,14 @@ export type BossFightConfig = {
   emoji?: string;
 };
 
+/** A2 fights are longer and mix in more review than the A1 course did. */
 export const BOSS_FIGHT_DEFAULTS = {
-  minQuestions: 12,
+  minQuestions: 15,
   hpPerHit: 10,
   bossRegen: 10,
-  reviewQuestions: 2,
+  reviewQuestions: 3,
   maxHp: 100,
-  surrenderAfter: 25,
+  surrenderAfter: 30,
   name: "Grammar Gremlin",
   emoji: "\u{1F479}",
 } as const;
@@ -148,6 +156,8 @@ export type Lesson = {
   grammar: {
     title: string;
     explanation: string;
+    /** Optional short tip chip shown on the Grammar screen (e.g. "NOW WORDS — verb + ing"). */
+    tip?: string;
     patterns: { subject?: string; verb?: string; rest?: string; note?: string }[];
     examples: string[];
     yourTurn: QuizItem[];
@@ -249,128 +259,170 @@ export function levelFor(totalStars: number) {
   return { ...LEVELS[i]!, level: i + 1 };
 }
 
+/* =============================================================================
+ * LESSON 1 — MY SCHOOL SUPPLIES · Present Continuous
+ * ============================================================================= */
+
 const lesson1: Lesson = {
   id: "lesson-1",
   number: 1,
   title: "My School Supplies",
-  subtitle: "Have / Don't Have",
+  subtitle: "Present Continuous",
   emoji: "🎒",
-  sentenceFrames: ["I have a ___.", "I don't have a ___.", "Do you have a ___?"],
+  sentenceFrames: [
+    "I'm putting my ___ in my backpack.",
+    "She's looking for her ___.",
+    "What are you doing? — I'm ___-ing.",
+  ],
   speedRoundSeconds: 10,
   vocabulary: [
     {
       word: "backpack",
       meaning: "a bag you carry on your back for school",
-      example: "I have a red backpack.",
+      example: "I'm putting my books in my backpack.",
       emoji: "🎒",
     },
     {
       word: "notebook",
       meaning: "a book for writing your own notes",
-      example: "I have one notebook for English.",
+      example: "She's writing the date in her notebook.",
       emoji: "📓",
     },
     {
       word: "pencil case",
       meaning: "a small bag for pens and pencils",
-      example: "My pencil case is blue.",
+      example: "He's looking for his pencil case.",
       emoji: "🧰",
     },
     {
       word: "ruler",
       meaning: "a straight tool for measuring and drawing lines",
-      example: "I use a ruler in Math class.",
+      example: "I'm drawing a straight line with my ruler.",
       emoji: "📏",
     },
     {
       word: "stapler",
       meaning: "a tool that joins papers together",
-      example: "Do you have a stapler?",
+      example: "The teacher is stapling our test papers.",
       emoji: "📎",
     },
     {
       word: "sticky tape",
-      meaning: "a tape for sticking paper together",
-      example: "I use sticky tape for my project.",
+      meaning: "tape for sticking paper together",
+      example: "I'm sticking the poster up with sticky tape.",
       emoji: "🩹",
+      tag: "Uncountable!",
     },
     {
       word: "textbook",
       meaning: "a book you study from in class",
-      example: "I don't have a textbook for Science.",
+      example: "We're reading page ten in our textbook.",
       emoji: "📕",
     },
-    { word: "pen", meaning: "a tool for writing in ink", example: "I have three blue pens.", emoji: "🖊️" },
+    {
+      word: "pen",
+      meaning: "a tool for writing in ink",
+      example: "I'm writing my name with my blue pen.",
+      emoji: "🖊️",
+    },
     {
       word: "pencil",
       meaning: "a tool for writing in grey lead",
-      example: "I have five pencils in my case.",
+      example: "He's sharpening his pencil.",
       emoji: "✏️",
     },
     {
       word: "highlighter",
       meaning: "a bright marker for important words",
-      example: "I use a yellow highlighter.",
+      example: "I'm marking the new words with my highlighter.",
       emoji: "🖍️",
     },
     {
       word: "eraser",
       meaning: "a tool for removing pencil marks",
-      example: "Can I borrow your eraser?",
+      example: "She's erasing the mistake with her eraser.",
       emoji: "🧽",
     },
     {
       word: "calculator",
       meaning: "a tool for doing math",
-      example: "I don't have a real calculator.",
+      example: "He's using a calculator for the big numbers.",
       emoji: "🧮",
     },
     {
       word: "glue",
       meaning: "a sticky liquid for joining paper",
-      example: "I need glue for this project.",
+      example: "I'm gluing the pieces together with glue.",
       emoji: "🧴",
+      tag: "Uncountable!",
     },
-    { word: "scissors", meaning: "a tool for cutting paper", example: "Do you have scissors?", emoji: "✂️" },
+    {
+      word: "scissors",
+      meaning: "a tool with two blades for cutting paper",
+      example: "Be careful! She's cutting paper with the scissors.",
+      emoji: "✂️",
+      tag: "Always plural!",
+    },
   ],
   grammar: {
-    title: "Have / Don't Have",
+    title: "Present Continuous — Happening Now",
     explanation:
-      "Use have to say what is yours. Use don't have to say what is NOT yours. To ask a friend, start with Do you have...?",
+      "When something is happening RIGHT NOW, use am, is, or are + a verb with -ing. I am → I'm. She is → She's. They are → They're. To ask what someone is doing, swap the words around: 'What are you doing?'",
+    tip: "💛 NOW WORDS — am / is / are + verb-ing",
     patterns: [
-      { subject: "I", verb: "have", rest: "a backpack." },
-      { subject: "I", verb: "don't have", rest: "a stapler." },
-      { subject: "Do you", verb: "have", rest: "a ruler?", note: "Yes, I do. / No, I don't." },
-      { subject: "I", verb: "have", rest: "ONE pen.", note: "one thing → no -s" },
-      { subject: "I", verb: "have", rest: "FIVE pens.", note: "more than one → add -s" },
+      { subject: "I am", verb: "packing", rest: "my school bag.", note: "I am = I'm" },
+      { subject: "She is", verb: "looking", rest: "for her pencil case.", note: "She is = She's" },
+      { subject: "We are", verb: "waiting", rest: "for the teacher.", note: "We are = We're" },
+      { subject: "He is not", verb: "listening", rest: "to the story.", note: "is not = isn't" },
+      {
+        subject: "Are you",
+        verb: "bringing",
+        rest: "your textbook?",
+        note: "Yes, I am. / No, I'm not.",
+      },
     ],
     examples: [
-      "I have a blue pencil case.",
-      "I don't have a calculator.",
-      "Do you have a highlighter?",
-      "I have five pencils and one eraser.",
+      "I'm putting my ruler in my backpack.",
+      "Sari isn't coming to school today.",
+      "What are you doing? — I'm reading a comic.",
+      "The students are working in pairs.",
     ],
     yourTurn: [
-      { question: "I ___ a backpack.", options: ["have", "has", "having"], answer: "have" },
-      { question: "I have five ___.", options: ["pencil", "pencils", "pencilses"], answer: "pencils" },
-      { question: "___ you have a ruler?", options: ["Do", "Does", "Are"], answer: "Do" },
+      {
+        question: "Dito ___ his homework right now.",
+        options: ["is doing", "does", "do"],
+        answer: "is doing",
+      },
+      { question: "___ you listening to me?", options: ["Are", "Do", "Is"], answer: "Are" },
+      {
+        question: "The students ___ working in pairs.",
+        options: ["are", "is", "be"],
+        answer: "are",
+      },
+      {
+        question: "I'm not ___ TV because I'm busy.",
+        options: ["watching", "watch", "watches"],
+        answer: "watching",
+      },
+      { question: "Look! It ___ raining.", options: ["is", "are", "am"], answer: "is" },
+      { question: "What ___ your friends doing?", options: ["are", "is", "do"], answer: "are" },
     ],
   },
   expressions: [
     {
-      prompt: "What do you have in your backpack?",
-      answer: "I have a textbook and a pencil case.",
+      prompt: "What are you doing right now?",
+      answer: "I'm studying English with my teacher.",
     },
-    { prompt: "Do you have a stapler?", answer: "Yes, I do. / No, I don't." },
-    { prompt: "How many pens do you have?", answer: "I have three pens." },
-    { prompt: "Do you have a calculator?", answer: "No, I don't. I use an app instead." },
-    { prompt: "What's in your pencil case?", answer: "I have pens, pencils, and an eraser." },
-    { prompt: "Can I borrow your ruler?", answer: "Sure, here you are!" },
+    { prompt: "What is your friend doing?", answer: "She's writing in her notebook." },
+    { prompt: "Where is your backpack?", answer: "It's on my chair. I'm keeping it next to me." },
+    { prompt: "What are you wearing today?", answer: "I'm wearing my blue school uniform." },
+    { prompt: "Is it raining right now?", answer: "No, it isn't. The sun is shining." },
+    { prompt: "What are your classmates doing?", answer: "They're opening their textbooks." },
   ],
   practice: {
     title: "Backpack Check",
     instructions:
-      "Flip a card and say: I have a ___. or I don't have a ___. Then your tutor asks: Do you have a ___? Answer: Yes, I do. / No, I don't.",
+      "Flip a card and say what is happening now: I'm putting the ruler in my bag! / She's looking for her pencil case! Then your tutor asks: What are you doing? Answer with a verb + -ing.",
   },
   reading: {
     title: "Students of the Future",
@@ -379,33 +431,34 @@ const lesson1: Lesson = {
       alt: "Dito uses a tablet and stylus at school, with a blue notebook, ruler, highlighter and pizza lunchbox nearby.",
     },
     paragraphs: [
-      "My name is Dito. I study at a special school in the city. I don't have a paper textbook — I have a tablet instead. I read my lessons on the screen, and I watch short videos to learn new topics.",
-      "I don't use a pencil case full of pens; I have just one stylus for writing. My little sister thinks the stylus is cute! In Math class, I have a calculator app, so I don't carry a real calculator.",
-      "I still have a few old-style tools, though — I have a ruler and a highlighter for my notes, and my backpack has one blue notebook for drawing ideas. At break time, everyone has a lunchbox. I love lunch on Tuesdays — that's pizza day!",
+      "It is Tuesday morning, and Dito is walking to school with his blue backpack on his back. The sun is shining. In his hand, he is holding a small ruler with a cute robot on it. He is looking for Sari, but she is not at the gate.",
+      "Inside the classroom, something exciting is happening. The students are not writing on paper today. They are using tablets, and the teacher is showing a science video on the big whiteboard. 'Look!' Dito says. 'The rocket is flying across the screen!'",
+      "After class, everyone is cleaning the room together. Sari is putting the tablets on the shelf, and Dito is stacking the chairs. 'School is changing,' says Sari, 'but we are still learning together — and that will never change.'",
     ],
     questions: [
       {
-        question: "What does Dito use instead of a paper textbook?",
-        options: ["a tablet", "a notebook", "a calculator", "a ruler"],
-        answer: "a tablet",
+        question: "What is Dito holding in his hand?",
+        options: ["a small ruler", "a tablet", "a rocket", "a comic"],
+        answer: "a small ruler",
       },
       {
-        question: "What does Dito use for writing instead of pens?",
-        options: ["a stylus", "a pencil", "a highlighter", "a pen"],
-        answer: "a stylus",
+        question: "What are the students using in class today?",
+        options: ["tablets", "paper", "slates", "chalk"],
+        answer: "tablets",
       },
       {
-        question: "What colour is Dito's notebook?",
-        options: ["blue", "red", "green", "yellow"],
-        answer: "blue",
+        question: "What is the teacher showing on the whiteboard?",
+        options: ["a science video", "a cartoon", "a map", "a game"],
+        answer: "a science video",
       },
       {
-        question: "What day is pizza day?",
-        options: ["Tuesday", "Monday", "Friday", "Sunday"],
-        answer: "Tuesday",
+        question: "What is Sari putting on the shelf?",
+        options: ["the tablets", "the chairs", "her backpack", "the rulers"],
+        answer: "the tablets",
       },
     ],
-    stretchQuestion: "Why doesn't Dito carry a real calculator?",
+    stretchQuestion:
+      "School is changing, but some things stay the same. What stays the same for Dito and Sari?",
     spotlight: {
       sound: "long U",
       exampleWord: "blue",
@@ -414,125 +467,268 @@ const lesson1: Lesson = {
     },
   },
   rolePlay: {
-    title: "What's In My Bag?",
+    title: "What's Happening Now?",
     conversation: {
       title: "Ready for school",
-      scene: "Dito and Sari check their bags before class.",
+      scene: "Dito is rushing to school and Sari is waiting at the gate.",
       image: schoolConversationImage,
-      imageAlt: "Two schoolchildren talking about pencils, notebooks and a ruler in a red backpack.",
+      imageAlt:
+        "Two schoolchildren talking about pencils, notebooks and a ruler in a red backpack.",
       roles: ["Dito", "Sari"],
       lines: [
-        { role: 1, text: "Hi, Dito! What do you have in your bag?" },
-        { role: 0, text: "I have a notebook, a ruler and a pencil case." },
-        { role: 1, text: "How many pencils do you have?" },
-        { role: 0, text: "I have three pencils. Do you have a ruler?" },
-        { role: 1, text: "No, I don't. Can I borrow your ruler, please?" },
-        { role: 0, text: "Yes, of course. Here you are!" },
-        { role: 1, text: "Thank you! Do you have a calculator?" },
-        { role: 0, text: "No, I don't. I don't need one today." },
+        { role: 1, text: "Morning, Dito! You're walking very fast. Are you late again?" },
+        {
+          role: 0,
+          text: "I think so! It's seven thirty, and I'm still putting my books in my bag.",
+        },
+        { role: 1, text: "Hurry up! I'm waiting here with two water bottles — one is for you." },
+        { role: 0, text: "Thanks, Sari! Hey, what's that in your hand?" },
+        { role: 1, text: "It's my new ruler. It has a cute robot on it. See?" },
+        { role: 0, text: "It's very cute! My cousin is giving me one like that on Friday." },
+        { role: 1, text: "Nice! Shh — the bell is ringing, and we're still outside!" },
+        { role: 0, text: "You're right. I'm running now. See you in class!" },
       ],
     },
     prompts: [
-      "Tell me three things you have in your bag.",
-      "Tell me one thing you don't have.",
-      "Ask me: Do you have a ___?",
-      "Ask me: How many ___ do you have?",
+      "Act it out: 'I'm putting my ___ in my bag.'",
+      "Tell me what your teacher is doing right now.",
+      "Ask me: 'What are you doing?' — then answer my question, too.",
+      "Say three -ing words you can see around you right now.",
     ],
     twists: [
-      "I have twenty pens in my bag!",
-      "I don't have a bag today — I forgot it at home!",
+      "I'm talking to my cat — she's sitting on my notebook!",
+      "Shh! My little brother is sleeping, so I'm whispering!",
     ],
     homework:
-      "Record yourself describing your real school bag: 3 things you have, 1 thing you don't have, and why.",
+      "Record yourself doing an action at home: 'I'm ___-ing right now!' Then record a second video and say what a family member is doing: 'He/She is ___-ing.'",
   },
   selfCheck: [
-    "Can I say what I have in my bag?",
-    "Can I say what I DON'T have?",
-    "Can I ask 'Do you have...?'",
-    "Can I use one/five with the correct word ending?",
+    "Can I say what people are doing right now with verb + -ing?",
+    "Can I use I'm / He's / She's / They're correctly?",
+    "Can I ask 'What are you doing?'",
+    "Can I name my school supplies in English?",
   ],
   boss: [
-    { question: "Which word means 'a tool for cutting paper'?", options: ["scissors", "glue", "ruler", "pen"], answer: "scissors" },
-    { question: "I ___ have a calculator. (say it is NOT yours)", options: ["don't", "doesn't", "not", "am not"], answer: "don't" },
-    { question: "I have three ___.", options: ["pens", "pen", "penes", "pen's"], answer: "pens" },
-    { question: "Which word means 'a bright marker for important words'?", options: ["highlighter", "eraser", "stapler", "notebook"], answer: "highlighter" },
-    { question: "___ you have a pencil case?", options: ["Do", "Does", "Is", "Have"], answer: "Do" },
+    { question: "Dito ___ packing his bag right now.", options: ["is", "are", "am"], answer: "is" },
+    { question: "Sari ___ looking for her ruler.", options: ["is", "are", "be"], answer: "is" },
+    { question: "___ you listening to the story?", options: ["Are", "Is", "Do"], answer: "Are" },
+    { question: "The students ___ reading quietly.", options: ["are", "is", "am"], answer: "are" },
+    {
+      question: "I'm not ___ the TV now.",
+      options: ["watching", "watch", "watches"],
+      answer: "watching",
+    },
+    {
+      question: "What ___ she doing? — She's drawing.",
+      options: ["is", "are", "does"],
+      answer: "is",
+    },
+    {
+      question: "Look! The cat ___ sleeping on my chair.",
+      options: ["is", "are", "am"],
+      answer: "is",
+    },
   ],
-  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Backpack Bandit", emoji: "🧹" },
+  bossFight: { name: "Backpack Bandit", emoji: "🧹" },
   sticker: { name: "Golden Backpack", emoji: "🎒" },
 };
+
+/* =============================================================================
+ * LESSON 2 — MY THINGS · Comparatives & Superlatives
+ * ============================================================================= */
 
 const lesson2: Lesson = {
   id: "lesson-2",
   number: 2,
   title: "My Things",
-  subtitle: "It Is / They Are + my / your",
+  subtitle: "Comparatives & Superlatives",
   emoji: "🛹",
-  sentenceFrames: ["It is a ___.", "They are ___.", "Is it your ___?"],
+  sentenceFrames: [
+    "My ___ is faster than my ___.",
+    "This is the best ___ in the world.",
+    "A ___ is more useful than a ___.",
+  ],
   speedRoundSeconds: 10,
   vocabulary: [
-    { word: "bicycle", meaning: "a two-wheel vehicle you ride", example: "It's my bicycle.", emoji: "🚲" },
-    { word: "skateboard", meaning: "a board with wheels you stand on", example: "Is it your skateboard?", emoji: "🛹" },
-    { word: "board game", meaning: "a game you play on a board with pieces", example: "It's a board game.", emoji: "🎲" },
+    {
+      word: "bicycle",
+      meaning: "a two-wheel vehicle you ride",
+      example: "My bicycle is faster than my skateboard.",
+      emoji: "🚲",
+    },
+    {
+      word: "skateboard",
+      meaning: "a board with wheels you stand on",
+      example: "Is your skateboard older than mine?",
+      emoji: "🛹",
+    },
+    {
+      word: "board game",
+      meaning: "a game you play on a board with pieces",
+      example: "Board games are more fun than phone games.",
+      emoji: "🎲",
+    },
     {
       word: "playing cards",
       meaning: "a set of cards for games (always plural!)",
-      example: "They are my playing cards.",
+      example: "These playing cards are older than our house!",
       emoji: "🃏",
       tag: "Always plural!",
     },
-    { word: "puzzle", meaning: "many small pieces you join to make a picture", example: "It's a puzzle.", emoji: "🧩" },
-    { word: "video game", meaning: "a game you play on a screen", example: "It's my favourite video game.", emoji: "🎮" },
+    {
+      word: "puzzle",
+      meaning: "many small pieces you join to make a picture",
+      example: "This puzzle is the hardest one in the box.",
+      emoji: "🧩",
+    },
+    {
+      word: "video game",
+      meaning: "a game you play on a screen",
+      example: "My new video game is more exciting than the old one.",
+      emoji: "🎮",
+    },
     {
       word: "headphones",
       meaning: "you wear them to listen (always plural!)",
-      example: "They are my headphones.",
+      example: "Music sounds better on my new headphones than on my old ones.",
       emoji: "🎧",
       tag: "Always plural!",
     },
-    { word: "phone", meaning: "a device for calling and messaging", example: "It's my phone.", emoji: "📱" },
-    { word: "football", meaning: "a ball for playing football", example: "It's my football.", emoji: "⚽" },
-    { word: "badminton racket", meaning: "you hit a shuttlecock with it", example: "It's a badminton racket.", emoji: "🏸" },
-    { word: "backpack", meaning: "a bag for your back", example: "It's my backpack.", emoji: "🎒" },
-    { word: "watch", meaning: "you wear it to see the time", example: "Is it your watch?", emoji: "⌚" },
-    { word: "wallet", meaning: "you keep money and cards in it", example: "It's my wallet.", emoji: "👛" },
-    { word: "water bottle", meaning: "you drink water from it", example: "It's my water bottle.", emoji: "🧴" },
+    {
+      word: "phone",
+      meaning: "a device for calling and messaging",
+      example: "My phone is newer than my brother's phone.",
+      emoji: "📱",
+    },
+    {
+      word: "football",
+      meaning: "a ball for playing football",
+      example: "A football is cheaper than a badminton racket.",
+      emoji: "⚽",
+    },
+    {
+      word: "badminton racket",
+      meaning: "you hit a shuttlecock with it",
+      example: "This racket is lighter than my old one.",
+      emoji: "🏸",
+    },
+    {
+      word: "backpack",
+      meaning: "a bag for your back",
+      example: "My backpack is heavier than my sister's — I have more books!",
+      emoji: "🎒",
+    },
+    {
+      word: "watch",
+      meaning: "you wear it to see the time",
+      example: "Grandpa's watch is older than my dad's car.",
+      emoji: "⌚",
+    },
+    {
+      word: "wallet",
+      meaning: "you keep money and cards in it",
+      example: "A small wallet is more useful than a big bag.",
+      emoji: "👛",
+    },
+    {
+      word: "water bottle",
+      meaning: "you drink water from it",
+      example: "My water bottle is fuller than yours!",
+      emoji: "🧴",
+    },
   ],
   grammar: {
-    title: "It Is / They Are + my / your",
+    title: "Comparatives & Superlatives — Bigger, Biggest!",
     explanation:
-      "Use It is for ONE thing. Use They are for MANY things. Say my for your own things, and ask with your. Careful: headphones and playing cards are always many!",
+      "Compare TWO things with -er + than (faster than). Pick the winner of MANY things with the -est (the fastest). Long words don't like -er/-est — give them more and the most instead (more exciting, the most exciting).",
+    tip: "⭐ COMPARE WORDS — -er / -est / more / the most",
     patterns: [
-      { subject: "What", verb: "is", rest: "it?", note: "It is a bicycle. (ONE thing)" },
-      { subject: "What", verb: "are", rest: "they?", note: "They are headphones. (MANY things)" },
-      { subject: "It", verb: "is", rest: "my phone.", note: "It's my phone." },
-      { subject: "Is it", verb: "", rest: "your watch?", note: "Yes, it's my watch. / No, it isn't." },
-      { subject: "They", verb: "are", rest: "my playing cards.", note: "always many → They are" },
+      {
+        subject: "My bicycle is",
+        verb: "faster",
+        rest: "than your skateboard.",
+        note: "fast → faster + than",
+      },
+      {
+        subject: "This puzzle is",
+        verb: "harder",
+        rest: "than that board game.",
+        note: "hard → harder",
+      },
+      { subject: "It is the", verb: "biggest", rest: "toy in the box.", note: "big → the biggest" },
+      {
+        subject: "Tablets are",
+        verb: "more expensive",
+        rest: "than books.",
+        note: "long words → more + word",
+      },
+      {
+        subject: "It is the",
+        verb: "most beautiful",
+        rest: "poster in the class.",
+        note: "long words → the most + word",
+      },
     ],
     examples: [
-      "It is a skateboard.",
-      "They are my playing cards.",
-      "Is it your football?",
-      "No, it isn't. It's my brother's.",
+      "My headphones are newer than yours.",
+      "This is the most exciting video game I have.",
+      "A watch is more useful than a toy.",
+      "Summer is the hottest time of the year.",
     ],
     yourTurn: [
-      { question: "___ is it?", options: ["What", "What are", "Is"], answer: "What" },
-      { question: "They ___ my headphones.", options: ["is", "are", "am"], answer: "are" },
-      { question: "It ___ a bicycle.", options: ["are", "is", "am"], answer: "is" },
+      {
+        question: "My bag is ___ than yours.",
+        options: ["heavier", "heavyest", "more heavy"],
+        answer: "heavier",
+      },
+      {
+        question: "This is the ___ film of the year.",
+        options: ["funniest", "funnier", "most funny"],
+        answer: "funniest",
+      },
+      {
+        question: "A drone is ___ exciting than a kite.",
+        options: ["more", "most", "much"],
+        answer: "more",
+      },
+      {
+        question: "Badminton is ___ than chess for me.",
+        options: ["easier", "more easy", "easiest"],
+        answer: "easier",
+      },
+      {
+        question: "That was the ___ day of my holiday.",
+        options: ["best", "better", "goodest"],
+        answer: "best",
+      },
+      {
+        question: "My new bike is ___ than my old one.",
+        options: ["faster", "more fast", "fastest"],
+        answer: "faster",
+      },
     ],
   },
   expressions: [
-    { prompt: "What is it?", answer: "It is a bicycle." },
-    { prompt: "What are they?", answer: "They are my headphones." },
-    { prompt: "Is it your phone?", answer: "Yes, it's my phone." },
-    { prompt: "Are they your playing cards?", answer: "No, they aren't. They're my brother's." },
-    { prompt: "Is it your watch?", answer: "No, it isn't." },
-    { prompt: "What's your favourite thing?", answer: "My favourite thing is my video game." },
+    { prompt: "Which is faster, your bike or the bus?", answer: "The bus is faster than my bike." },
+    {
+      prompt: "What is the best thing you own?",
+      answer: "My tablet. It's the most useful thing I have.",
+    },
+    {
+      prompt: "Is your backpack heavier than your friend's?",
+      answer: "Yes, it is. I'm carrying more books.",
+    },
+    { prompt: "What is more fun than homework?", answer: "Playing football with my friends!" },
+    { prompt: "Which is the biggest city in Indonesia?", answer: "Jakarta is the biggest city." },
+    {
+      prompt: "What is the most delicious food you know?",
+      answer: "My grandmother's fried rice. Nobody cooks it better.",
+    },
   ],
   practice: {
     title: "What Is It?",
     instructions:
-      "Flip a belongings card face-down, then reveal it. Ask the right question and answer it: What is it? → It is a ___. / What are they? → They are ___. Then the app asks: Is it your ___? Answer Yes, it's my ___. / No, it isn't.",
+      "Flip a belongings card face-down, then reveal it. Compare it with another thing: My skateboard is faster than my bicycle! / Headphones are more useful than a watch! Then answer: Which is better — yours or your friend's? Why?",
   },
   reading: {
     title: "Grandpa's Toy Box",
@@ -541,31 +737,40 @@ const lesson2: Lesson = {
       alt: "A grandfather and child explore a wooden toy airplane, blocks, a grey rocking horse and a brown-and-white pony beside modern games and headphones.",
     },
     paragraphs: [
-      "My grandfather has an old wooden toy box. Look at his old toys! Are they the same as your things today? How are they different?",
-      "It is an old toy airplane. It has two wings. One wing is a little broken. My grandfather says, 'It's my favourite old toy!'",
-      "They are old wooden blocks. There are ten blocks in a small bag. My grandfather likes to build towers with them.",
-      "It is an old rocking horse. It is small and grey. I like to sit on it every time I visit. My grandfather also has a small toy pony. It is brown and white.",
-      "My things today are different. I have a video game and headphones, not wooden blocks or a rocking horse. But old toys and new things are both fun. Let's play with Grandpa's toys together!",
+      "Grandpa Bayu keeps an old wooden box under the bed in his room. Inside the box, there are toys from many years ago. 'These toys are older than you!' he laughs. 'Maybe they are even older than your father!'",
+      "His favorite toy is a small red car. 'It is smaller than your video games, but it is more special to me,' he says. 'My father made it from real metal. It was the most expensive toy in the shop at that time.'",
+      "Sari thinks the toys are fascinating. 'Board games are more fun than phone games,' says Grandpa. 'When I was young, we played together in one room, and the winner was the happiest kid in the street.'",
+      "At the end of the afternoon, Dito and Sari help Grandpa close the box. 'The best part of the box isn't a toy,' Grandpa smiles. 'It's the stories.'",
     ],
     questions: [
       {
-        question: "What toy has two wings?",
-        options: ["an airplane", "a rocking horse", "wooden blocks", "a toy pony"],
-        answer: "an airplane",
+        question: "Where is the toy box?",
+        options: ["under the bed", "in the kitchen", "on the shelf", "in the garden"],
+        answer: "under the bed",
       },
-      { question: "How many wooden blocks are in the bag?", options: ["ten", "five", "eight", "three"], answer: "ten" },
-      { question: "What colour is the rocking horse?", options: ["grey", "white", "brown", "black"], answer: "grey" },
       {
-        question: "What does the writer have today instead of wooden blocks?",
-        options: ["a video game", "a toy monkey", "a rocking horse", "a puzzle"],
-        answer: "a video game",
+        question: "What is Grandpa's favorite toy?",
+        options: ["a small red car", "a wooden airplane", "a board game", "a rocking horse"],
+        answer: "a small red car",
+      },
+      {
+        question: "What was the little car made from?",
+        options: ["real metal", "plastic", "wood", "paper"],
+        answer: "real metal",
+      },
+      {
+        question: "What does Grandpa say is the best part of the box?",
+        options: ["the stories", "the red car", "the wooden blocks", "the money"],
+        answer: "the stories",
       },
     ],
-    stretchQuestion: "How are Grandpa's old toys different from your things today?",
+    stretchQuestion:
+      "Grandpa says old toys and new toys are both fun. What do you think — and why?",
     spotlight: {
       sound: "long O",
       exampleWord: "boat",
-      instruction: "Listen to each word. They all have the long O sound, like BOAT! Tap to confirm each one.",
+      instruction:
+        "Listen to each word. They all have the long O sound, like BOAT! Tap to confirm each one.",
       words: ["boat", "coat", "cold", "nose", "pony", "video game"],
       mode: "sound_sort",
       sortStyle: "confirm_all",
@@ -586,110 +791,304 @@ const lesson2: Lesson = {
       title: "Whose things are these?",
       scene: "Sari and Dito meet in the park with their favorite things.",
       image: thingsConversationImage,
-      imageAlt: "Two children identifying a blue bottle, headphones, playing cards and a red bicycle at a park table.",
+      imageAlt:
+        "Two children identifying a blue bottle, headphones, playing cards and a red bicycle at a park table.",
       roles: ["Dito", "Sari"],
       lines: [
-        { role: 1, text: "Is it your water bottle, Dito?" },
-        { role: 0, text: "Yes, it is. It's my blue water bottle." },
-        { role: 1, text: "What are they?" },
-        { role: 0, text: "They are my headphones. I use them to listen to music." },
-        { role: 1, text: "Are they your playing cards, too?" },
-        { role: 0, text: "No, they aren't. They're my brother's playing cards." },
-        { role: 0, text: "Is it your bicycle, Sari?" },
-        { role: 1, text: "Yes, it is! It's red. Let's ride to the playground." },
+        { role: 1, text: "Whose tablet is this? It's newer than mine." },
+        {
+          role: 0,
+          text: "It's mine! My uncle gave it to me for my birthday. It was the best present ever.",
+        },
+        { role: 1, text: "Wow. Is it faster than your old phone?" },
+        {
+          role: 0,
+          text: "Much faster! And the camera is better too. Look at this photo of your skateboard.",
+        },
+        { role: 1, text: "Hey, nice photo! My new skateboard is more colorful than my old one." },
+        { role: 0, text: "True! And what's that in the big box under your chair?" },
+        {
+          role: 1,
+          text: "It's my model airplane. It's the most difficult thing I own — a hundred tiny pieces!",
+        },
+        {
+          role: 0,
+          text: "Show and Tell is going to be fun today. Your things are more interesting than mine!",
+        },
       ],
     },
     prompts: [
-      "Show me 3 things you have. Say: 'It's my ___.'",
-      "Show me one thing that's always plural (headphones or playing cards). Say: 'They are my ___.'",
-      "Ask me: Is it your ___?",
-      "Ask me: What is it? / What are they?",
+      "Show me 3 things and compare them: 'My ___ is ___er than my ___.'",
+      "Tell me your favourite thing and why: 'My ___ is the best ___ because...'",
+      "Ask me: 'Which is more fun, ___ or ___?'",
+      "Use 'the most' with a long word once: 'It's the most exciting ___ I have.'",
     ],
     twists: [
-      "It's not my phone — it's my sister's!",
-      "They aren't my headphones — I can't find them anywhere!",
+      "My tablet is more expensive than a bicycle — but it was a gift!",
+      "These playing cards are older than my grandma!",
     ],
     homework:
-      "Record a tour of 4 of your favourite things. Use 'It's my ___' for single items and 'They're my ___' for at least one plural item (like headphones or playing cards).",
+      "Record a comparison of 4 of your things: use -er + than twice, more + word once, and the -est / the most once. Example: 'My bicycle is faster than my skateboard. My headphones are more useful than a watch. This video game is the best.'",
   },
   selfCheck: [
-    "Can I say 'It is' for ONE thing?",
-    "Can I say 'They are' for MANY things?",
-    "Can I use 'my' and 'your' correctly?",
-    "Can I remember headphones and playing cards are always plural?",
+    "Can I compare two things with -er + than?",
+    "Can I use the -est for the winner of many?",
+    "Can I use more / the most with long words?",
+    "Can I name my things in English?",
   ],
   boss: [
-    { question: "What ___ they?", options: ["are", "is", "am", "be"], answer: "are" },
-    { question: "It ___ my skateboard.", options: ["is", "are", "am", "be"], answer: "is" },
-    { question: "Which word is ALWAYS plural?", options: ["headphones", "phone", "watch", "puzzle"], answer: "headphones" },
-    { question: "Is it your football? (say NO)", options: ["No, it isn't.", "No, they aren't.", "No, I don't.", "No, it don't."], answer: "No, it isn't." },
-    { question: "Which word means 'you wear it to see the time'?", options: ["watch", "wallet", "phone", "football"], answer: "watch" },
+    {
+      question: "My bike is ___ than your bike.",
+      options: ["faster", "fast", "fastest"],
+      answer: "faster",
+    },
+    {
+      question: "This is the ___ book in the library.",
+      options: ["oldest", "older", "old"],
+      answer: "oldest",
+    },
+    {
+      question: "A tablet is ___ expensive than a book.",
+      options: ["more", "most", "the"],
+      answer: "more",
+    },
+    {
+      question: "Summer is ___ than winter.",
+      options: ["hotter", "hottest", "more hot"],
+      answer: "hotter",
+    },
+    {
+      question: "That was the ___ day ever!",
+      options: ["best", "better", "goodest"],
+      answer: "best",
+    },
+    {
+      question: "My drone is ___ than my kite.",
+      options: ["more exciting", "most exciting", "excited"],
+      answer: "more exciting",
+    },
+    {
+      question: "He is the ___ runner in the class.",
+      options: ["fastest", "faster", "more fast"],
+      answer: "fastest",
+    },
   ],
-  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Mix-Up Monster", emoji: "👽" },
+  bossFight: { name: "Mix-Up Monster", emoji: "👽" },
   sticker: { name: "Treasure Chest", emoji: "🧰" },
 };
+
+/* =============================================================================
+ * LESSON 3 — MY CLASSROOM · There Is / There Are + Prepositions
+ * (this/that/these/those stay alive in the "Near or Far?" practice game)
+ * ============================================================================= */
 
 const lesson3: Lesson = {
   id: "lesson-3",
   number: 3,
   title: "My Classroom",
-  subtitle: "This / That / These / Those",
+  subtitle: "There Is / There Are",
   emoji: "🏫",
+  // These four frames feed the near/far Practice Game (this/that/these/those).
   sentenceFrames: ["This is a ___.", "That is a ___.", "These are ___.", "Those are ___."],
   speedRoundSeconds: 10,
   vocabulary: [
     // `cue` + `many` feed the Practice Game's near/far zoom frame (this/that/these/those).
-    { word: "bookcase", meaning: "a piece of furniture that holds books", example: "That is a big bookcase.", emoji: "📚", cue: "far" },
-    { word: "calendar", meaning: "shows the days and months on a wall", example: "The calendar is on the wall.", emoji: "📅", cue: "far" },
-    { word: "chair", meaning: "you sit on it", example: "This is my chair.", emoji: "🪑", cue: "near" },
-    { word: "clock", meaning: "shows the time", example: "The clock is red.", emoji: "🕐", cue: "far" },
-    { word: "computer", meaning: "a machine for work and games", example: "There is a computer on the desk.", emoji: "💻", cue: "near" },
-    { word: "cupboard", meaning: "furniture with doors for keeping things", example: "Those are cupboards.", emoji: "🗄️", cue: "far", many: true },
-    { word: "desk", meaning: "the table where you study", example: "This is my desk.", emoji: "🪑", cue: "near" },
-    { word: "drawer", meaning: "a part that slides out of a desk", example: "My pens are in the drawer.", emoji: "🗃️", cue: "near" },
-    { word: "map", meaning: "a picture of countries or the world", example: "That map shows Indonesia.", emoji: "🗺️", cue: "far" },
-    { word: "poster", meaning: "a big picture on the wall", example: "Those are new posters.", emoji: "🖼️", cue: "far", many: true },
-    { word: "shelf", meaning: "a flat board on the wall for keeping things", example: "The books are on the shelf.", emoji: "📚", cue: "far" },
-    { word: "whiteboard", meaning: "a big white board the teacher writes on", example: "The whiteboard is clean.", emoji: "⬜", cue: "far" },
-    { word: "projector", meaning: "shows the teacher's screen on the wall", example: "The projector is on.", emoji: "📽️", cue: "far" },
-    { word: "air conditioner", meaning: "keeps the classroom cool", example: "The air conditioner is on the wall.", emoji: "❄️", cue: "far" },
+    {
+      word: "bookcase",
+      meaning: "a piece of furniture that holds books",
+      example: "There are two big bookcases in our library.",
+      emoji: "📚",
+      cue: "far",
+    },
+    {
+      word: "calendar",
+      meaning: "shows the days and months on a wall",
+      example: "There is a calendar above the teacher's desk.",
+      emoji: "📅",
+      cue: "far",
+    },
+    {
+      word: "chair",
+      meaning: "you sit on it",
+      example: "There are twenty chairs in front of me.",
+      emoji: "🪑",
+      cue: "near",
+    },
+    {
+      word: "clock",
+      meaning: "shows the time",
+      example: "There is a red clock above the door.",
+      emoji: "🕐",
+      cue: "far",
+    },
+    {
+      word: "computer",
+      meaning: "a machine for work and games",
+      example: "There is a computer on my desk.",
+      emoji: "💻",
+      cue: "near",
+    },
+    {
+      word: "cupboard",
+      meaning: "furniture with doors for keeping things",
+      example: "Those cupboards are behind the teacher's desk.",
+      emoji: "🗄️",
+      cue: "far",
+      many: true,
+    },
+    {
+      word: "desk",
+      meaning: "the table where you study",
+      example: "This desk is next to the window.",
+      emoji: "🪑",
+      cue: "near",
+    },
+    {
+      word: "drawer",
+      meaning: "a part that slides out of a desk",
+      example: "My pens are in the drawer under my desk.",
+      emoji: "🗃️",
+      cue: "near",
+    },
+    {
+      word: "map",
+      meaning: "a picture of countries or the world",
+      example: "There is a map of Indonesia between the windows.",
+      emoji: "🗺️",
+      cue: "far",
+    },
+    {
+      word: "poster",
+      meaning: "a big picture on the wall",
+      example: "Those posters are above the whiteboard.",
+      emoji: "🖼️",
+      cue: "far",
+      many: true,
+    },
+    {
+      word: "shelf",
+      meaning: "a flat board on the wall for keeping things",
+      example: "There is a shelf full of books on the wall.",
+      emoji: "📚",
+      cue: "far",
+    },
+    {
+      word: "whiteboard",
+      meaning: "a big white board the teacher writes on",
+      example: "There is a big whiteboard in front of the class.",
+      emoji: "⬜",
+      cue: "far",
+    },
+    {
+      word: "projector",
+      meaning: "shows the teacher's screen on the wall",
+      example: "The projector is on the ceiling, above our heads.",
+      emoji: "📽️",
+      cue: "far",
+    },
+    {
+      word: "air conditioner",
+      meaning: "keeps the classroom cool",
+      example: "There is an air conditioner above the window.",
+      emoji: "❄️",
+      cue: "far",
+    },
   ],
   grammar: {
-    title: "This / That / These / Those",
+    title: "There Is / There Are — Saying Where",
     explanation:
-      "Near you → this (ONE) and these (MANY). Far away → that (ONE) and those (MANY). To say a colour, use: The ___ is ___.",
+      "Use there is + ONE thing and there are + TWO or more. Say WHERE with prepositions: on, in, under, next to, between, behind, in front of, above. Ask Is there…? for one thing and Are there any…? for many.",
+    tip: "📍 WHERE WORDS — on · in · under · next to · between · behind",
     patterns: [
-      { subject: "This", verb: "is", rest: "a pen.", note: "NEAR + ONE → What is this?" },
-      { subject: "That", verb: "is", rest: "a clock.", note: "FAR + ONE → What is that?" },
-      { subject: "These", verb: "are", rest: "pencils.", note: "NEAR + MANY → What are these?" },
-      { subject: "Those", verb: "are", rest: "posters.", note: "FAR + MANY → What are those?" },
-      { subject: "The clock", verb: "is", rest: "red.", note: "The ___ is ___. (colour)" },
+      { subject: "There is", verb: "a map", rest: "on the wall.", note: "ONE thing → there is" },
+      {
+        subject: "There are",
+        verb: "some posters",
+        rest: "between the windows.",
+        note: "TWO or more → there are",
+      },
+      {
+        subject: "Is there",
+        verb: "a computer",
+        rest: "in your classroom?",
+        note: "Yes, there is. / No, there isn't.",
+      },
+      {
+        subject: "Are there",
+        verb: "any plants",
+        rest: "in your classroom?",
+        note: "Yes, there are. / No, there aren't.",
+      },
+      {
+        subject: "There isn't",
+        verb: "a lift",
+        rest: "in our school.",
+        note: "negative → there isn't / there aren't",
+      },
     ],
     examples: [
-      "This is my desk.",
-      "That is a whiteboard.",
-      "These are my pencils.",
-      "Those are posters.",
-      "The clock is red.",
+      "There is a clock above the door.",
+      "There are four computers next to the door.",
+      "There isn't a lift in our school.",
+      "Is there a library in your town? — Yes, there is one behind the market.",
     ],
     yourTurn: [
-      { question: "___ is my pen. (it is close, in my hand)", options: ["This", "That", "Those"], answer: "This" },
-      { question: "___ are the posters. (far away, on the wall)", options: ["These", "Those", "This"], answer: "Those" },
-      { question: "The whiteboard ___ white.", options: ["are", "is", "am"], answer: "is" },
+      {
+        question: "There ___ a big bookcase in the corner.",
+        options: ["is", "are", "be"],
+        answer: "is",
+      },
+      {
+        question: "There ___ some drawers under my desk.",
+        options: ["are", "is", "isn't"],
+        answer: "are",
+      },
+      {
+        question: "The cat is ___ the table — I can't see it!",
+        options: ["under", "above", "between"],
+        answer: "under",
+      },
+      {
+        question: "___ there any computers in the library?",
+        options: ["Are", "Is", "Do"],
+        answer: "Are",
+      },
+      {
+        question: "The teacher's desk is ___ the whiteboard.",
+        options: ["in front of", "between", "above"],
+        answer: "in front of",
+      },
+      {
+        question: "There isn't ___ glue in my pencil case.",
+        options: ["any", "some", "a"],
+        answer: "any",
+      },
     ],
   },
   expressions: [
-    { prompt: "What is this?", answer: "This is my chair." },
-    { prompt: "What is that?", answer: "That is a whiteboard." },
-    { prompt: "What are these?", answer: "These are my pencils." },
-    { prompt: "What are those?", answer: "Those are posters." },
-    { prompt: "What colour is the clock?", answer: "The clock is red." },
-    { prompt: "What colour are those cupboards?", answer: "They are brown." },
+    {
+      prompt: "What is there on your desk?",
+      answer: "There is a lamp, and there are some pencils.",
+    },
+    {
+      prompt: "Is there a whiteboard in your classroom?",
+      answer: "Yes, there is. It's in front of the class.",
+    },
+    {
+      prompt: "Are there any plants in your classroom?",
+      answer: "Yes, there are two. They're next to the window.",
+    },
+    { prompt: "Where is the clock in your room?", answer: "It's above the door." },
+    { prompt: "What is there under your bed?", answer: "There are some boxes full of toys." },
+    {
+      prompt: "Is there a library near your house?",
+      answer: "Yes, there is one behind the market.",
+    },
   ],
   practice: {
     title: "Near or Far?",
     instructions:
-      "Look at the card: is the thing NEAR you or FAR away? One thing or many? Say it: This is a ___. / That is a ___. / These are ___. / Those are ___. Then answer the colour question: What colour is it? → The ___ is ___.",
+      "Look at the card: is the thing NEAR you or FAR away? One thing or many? Say it: This is a ___. / That is a ___. / These are ___. / Those are ___. Then say WHERE it is: It is next to the window. / They are above the whiteboard.",
   },
   reading: {
     title: "A School With One Room",
@@ -698,34 +1097,40 @@ const lesson3: Lesson = {
       alt: "An illustrated 1930 one-room school with a red building, white porch, one teacher and Margaret writing with chalk on a slate.",
     },
     paragraphs: [
-      "This is a photo of an old school in the United States. It is from 1930. Look — that is the school building. It is small and red, with a white porch.",
-      "This is Margaret. She lives in a small town, and she goes to a one-room school. All the students are in one room together. That is her teacher — she is the only teacher in the school. These are Margaret's classmates, and those are their desks. Her older brother William is in the same class!",
-      "Margaret doesn't have a notebook or a pencil case. Look at her desk — this is a slate. It is black, and she writes on it with chalk. And those books on the shelf? They are not Margaret's. Only the teacher has a textbook.",
-      "Margaret likes history the best, because her teacher tells good stories about the past. When she grows up, Margaret wants to be a teacher, too.",
+      "This is a photo of an old school in the United States from 1930. In the picture, there is a small red building with a white porch. There is only one room inside, but there are students of every age in it.",
+      "Margaret is one of the students. She lives in a small town with her family. In her classroom, there are three long desks in front of the blackboard, and there is one teacher for everyone. Her older brother William is sitting between two friends near the window.",
+      "There aren't any notebooks or pencil cases on the desks. There is a black slate on every desk, and there is some chalk in the box under it. On the shelf behind the teacher, there are a few textbooks — but they are only for the teacher.",
+      "Margaret's favorite time is story time, when the teacher tells stories about the past. There is no better class for Margaret — and when she grows up, she wants to be a teacher, too.",
     ],
     questions: [
       {
-        question: "Where does Margaret live?",
-        options: ["a small town", "a big city", "a village", "a farm"],
-        answer: "a small town",
+        question: "Where is the school in the photo?",
+        options: ["in the United States", "in Indonesia", "in a big city", "on a farm"],
+        answer: "in the United States",
       },
       {
-        question: "What does Margaret write on instead of a notebook?",
-        options: ["a slate", "paper", "a tablet", "a whiteboard"],
-        answer: "a slate",
+        question: "What is there on every desk?",
+        options: ["a black slate", "a notebook", "a textbook", "a pencil case"],
+        answer: "a black slate",
       },
       {
-        question: "Who has the only textbook?",
-        options: ["the teacher", "Margaret", "William", "nobody"],
-        answer: "the teacher",
+        question: "Where are the textbooks?",
+        options: [
+          "on the shelf behind the teacher",
+          "under the desks",
+          "in Margaret's bag",
+          "next to the door",
+        ],
+        answer: "on the shelf behind the teacher",
       },
       {
-        question: "What is Margaret's favourite subject?",
-        options: ["history", "math", "science", "English"],
-        answer: "history",
+        question: "Who is sitting between two friends near the window?",
+        options: ["William", "Margaret", "the teacher", "nobody"],
+        answer: "William",
       },
     ],
-    stretchQuestion: "What does Margaret want to be when she grows up, and why?",
+    stretchQuestion:
+      "Margaret has no notebook and no textbook, but she is happy at school. Why do you think that is?",
     spotlight: {
       sound: "long E and short E",
       exampleWord: "bee",
@@ -753,122 +1158,305 @@ const lesson3: Lesson = {
     title: "Describe Your Study Space",
     conversation: {
       title: "A look around our classroom",
-      scene: "Dito and Sari look at things near their desk and across the room.",
+      scene: "Dito is showing Sari around the classroom for the first time.",
       image: classroomConversationImage,
-      imageAlt: "A boy pointing to a nearby pencil and books while a girl shows a whiteboard and distant posters.",
+      imageAlt:
+        "A boy pointing to a nearby pencil and books while a girl shows a whiteboard and distant posters.",
       roles: ["Dito", "Sari"],
       lines: [
-        { role: 0, text: "This is my pencil. It's yellow." },
-        { role: 1, text: "What are these on the desk?" },
-        { role: 0, text: "These are my books. I read them after class." },
-        { role: 1, text: "What is that over there?" },
-        { role: 0, text: "That is our whiteboard. It's next to the cupboard." },
-        { role: 1, text: "And what are those on the far wall?" },
-        { role: 0, text: "Those are posters. My favorite poster is green." },
-        { role: 1, text: "I like it, too. Our classroom is a nice place to learn!" },
+        { role: 0, text: "Welcome to our classroom, Sari! Let me show you around." },
+        { role: 1, text: "Thanks! Wow, there are so many posters on the walls." },
+        {
+          role: 0,
+          text: "Yes, and there are two big maps above the whiteboard. The world map is my favorite.",
+        },
+        { role: 1, text: "I see it! And what's that between the bookcase and the window?" },
+        {
+          role: 0,
+          text: "That's our class plant. There isn't another one, so we take turns giving it water.",
+        },
+        { role: 1, text: "Funny! Are there any computers in here?" },
+        {
+          role: 0,
+          text: "There are four computers next to the door. They're older than the ones in the library, but they still work.",
+        },
+        {
+          role: 1,
+          text: "It's a nice room. There's a lot to look at — I think I'll learn a lot here!",
+        },
       ],
     },
     prompts: [
-      "Point near you: 'This is my ___.'",
-      "Point far from you: 'That is a ___.'",
-      "Say the colour of two things: 'The ___ is ___.'",
-      "Ask me about my room: 'What is that?' / 'What are those?'",
+      "Describe my desk: 'There is a ___ on it.'",
+      "Say where two things are: 'The ___ is next to / above / under the ___.'",
+      "Ask me: 'Is there a ___ in your classroom?' / 'Are there any ___?'",
+      "Play the near/far game: point and say 'This/That is a ___.'",
     ],
     twists: [
-      "That is my cat — she sleeps on my desk!",
-      "These are not my books — they're my brother's!",
+      "There is a spider above the whiteboard — nobody move!",
+      "There aren't any chairs today — we're sitting on the floor!",
     ],
     homework:
-      "Record a tour of your study space: name 5 objects with this/that/these/those, and say the colour of at least 2 of them.",
+      "Record a tour of your room: use There is... three times and There are... two times, and say where each thing is (on, in, under, next to, above, behind, between).",
   },
   selfCheck: [
-    "Can I use 'this' for near and 'that' for far?",
-    "Can I use 'these' and 'those' for many things?",
-    "Can I say the colour of something ('The clock is red')?",
-    "Can I hear the difference between long E and short E?",
+    "Can I use There is for one thing and There are for many?",
+    "Can I say where things are with prepositions?",
+    "Can I ask 'Is there…?' and 'Are there any…?'",
+    "Can I describe my classroom in English?",
   ],
   boss: [
-    { question: "___ is my pen. (near me)", options: ["This", "Those", "These", "That"], answer: "This" },
-    { question: "___ are the posters on the far wall.", options: ["Those", "This", "These", "That"], answer: "Those" },
-    { question: "The whiteboard ___ white.", options: ["is", "are", "am", "be"], answer: "is" },
-    { question: "Which word means 'shows the time'?", options: ["clock", "map", "shelf", "drawer"], answer: "clock" },
-    { question: "What are these? (many pencils, near you)", options: ["These are pencils.", "This is pencils.", "Those is pencils.", "That are pencils."], answer: "These are pencils." },
+    { question: "There ___ a clock above the door.", options: ["is", "are", "be"], answer: "is" },
+    {
+      question: "There ___ some chairs in front of the class.",
+      options: ["are", "is", "be"],
+      answer: "are",
+    },
+    {
+      question: "The ball is ___ the box. I can't see it!",
+      options: ["under", "above", "on"],
+      answer: "under",
+    },
+    { question: "___ there any windows behind you?", options: ["Are", "Is", "Do"], answer: "Are" },
+    {
+      question: "There is a map ___ the two posters.",
+      options: ["between", "under", "on"],
+      answer: "between",
+    },
+    {
+      question: "There isn't ___ paper on my desk.",
+      options: ["any", "some", "many"],
+      answer: "any",
+    },
+    {
+      question: "The teacher's desk is ___ ___ the whiteboard.",
+      options: ["in front of", "on between", "under above"],
+      answer: "in front of",
+    },
   ],
-  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Chalk Dust Dragon", emoji: "🐉" },
+  bossFight: { name: "Chalk Dust Dragon", emoji: "🐉" },
   sticker: { name: "Golden Whiteboard", emoji: "🏫" },
 };
+
+/* =============================================================================
+ * LESSON 4 — FAMILY, FRIENDS & NEIGHBORS · Past Simple
+ * ============================================================================= */
 
 const lesson4: Lesson = {
   id: "lesson-4",
   number: 4,
   title: "Family, Friends & Neighbors",
-  subtitle: "Is she? / Is he? / Are they?",
+  subtitle: "Past Simple",
   emoji: "👨‍👩‍👧‍👦",
-  sentenceFrames: ["Is she your ___?", "Is he your ___?", "Are they your ___?", "___ is ___ years old."],
+  sentenceFrames: [
+    "Yesterday I ___-ed with my ___.",
+    "Last weekend we went to ___.",
+    "It was the ___ day of the week.",
+  ],
   speedRoundSeconds: 10,
   vocabulary: [
-    { word: "aunt", meaning: "your mother's or father's sister", example: "She is my aunt.", emoji: "👩" },
-    { word: "uncle", meaning: "your mother's or father's brother", example: "Is he your uncle?", emoji: "🧔" },
-    { word: "cousin", meaning: "your aunt's or uncle's child", example: "My cousin is 14 years old.", emoji: "🧒" },
+    {
+      word: "aunt",
+      meaning: "your mother's or father's sister",
+      example: "My aunt made a big dinner for us yesterday.",
+      emoji: "👩",
+    },
+    {
+      word: "uncle",
+      meaning: "your mother's or father's brother",
+      example: "My uncle told us a funny story last night.",
+      emoji: "🧔",
+    },
+    {
+      word: "cousin",
+      meaning: "your aunt's or uncle's child",
+      example: "My cousin visited us last weekend.",
+      emoji: "🧒",
+    },
     {
       word: "grandparents",
       meaning: "grandmother + grandfather together (always plural!)",
-      example: "They are my grandparents.",
+      example: "We went to my grandparents' house on Sunday.",
       emoji: "👴👵",
       tag: "Always plural!",
     },
-    { word: "neighbor", meaning: "someone who lives near your house", example: "Our neighbor is kind.", emoji: "🏠" },
+    {
+      word: "neighbor",
+      meaning: "someone who lives near your house",
+      example: "Our neighbor helped us carry the boxes.",
+      emoji: "🏠",
+    },
     {
       word: "children",
       meaning: "more than one child (always plural!)",
-      example: "They have three children.",
+      example: "The children played badminton in the street.",
       emoji: "🧒🧒",
       tag: "Always plural!",
+    },
+    {
+      word: "twins",
+      meaning: "two children born on the same day to the same mother (always plural!)",
+      example: "My cousins are twins — they were born on the same day!",
+      emoji: "👯",
+      tag: "Always plural!",
+    },
+    {
+      word: "kind",
+      meaning: "friendly and helpful to people",
+      example: "Grandma was very kind — she gave me her umbrella.",
+      emoji: "😊",
+    },
+    {
+      word: "funny",
+      meaning: "it makes you laugh",
+      example: "Uncle Bayu was the funniest person at the party.",
+      emoji: "🤣",
+    },
+    {
+      word: "clever",
+      meaning: "quick at learning and understanding things",
+      example: "My cousin is clever — she fixed my drone!",
+      emoji: "🧠",
+    },
+    {
+      word: "strict",
+      meaning: "makes many rules and watches them closely",
+      example: "My grandpa was strict, but he was kind, too.",
+      emoji: "🧑‍🏫",
+    },
+    {
+      word: "generous",
+      meaning: "happy to give things to other people",
+      example: "Aunt Lina is generous — she always brings presents.",
+      emoji: "🎁",
     },
   ],
   // Taught in an earlier course: they join the games, but not the words-learned bar.
   reviewVocabulary: [
     { word: "mother", meaning: "your female parent", example: "Is she your mother?", emoji: "👩" },
     { word: "father", meaning: "your male parent", example: "He is my father.", emoji: "👨" },
-    { word: "brother", meaning: "a boy with the same parents as you", example: "My brother is 15.", emoji: "👦" },
-    { word: "sister", meaning: "a girl with the same parents as you", example: "She is my sister.", emoji: "👧" },
-    { word: "grandmother", meaning: "your mother's or father's mother", example: "My grandmother is kind.", emoji: "👵" },
-    { word: "grandfather", meaning: "your mother's or father's father", example: "My grandfather is 72.", emoji: "👴" },
-    { word: "parents", meaning: "your mother and father together", example: "They are my parents.", emoji: "👫" },
+    {
+      word: "brother",
+      meaning: "a boy with the same parents as you",
+      example: "My brother is 15.",
+      emoji: "👦",
+    },
+    {
+      word: "sister",
+      meaning: "a girl with the same parents as you",
+      example: "She is my sister.",
+      emoji: "👧",
+    },
+    {
+      word: "grandmother",
+      meaning: "your mother's or father's mother",
+      example: "My grandmother is kind.",
+      emoji: "👵",
+    },
+    {
+      word: "grandfather",
+      meaning: "your mother's or father's father",
+      example: "My grandfather is 72.",
+      emoji: "👴",
+    },
+    {
+      word: "parents",
+      meaning: "your mother and father together",
+      example: "They are my parents.",
+      emoji: "👫",
+    },
   ],
   grammar: {
-    title: "Is she? / Is he? / Are they?",
+    title: "Past Simple — Yesterday's Stories",
     explanation:
-      "To ask about ONE girl or woman, start with Is she. For ONE boy or man, start with Is he. For MANY people, start with Are they. To say an age: ___ is ___ years old.",
+      "Finished actions in the past get -ed: played, visited, watched. Many common verbs are irregular: go → went, eat → ate, see → saw, have → had. Use was with I/he/she/it and were with you/we/they. For negatives use didn't + base verb: I didn't watch TV.",
+    tip: "⏪ TIME MACHINE — yesterday + verb-ed",
     patterns: [
-      { subject: "Is she", verb: "", rest: "your mother?", note: "Yes, she is. / No, she isn't." },
-      { subject: "Is he", verb: "", rest: "your uncle?", note: "Yes, he is. / No, he isn't." },
-      { subject: "Are they", verb: "", rest: "your grandparents?", note: "Yes, they are. / No, they aren't." },
-      { subject: "My cousin", verb: "is", rest: "14 years old.", note: "___ is ___ years old." },
+      {
+        subject: "We",
+        verb: "visited",
+        rest: "my grandparents last Sunday.",
+        note: "visit → visited (+ed)",
+      },
+      { subject: "I", verb: "went", rest: "to my cousin's house.", note: "go → went (irregular!)" },
+      {
+        subject: "She",
+        verb: "made",
+        rest: "fried rice for us.",
+        note: "make → made (irregular!)",
+      },
+      { subject: "My weekend", verb: "was", rest: "really fun.", note: "was = past of is" },
+      {
+        subject: "I",
+        verb: "didn't watch",
+        rest: "TV last night.",
+        note: "negative: didn't + base verb",
+      },
     ],
     examples: [
-      "Is she your aunt?",
-      "No, she isn't. She's my mother.",
-      "Are they your grandparents?",
-      "My uncle is 35 years old.",
+      "Yesterday we played badminton after school.",
+      "We were at my grandma's house all afternoon.",
+      "I didn't watch TV last night.",
+      "Where were you? — I was in the garden.",
     ],
     yourTurn: [
-      { question: "___ she your aunt?", options: ["Is", "Are", "Am"], answer: "Is" },
       {
-        question: "Are they your ___? (two older people)",
-        options: ["grandparents", "grandfather", "cousin"],
-        answer: "grandparents",
+        question: "I ___ my homework yesterday.",
+        options: ["finished", "finish", "finishing"],
+        answer: "finished",
       },
-      { question: "My uncle ___ 35 years old.", options: ["are", "is", "am"], answer: "is" },
+      {
+        question: "We ___ to the beach last month.",
+        options: ["went", "goed", "go"],
+        answer: "went",
+      },
+      {
+        question: "She ___ a funny story last night.",
+        options: ["told", "tell", "telled"],
+        answer: "told",
+      },
+      {
+        question: "My cousins ___ at our house last weekend.",
+        options: ["were", "was", "is"],
+        answer: "were",
+      },
+      {
+        question: "I ___ eat breakfast this morning.",
+        options: ["didn't", "don't", "wasn't"],
+        answer: "didn't",
+      },
+      {
+        question: "___ you see the football match?",
+        options: ["Did", "Was", "Were"],
+        answer: "Did",
+      },
     ],
   },
   expressions: [
-    { prompt: "Is she your mother?", answer: "Yes, she is." },
-    { prompt: "Is he your uncle?", answer: "No, he isn't. He's my father." },
-    { prompt: "Are they your grandparents?", answer: "Yes, they are." },
-    { prompt: "How old is your cousin?", answer: "She is 14 years old." },
-    { prompt: "Who is your neighbor?", answer: "Our neighbor is Mr. Budi. He is kind." },
-    { prompt: "Do you have any cousins?", answer: "Yes, I have two cousins." },
+    {
+      prompt: "What did you do last weekend?",
+      answer: "I visited my grandparents and played badminton.",
+    },
+    {
+      prompt: "Where were you yesterday afternoon?",
+      answer: "I was at home. I was doing my homework.",
+    },
+    {
+      prompt: "Did you watch anything fun last night?",
+      answer: "Yes, I did. I watched a cartoon with my sister.",
+    },
+    {
+      prompt: "What was your favorite food when you were little?",
+      answer: "It was fried chicken. I ate it every week!",
+    },
+    {
+      prompt: "Who was your best friend in kindergarten?",
+      answer: "Rafa was. He lived next to my house.",
+    },
+    {
+      prompt: "What did you eat for breakfast this morning?",
+      answer: "I ate eggs and rice. It was tasty.",
+    },
   ],
   practice: {
     title: "Family Detective 🕵️",
@@ -880,8 +1468,22 @@ const lesson4: Lesson = {
     title: "The Santoso Family",
     instructions: "Tap a question to ask it out loud. Grey out the people it can't be.",
     faces: [
-      { id: "f1", name: "Grandpa Hasan", age: 72, emoji: "👴", gender: "male", relation: "grandparent" },
-      { id: "f2", name: "Grandma Siti", age: 70, emoji: "👵", gender: "female", relation: "grandparent" },
+      {
+        id: "f1",
+        name: "Grandpa Hasan",
+        age: 72,
+        emoji: "👴",
+        gender: "male",
+        relation: "grandparent",
+      },
+      {
+        id: "f2",
+        name: "Grandma Siti",
+        age: 70,
+        emoji: "👵",
+        gender: "female",
+        relation: "grandparent",
+      },
       { id: "f3", name: "Mrs. Dewi", age: 41, emoji: "👩", gender: "female", relation: "mother" },
       { id: "f4", name: "Mr. Rudi", age: 44, emoji: "👨", gender: "male", relation: "father" },
       { id: "f5", name: "Aunt Lina", age: 36, emoji: "👩‍🦰", gender: "female", relation: "aunt" },
@@ -898,10 +1500,57 @@ const lesson4: Lesson = {
       image: familiesReadingImage,
       alt: "Different families enjoy a picnic: a child with two parents, a child with a mother, and children with grandparents.",
     },
-    // Passage, questions and in-passage word hunt are pure config — fill them in later.
-    paragraphs: [],
-    placeholder: "Reading passage coming soon — the tutor will add the text.",
-    questions: [],
+    paragraphs: [
+      "Last week, Sari's teacher asked the class to talk about their families. The students learned that families come in all shapes and sizes — every family was different.",
+      "Dito lived with his parents and his older sister. Last month, his cousin Rafa stayed with Dito's family because Rafa's parents worked in another city. 'It was fun!' said Dito. 'We played badminton every afternoon, and Grandma cooked delicious food for us.'",
+      "Ana's family was smaller — it was just her and her mother. 'My mother works hard, and she is my best friend,' Ana said. 'Last Sunday we made pancakes and watched a movie.'",
+      "Bimo lived next door with his grandparents and his aunt. His aunt had three cats, and Bimo loved them. 'My grandmother told us the funniest stories,' he said. 'We laughed for hours!'",
+      "At the end of the week, the class made a big poster called 'Our Families.' There were photos of brothers, sisters, cousins, aunts, uncles, and grandparents on it. Miss Rina wrote one sentence at the bottom: 'Families are different, but love is the same.'",
+    ],
+    questions: [
+      {
+        question: "Why did Rafa stay with Dito's family?",
+        options: [
+          "his parents worked in another city",
+          "his house was too small",
+          "he wanted to play badminton",
+          "his school was closed",
+        ],
+        answer: "his parents worked in another city",
+      },
+      {
+        question: "What did Ana and her mother do last Sunday?",
+        options: [
+          "made pancakes and watched a movie",
+          "went to the beach",
+          "visited grandparents",
+          "played badminton",
+        ],
+        answer: "made pancakes and watched a movie",
+      },
+      {
+        question: "Who does Bimo live with?",
+        options: [
+          "his grandparents and his aunt",
+          "his parents and his sister",
+          "his cousins",
+          "his uncle and aunt",
+        ],
+        answer: "his grandparents and his aunt",
+      },
+      {
+        question: "What did Miss Rina write on the poster?",
+        options: [
+          "Families are different, but love is the same",
+          "Family means one house",
+          "Every family is the same",
+          "Families need a garden",
+        ],
+        answer: "Families are different, but love is the same",
+      },
+    ],
+    stretchQuestion:
+      "How is your family special? Tell the class two things your family did together last month.",
     spotlight: {
       sound: "soft C and hard C",
       exampleWord: "city",
@@ -930,56 +1579,93 @@ const lesson4: Lesson = {
     title: "Draw My Family",
     conversation: {
       title: "Meet my family",
-      scene: "Sari shows Dito some photos in her family album.",
+      scene: "Sari is drawing her family and shows Dito the family photos.",
       image: familyConversationImage,
-      imageAlt: "Two children looking at family photos of grandparents, an aunt and a cousin in an album.",
+      imageAlt:
+        "Two children looking at family photos of grandparents, an aunt and a cousin in an album.",
       roles: ["Dito", "Sari"],
       lines: [
-        { role: 0, text: "Are they your grandparents?" },
-        { role: 1, text: "Yes, they are. They live near our house." },
-        { role: 0, text: "Is she your mother?" },
-        { role: 1, text: "No, she isn't. She's my aunt. She is 35 years old." },
-        { role: 0, text: "Is he your cousin?" },
-        { role: 1, text: "Yes, he is. His name is Rafi." },
-        { role: 0, text: "How old is he?" },
-        { role: 1, text: "He is 14 years old. We like playing football together." },
+        { role: 0, text: "Hi Sari! What are you drawing?" },
+        {
+          role: 1,
+          text: "I'm drawing my family for our class wall. Look — this is my aunt, and these are my cousins.",
+        },
+        { role: 0, text: "Nice! Did you visit them last weekend?" },
+        {
+          role: 1,
+          text: "Yes! We went to my aunt's house on Saturday. She made fried rice — it was delicious.",
+        },
+        {
+          role: 0,
+          text: "Yum! My weekend was quieter. I stayed home and helped my father wash the car.",
+        },
+        { role: 1, text: "That sounds useful! Is that your grandpa in the photo on your desk?" },
+        {
+          role: 0,
+          text: "Yes, it is. He was a teacher, and he told wonderful stories. He was the funniest person in our family.",
+        },
+        { role: 1, text: "He looks kind. Family time is the best, isn't it?" },
       ],
     },
     prompts: [
       "Draw and describe 3 people in your family.",
-      "Say each one's name and age: 'This is my ___. He/She is ___ years old.'",
-      "Ask your teacher 2 Yes/No questions about THEIR family.",
+      "Tell one thing you did together: 'Last weekend we ___-ed...'",
+      "Ask your teacher about THEIR weekend: 'What did you do last weekend?'",
     ],
     twists: [
-      "My cousin is only 2 years old — she's a baby!",
-      "My uncle lives in a different city — I never see him!",
+      "My cousin is only 2 years old — she learned to walk last month!",
+      "My uncle moved to another city — I didn't see him all year!",
     ],
     homework:
-      "Interview someone at home in English! Ask their name and age, and one thing they like. Then record your report: 'This is my ___. He/She is ___ years old. He/She likes ___.' If nobody can answer in English, that's OK — ask the questions and answer them for that person yourself.",
+      "Interview someone at home in English! Ask: 'What did you do last weekend?' Then record your report: 'My ___ ___-ed last weekend. It was ___!' If nobody can answer in English, that's OK — ask the questions and answer them for that person yourself.",
     drawAndDescribe: true,
     drawChecklist: [
       "Draw 3 family members (stick figures are perfect!)",
-      "Describe each one: 'This is my ___. He/She is ___ years old.'",
+      "Write one past-tense sentence for each: 'This is my aunt. She made me pancakes.'",
       "Let your teacher guess who is who!",
     ],
   },
   selfCheck: [
-    "Can I ask 'Is she/he your ___?' correctly?",
-    "Can I ask 'Are they your ___?' for plural people?",
-    "Can I say someone's age: 'He is ___ years old'?",
-    "Can I guess a mystery person using Yes/No questions?",
+    "Can I tell a story about yesterday with -ed verbs?",
+    "Can I use went, ate, saw, and had?",
+    "Can I say where I was with was and were?",
+    "Can I talk about my family in English?",
   ],
   boss: [
-    { question: "___ she your aunt?", options: ["Is", "Are", "Am", "Do"], answer: "Is" },
-    { question: "Are they your grandparents? (say YES)", options: ["Yes, they are.", "Yes, she is.", "Yes, he is.", "Yes, it is."], answer: "Yes, they are." },
-    { question: "My cousin ___ 14 years old.", options: ["is", "are", "am", "be"], answer: "is" },
-    { question: "Which word means 'someone who lives near your house'?", options: ["neighbor", "cousin", "uncle", "aunt"], answer: "neighbor" },
-    { question: "Which word is ALWAYS plural?", options: ["children", "child", "cousin", "aunt"], answer: "children" },
+    { question: "Yesterday we ___ to the park.", options: ["went", "go", "goes"], answer: "went" },
+    {
+      question: "I ___ my grandma last weekend.",
+      options: ["visited", "visit", "am visiting"],
+      answer: "visited",
+    },
+    {
+      question: "She ___ a cake for my birthday.",
+      options: ["made", "makes", "maked"],
+      answer: "made",
+    },
+    {
+      question: "We ___ so tired after the trip.",
+      options: ["were", "was", "are"],
+      answer: "were",
+    },
+    {
+      question: "I ___ watch TV last night.",
+      options: ["didn't", "don't", "wasn't"],
+      answer: "didn't",
+    },
+    {
+      question: "___ you see the football match on Sunday?",
+      options: ["Did", "Do", "Was"],
+      answer: "Did",
+    },
+    {
+      question: "He ___ his homework before dinner.",
+      options: ["finished", "finish", "finishing"],
+      answer: "finished",
+    },
   ],
-  bossFight: { minQuestions: 12, hpPerHit: 10, bossRegen: 10, name: "Question Kraken", emoji: "🐙" },
+  bossFight: { name: "Question Kraken", emoji: "🐙" },
   sticker: { name: "Family Photo Frame", emoji: "🖼️" },
 };
 
 export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3, lesson4];
-
-

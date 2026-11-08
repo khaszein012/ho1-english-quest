@@ -1,8 +1,28 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { BOSS_REQUIRED, BOSS_WIN_BONUS, LEGACY_STORAGE_KEYS, LESSONS, STORAGE_KEY, WORD_MASTERY_TARGET, levelFor, type ScreenId } from "./config";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  BOSS_REQUIRED,
+  BOSS_WIN_BONUS,
+  LEGACY_STORAGE_KEYS,
+  LESSONS,
+  STORAGE_KEY,
+  WORD_MASTERY_TARGET,
+  levelFor,
+  type ScreenId,
+} from "./config";
 import { DEFAULT_STUDENT_NAME, normalizeStudentName } from "./profile";
 
 export type AudioMode = "app" | "teacher" | "device";
+
+/** Which palette the app shows. Light is opt-in; the deep-indigo default is "dark". */
+export type ThemeMode = "light" | "dark";
 
 /** Best boss fight per lesson: fewest misses, then fewest hits needed. */
 export type BossRecord = { hits: number; misses: number };
@@ -18,6 +38,7 @@ export type QuestState = {
   stickers: string[];
   selfChecks: SelfCheckEntry[];
   audioMode: AudioMode;
+  theme: ThemeMode;
   bossBest: Record<string, BossRecord>;
   bossBonusAwarded: string[];
 };
@@ -31,6 +52,7 @@ const emptyState: QuestState = {
   stickers: [],
   selfChecks: [],
   audioMode: "app",
+  theme: "dark",
   bossBest: {},
   bossBonusAwarded: [],
 };
@@ -79,6 +101,7 @@ type QuestContextValue = {
   unlockSticker: (lessonId: string) => void;
   saveSelfCheck: (lessonId: string, answers: number[]) => void;
   setAudioMode: (mode: AudioMode) => void;
+  setTheme: (theme: ThemeMode) => void;
   setStudentName: (name: string) => void;
 };
 
@@ -132,12 +155,18 @@ export function QuestProvider({ children }: { children: ReactNode }) {
     addStars: (lessonId, amount = 1) =>
       setState((prev) => ({
         ...prev,
-        starsByLesson: { ...prev.starsByLesson, [lessonId]: (prev.starsByLesson[lessonId] ?? 0) + amount },
+        starsByLesson: {
+          ...prev.starsByLesson,
+          [lessonId]: (prev.starsByLesson[lessonId] ?? 0) + amount,
+        },
       })),
     markWordCorrect: (lessonId, word) =>
       setState((prev) => {
         const key = `${lessonId}:${word}`;
-        const next = { ...prev, wordCounts: { ...prev.wordCounts, [key]: (prev.wordCounts[key] ?? 0) + 1 } };
+        const next = {
+          ...prev,
+          wordCounts: { ...prev.wordCounts, [key]: (prev.wordCounts[key] ?? 0) + 1 },
+        };
         const lesson = LESSONS.find((l) => l.id === lessonId);
         if (lesson) {
           const learned = lesson.vocabulary.filter(
@@ -164,20 +193,21 @@ export function QuestProvider({ children }: { children: ReactNode }) {
     defeatBoss: (lessonId) =>
       setState((prev) => ({
         ...prev,
-        bossDefeated: prev.bossDefeated.includes(lessonId) ? prev.bossDefeated : [...prev.bossDefeated, lessonId],
+        bossDefeated: prev.bossDefeated.includes(lessonId)
+          ? prev.bossDefeated
+          : [...prev.bossDefeated, lessonId],
         stickers: prev.stickers.includes(lessonId) ? prev.stickers : [...prev.stickers, lessonId],
       })),
     finishBossFight: (lessonId, hits, misses) =>
       setState((prev) => {
         const best = prev.bossBest[lessonId];
-        const better = !best || misses < best.misses || (misses === best.misses && hits < best.hits);
+        const better =
+          !best || misses < best.misses || (misses === best.misses && hits < best.hits);
         const bonus = prev.bossBonusAwarded.includes(lessonId) ? 0 : BOSS_WIN_BONUS;
         return {
           ...prev,
           bossBest: better ? { ...prev.bossBest, [lessonId]: { hits, misses } } : prev.bossBest,
-          bossBonusAwarded: bonus
-            ? [...prev.bossBonusAwarded, lessonId]
-            : prev.bossBonusAwarded,
+          bossBonusAwarded: bonus ? [...prev.bossBonusAwarded, lessonId] : prev.bossBonusAwarded,
           starsByLesson: bonus
             ? { ...prev.starsByLesson, [lessonId]: (prev.starsByLesson[lessonId] ?? 0) + bonus }
             : prev.starsByLesson,
@@ -188,12 +218,16 @@ export function QuestProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({
         ...prev,
         selfChecks: [
-          ...prev.selfChecks.filter((e) => !(e.lessonId === lessonId && e.date === new Date().toISOString().slice(0, 10))),
+          ...prev.selfChecks.filter(
+            (e) => !(e.lessonId === lessonId && e.date === new Date().toISOString().slice(0, 10)),
+          ),
           { lessonId, answers, date: new Date().toISOString().slice(0, 10) },
         ],
       })),
     setAudioMode: (mode) => setState((prev) => ({ ...prev, audioMode: mode })),
-    setStudentName: (name) => setState((prev) => ({ ...prev, studentName: normalizeStudentName(name) })),
+    setTheme: (theme) => setState((prev) => ({ ...prev, theme })),
+    setStudentName: (name) =>
+      setState((prev) => ({ ...prev, studentName: normalizeStudentName(name) })),
   };
 
   return <QuestContext.Provider value={value}>{children}</QuestContext.Provider>;

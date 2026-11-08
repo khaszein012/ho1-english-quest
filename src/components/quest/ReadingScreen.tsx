@@ -1,10 +1,15 @@
 import { useMemo, useRef, useState } from "react";
 import type { Lesson } from "@/lib/quest/config";
 import { useQuest } from "@/lib/quest/store";
-import { AudioModePanel, SpeakerButton, cancelSpeech, speakText, useSpeak } from "@/lib/quest/audio";
+import {
+  AudioModePanel,
+  SpeakerButton,
+  cancelSpeech,
+  speakText,
+  useSpeak,
+} from "@/lib/quest/audio";
 import { bigCelebration, randomPraise, starBurst } from "@/lib/quest/fx";
 import { SoundSortSpotlight } from "./SoundSortSpotlight";
-
 
 type Token = { text: string; clean: string; sentenceIndex: number };
 
@@ -38,7 +43,6 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
   const [found, setFound] = useState<string[]>([]);
   const [missTap, setMissTap] = useState<string | null>(null);
   const targets = soundSort ? [] : r.spotlight.words.map((w) => w.toLowerCase());
-
 
   /**
    * Matches a tapped word to a spotlight target, allowing simple inflections
@@ -78,7 +82,7 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         rate: 0.7,
         onEnd: () => {
           if (runId !== runIdRef.current) return;
-          // Small breath between sentences keeps the pace A1-friendly.
+          // Small breath between sentences keeps the pace learner-friendly.
           window.setTimeout(() => step(i + 1), 400);
         },
       });
@@ -86,7 +90,6 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
     // Let the cancel above settle before queueing the first utterance.
     window.setTimeout(() => step(from), 80);
   }
-
 
   function tapWord(token: Token, tokenKey: string) {
     if (soundSort) return;
@@ -155,73 +158,76 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
           </p>
         </div>
       ) : (
-      <div className="reading-story card-quest space-y-4 p-5 sm:p-7">
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => readAloud(0)}
-            disabled={!enabled}
-            className="btn-pop bg-gold px-4 py-3 text-lg text-gold-foreground disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            ▶️ Read to me
-          </button>
-          <button
-            onClick={stopReading}
-            disabled={!enabled}
-            className="btn-pop bg-secondary px-4 py-3 text-lg text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            ⏹️ Stop
-          </button>
-          {!enabled && (
-            <p className="text-sm text-muted-foreground">
-              App voice is off in this audio mode — switch to App Voice 🔊 above to let the app read.
-            </p>
-          )}
+        <div className="reading-story card-quest space-y-4 p-5 sm:p-7">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => readAloud(0)}
+              disabled={!enabled}
+              className="btn-pop bg-gold px-4 py-3 text-lg text-gold-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              ▶️ Read to me
+            </button>
+            <button
+              onClick={stopReading}
+              disabled={!enabled}
+              className="btn-pop bg-secondary px-4 py-3 text-lg text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              ⏹️ Stop
+            </button>
+            {!enabled && (
+              <p className="text-sm text-muted-foreground">
+                App voice is off in this audio mode — switch to App Voice 🔊 above to let the app
+                read.
+              </p>
+            )}
+          </div>
+
+          <div className="reading-passage space-y-7">
+            {r.paragraphs.map((_, pi) => (
+              <p key={pi}>
+                {sentences.map((s, si) =>
+                  s.paragraph !== pi ? null : (
+                    <span
+                      key={si}
+                      ref={(el) => {
+                        sentenceRefs.current[si] = el;
+                      }}
+                      className={`rounded-lg px-1 py-0.5 transition-colors ${
+                        speaking === si ? "bg-gold text-gold-foreground" : ""
+                      }`}
+                    >
+                      {s.text.split(/(\s+)/).map((piece) => {
+                        if (!piece.trim()) return piece;
+                        const clean = piece.replace(/[^A-Za-z']/g, "");
+                        const token: Token = { text: piece, clean, sentenceIndex: si };
+                        const id = `${si}-${piece}`;
+                        tokenId += 1;
+                        const tokenKey = `${id}-${tokenId}`;
+                        const match = targetFor(clean);
+                        const isFound = !!match && found.includes(match);
+                        return (
+                          <span
+                            key={tokenKey}
+                            onClick={() => tapWord(token, tokenKey)}
+                            className={`rounded px-0.5 ${soundSort ? "" : "cursor-pointer"} ${
+                              isFound
+                                ? "bg-gold font-bold text-gold-foreground"
+                                : soundSort
+                                  ? ""
+                                  : "hover:bg-secondary"
+                            } ${missTap === tokenKey ? "animate-shake" : ""}`}
+                          >
+                            {piece}
+                          </span>
+                        );
+                      })}{" "}
+                    </span>
+                  ),
+                )}
+              </p>
+            ))}
+          </div>
         </div>
-
-
-        <div className="reading-passage space-y-7">
-          {r.paragraphs.map((_, pi) => (
-            <p key={pi}>
-              {sentences.map((s, si) =>
-                s.paragraph !== pi ? null : (
-                  <span
-                    key={si}
-                    ref={(el) => {
-                      sentenceRefs.current[si] = el;
-                    }}
-                    className={`rounded-lg px-1 py-0.5 transition-colors ${
-                      speaking === si ? "bg-gold text-gold-foreground" : ""
-                    }`}
-                  >
-                    {s.text.split(/(\s+)/).map((piece) => {
-                      if (!piece.trim()) return piece;
-                      const clean = piece.replace(/[^A-Za-z']/g, "");
-                      const token: Token = { text: piece, clean, sentenceIndex: si };
-                      const id = `${si}-${piece}`;
-                      tokenId += 1;
-                      const tokenKey = `${id}-${tokenId}`;
-                      const match = targetFor(clean);
-                      const isFound = !!match && found.includes(match);
-                      return (
-                        <span
-                          key={tokenKey}
-                          onClick={() => tapWord(token, tokenKey)}
-                          className={`rounded px-0.5 ${soundSort ? "" : "cursor-pointer"} ${
-                            isFound ? "bg-gold font-bold text-gold-foreground" : soundSort ? "" : "hover:bg-secondary"
-                          } ${missTap === tokenKey ? "animate-shake" : ""}`}
-
-                        >
-                          {piece}
-                        </span>
-                      );
-                    })}{" "}
-                  </span>
-                ),
-              )}
-            </p>
-          ))}
-        </div>
-      </div>
       )}
 
       {soundSort ? (
@@ -246,7 +252,6 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
           )}
         </div>
       )}
-
 
       <div className="card-quest space-y-4 p-5">
         <h3 className="font-display text-xl font-bold">Comprehension Questions</h3>
@@ -288,7 +293,10 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                   );
                   if (idx >= 0) {
                     setSpeaking(idx);
-                    sentenceRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    sentenceRefs.current[idx]?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center",
+                    });
                   }
                 }}
                 className="btn-pop bg-gold px-4 py-3 text-base text-gold-foreground"
@@ -307,7 +315,9 @@ export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         <div className="card-quest space-y-2 border-dashed p-5">
           <h3 className="font-display text-xl font-bold">Stretch question 🌱 (tutor asks aloud)</h3>
           <p className="text-xl">{r.stretchQuestion}</p>
-          <p className="text-sm text-muted-foreground">No score here — just talk about it together.</p>
+          <p className="text-sm text-muted-foreground">
+            No score here — just talk about it together.
+          </p>
         </div>
       )}
     </div>

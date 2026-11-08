@@ -49,9 +49,9 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         <h3 className="font-display text-xl font-bold">The sentence pattern 🎨</h3>
         <div className="flex flex-wrap gap-2 text-sm font-semibold">
           <span className="rounded-full bg-sky/20 px-3 py-1 text-sky">💙 WHO — the person</span>
-          <span className="rounded-full bg-gold/20 px-3 py-1 text-gold">💛 DOING WORD — have / don't have</span>
+          {g.tip && <span className="rounded-full bg-gold/20 px-3 py-1 text-gold">{g.tip}</span>}
           <span className="rounded-full bg-secondary px-3 py-1 text-muted-foreground">
-            🤍 THE THING — what it is
+            🤍 THE REST — the rest of the sentence
           </span>
         </div>
         {g.patterns.map((p, i) => (
@@ -73,11 +73,13 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
         ))}
       </div>
 
-
       <div className="card-quest space-y-3 p-5">
         <h3 className="font-display text-xl font-bold">Listen to the examples</h3>
         {g.examples.map((ex) => (
-          <div key={ex} className="flex items-center justify-between gap-3 rounded-2xl bg-secondary/70 px-4 py-3">
+          <div
+            key={ex}
+            className="flex items-center justify-between gap-3 rounded-2xl bg-secondary/70 px-4 py-3"
+          >
             <span className="text-lg">{ex}</span>
             <SpeakerButton text={ex} />
           </div>
@@ -114,9 +116,7 @@ export function GrammarScreen({ lesson, onComplete }: { lesson: Lesson; onComple
                 ✅ Yes! {item.question.replace("___", item.answer)}
               </p>
             ) : (
-              nudge[i] && (
-                <p className="animate-pop-in text-lg text-gold">{nudge[i]}</p>
-              )
+              nudge[i] && <p className="animate-pop-in text-lg text-gold">{nudge[i]}</p>
             )}
           </div>
         ))}

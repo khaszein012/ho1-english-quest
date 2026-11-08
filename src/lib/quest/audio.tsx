@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQuest, type AudioMode } from "./store";
 
-const A1_RATE = 0.8;
+/** Slightly brisker than the A1 course — A2 learners follow a little more speech. */
+const LEARNER_RATE = 0.85;
 
 /* ---------------------------------------------------------------------------
    Shared browser text-to-speech engine.
@@ -91,7 +92,7 @@ export function speakText(text: string, opts: { rate?: number; onEnd?: () => voi
   const voice = pickVoice();
   if (voice) utterance.voice = voice;
   utterance.lang = voice?.lang ?? "en-US";
-  utterance.rate = opts.rate ?? A1_RATE;
+  utterance.rate = opts.rate ?? LEARNER_RATE;
   utterance.pitch = 1.05;
 
   let done = false;
@@ -196,7 +197,6 @@ export function openTeacherWindow(title: string, lines: string[]) {
   return true;
 }
 
-
 const MODES: { id: AudioMode; label: string }[] = [
   { id: "app", label: "App Voice 🔊" },
   { id: "teacher", label: "Teacher Reads 🗣️" },
@@ -213,7 +213,6 @@ export function AudioModePanel({
   const { state, setAudioMode } = useQuest();
   const [testAnswer, setTestAnswer] = useState<"none" | "yes" | "no">("none");
   const [popupBlocked, setPopupBlocked] = useState(false);
-
 
   return (
     <div className="card-quest p-4 sm:p-5">
@@ -264,7 +263,8 @@ export function AudioModePanel({
 
       {state.audioMode === "device" && (
         <p className="mt-3 rounded-xl bg-secondary/70 px-3 py-2 text-sm text-muted-foreground">
-          Send {state.studentName} this page link to play the audio on their own device, then follow along together.
+          Send {state.studentName} this page link to play the audio on their own device, then follow
+          along together.
         </p>
       )}
 
@@ -342,7 +342,9 @@ export function SpeakerButton({
           Audio isn't available in this browser — ask your teacher to read it aloud!
         </span>
       )}
-      {supported && hiccup && <span className="text-xs text-berry">Audio hiccup — tap again 🔁</span>}
+      {supported && hiccup && (
+        <span className="text-xs text-berry">Audio hiccup — tap again 🔁</span>
+      )}
     </span>
   );
 }
