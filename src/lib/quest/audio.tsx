@@ -62,14 +62,51 @@ export function initSpeech() {
   window.addEventListener("keydown", unlock, { once: true });
 }
 
+/** The tutor's chosen voice ("" = auto). Synced from quest state by useSpeak/AudioModePanel. */
+let preferredVoiceURI = "";
+
+export function setPreferredVoice(uri: string) {
+  preferredVoiceURI = uri;
+}
+
 function pickVoice() {
   if (!voices.length) return undefined; // browser default — never block on this
+  if (preferredVoiceURI) {
+    const chosen = voices.find((v) => v.voiceURI === preferredVoiceURI);
+    // A saved voice can be missing on another device — fall through to auto.
+    if (chosen) return chosen;
+  }
   return (
     voices.find((v) => v.lang === "en-US" && v.localService) ??
     voices.find((v) => v.lang === "en-US") ??
     voices.find((v) => v.lang?.startsWith("en")) ??
     undefined
   );
+}
+
+/**
+ * English voices for the picker, updated live — Chrome fills getVoices()
+ * asynchronously after "voiceschanged", so the list starts empty and populates.
+ */
+export function useEnglishVoices() {
+  const [list, setList] = useState<SpeechSynthesisVoice[]>([]);
+  useEffect(() => {
+    if (!speechSupported()) return;
+    const update = () => {
+      const all = window.speechSynthesis.getVoices();
+      setList(
+        [...all]
+          .filter((v) => v.lang?.toLowerCase().startsWith("en"))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      );
+    };
+    update();
+    window.speechSynthesis.addEventListener?.("voiceschanged", update);
+    return () => {
+      window.speechSynthesis.removeEventListener?.("voiceschanged", update);
+    };
+  }, []);
+  return list;
 }
 
 export function cancelSpeech() {
@@ -164,6 +201,10 @@ export function useSpeak() {
   useEffect(() => {
     initSpeech();
   }, []);
+  // Keep the engine's preferred voice in sync with the saved choice.
+  useEffect(() => {
+    setPreferredVoice(state.voiceURI);
+  }, [state.voiceURI]);
   const speak = useCallback(
     (text: string | string[]) => {
       if (!enabled) return;
@@ -210,9 +251,14 @@ export function AudioModePanel({
   scriptTitle?: string;
   scriptLines?: string[];
 }) {
-  const { state, setAudioMode } = useQuest();
+  const { state, setAudioMode, setVoiceURI } = useQuest();
   const [testAnswer, setTestAnswer] = useState<"none" | "yes" | "no">("none");
   const [popupBlocked, setPopupBlocked] = useState(false);
+  const englishVoices = useEnglishVoices();
+  // Test Sound speaks directly, so the engine needs the saved choice synced here too.
+  useEffect(() => {
+    setPreferredVoice(state.voiceURI);
+  }, [state.voiceURI]);
 
   return (
     <div className="card-quest p-4 sm:p-5">
@@ -236,9 +282,37 @@ export function AudioModePanel({
       </div>
 
       {state.audioMode === "app" && (
-        <p className="mt-3 rounded-xl bg-secondary/70 px-3 py-2 text-sm text-muted-foreground">
-          Using a headset? Turn ON "Share sound" in Zoom, or switch to Teacher Reads mode.
-        </p>
+        <>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <label htmlFor="app-voice" className="text-sm font-bold">
+              Voice
+            </label>
+            <select
+              id="app-voice"
+              value={
+                state.voiceURI && englishVoices.some((v) => v.voiceURI === state.voiceURI)
+                  ? state.voiceURI
+                  : ""
+              }
+              onChange={(e) => setVoiceURI(e.target.value)}
+              className="btn-pop max-w-full bg-secondary px-3 py-2 text-sm text-secondary-foreground"
+              aria-label="App voice"
+            >
+              <option value="">Auto (recommended)</option>
+              {englishVoices.map((v) => (
+                <option key={v.voiceURI} value={v.voiceURI}>
+                  {v.name} ({v.lang}){v.localService ? "" : " ☁"}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs text-muted-foreground">
+              Pick a voice, then tap Test Sound.
+            </span>
+          </div>
+          <p className="mt-3 rounded-xl bg-secondary/70 px-3 py-2 text-sm text-muted-foreground">
+            Using a headset? Turn ON "Share sound" in Zoom, or switch to Teacher Reads mode.
+          </p>
+        </>
       )}
       {state.audioMode === "teacher" && (
         <div className="mt-3 flex flex-wrap items-center gap-3">

@@ -32,7 +32,16 @@
 - [x] Add a 🎓 tutor switch in both headers that unlocks every lesson's boss while active (gold-lit button, persisted in the quest save), so any lesson and boss can be tested without a play-through; bosses lock again when it is turned off.
 
 # Scope alignment with the course book
-- [x] Re-align all four lessons to the book's Units 1-4 after reviewing the official scope: grammar targets reverted to the book structures (have / It is-They are + my-your / this-that-these-those + colour adjectives / Is she-Is he-Are they + ages); the out-of-scope A1→A2 grammar experiment (present continuous, comparatives, there is/there are, past simple) was removed.
+- [x] Re-align all four lessons to the book's Units 1-4 after reviewing the official scope: grammar targets reverted to the book structures (have / It is-They are + my-you / this-that-these-those + colour adjectives / Is she-Is he-Are they + ages); the out-of-scope A1→A2 grammar experiment (present continuous, comparatives, there is/there are, past simple) was removed.
 - [x] Vocabulary lists now follow the book's unit word lists (16/16/16/9 words, e.g. crayon, glue stick, lunchbox, paintbrush, pencil sharpener, tape; kite, doll, hula hoop, rollerblades, soccer ball; easel, mat, wastebasket, drawing; family, friend, teacher, children).
 - [x] Lesson titles match the book ("School Things", "My Toys", "My Classroom", "Family and Friends"); reading titles match ("Students of the Future", "Old Toys", "One-room School", "Different Kinds of Families"); phonics sets extended to the book's lists (long u adds boots + glue stick, long o adds jump rope, long e adds easel).
 - [x] The A2 depth stays: richer meanings and examples, fuller reading passages, harder boss tuning, per-boss personalities, story-check questions — all within the book's grammar.
+
+# Content quality guards
+- [x] Add a lesson-config validator (`config-validator.ts`) that runs against the real `LESSONS` at module load and fails fast in dev/build: answers must be inside their options, comprehension answers and word-hunt targets must appear in the passage, grammar patterns must be complete (with the book's Is she/Is he/Are they exception), conversations must alternate exactly two roles, vocabulary must be unique and non-empty, and boss/listening minimums. First run caught two real answer/passage mismatches (lesson 1 "yellow boots", lesson 4 "Rafa's parents"), now fixed.
+- [x] Add `npm test` (Node's built-in runner, zero new dependencies) with suites for the validator (fixture lessons, one broken rule per test) and the profile helper; fix the orphaned `profile.test.ts` import.
+- [x] Fix the reading read-aloud sentence splitter (now `reading.ts`): punctuation inside quoted dialogue no longer breaks sentences, attribution stays with its quote ("'It is fun!' says Dito." is one unit), apostrophes and curly quotes are handled, and repeated punctuation stays together — verified in the browser on the "Old Toys" and "Different Kinds of Families" passages.
+
+# App voice picker
+- [x] Add a voice choice to the App Voice audio panel: a select listing the device's English voices live (handles Chrome's async voice loading), with "Auto (recommended)" as the default and a ☁ marker for online voices that may lag.
+- [x] The choice is saved in the quest state (`voiceURI`, empty = auto), survives reloads, falls back to auto on devices where the saved voice is missing, and applies to every spoken thing — SpeakerButtons, Test Sound and the reading read-aloud.

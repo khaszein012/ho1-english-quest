@@ -41,6 +41,8 @@ export type QuestState = {
   stickers: string[];
   selfChecks: SelfCheckEntry[];
   audioMode: AudioMode;
+  /** Chosen App Voice (""), or the voiceURI of a specific browser voice. Empty = auto. */
+  voiceURI: string;
   theme: ThemeMode;
   /** Tutor switch: when on, every boss is unlocked so any lesson can be tested instantly. */
   teacherMode: boolean;
@@ -57,6 +59,7 @@ const emptyState: QuestState = {
   stickers: [],
   selfChecks: [],
   audioMode: "app",
+  voiceURI: "",
   theme: "light",
   teacherMode: false,
   bossBest: {},
@@ -107,6 +110,7 @@ type QuestContextValue = {
   unlockSticker: (lessonId: string) => void;
   saveSelfCheck: (lessonId: string, answers: number[]) => void;
   setAudioMode: (mode: AudioMode) => void;
+  setVoiceURI: (uri: string) => void;
   setTheme: (theme: ThemeMode) => void;
   setTeacherMode: (on: boolean) => void;
   setStudentName: (name: string) => void;
@@ -234,6 +238,7 @@ export function QuestProvider({ children }: { children: ReactNode }) {
         ],
       })),
     setAudioMode: (mode) => setState((prev) => ({ ...prev, audioMode: mode })),
+    setVoiceURI: (uri) => setState((prev) => ({ ...prev, voiceURI: uri })),
     setTheme: (theme) => setState((prev) => ({ ...prev, theme })),
     setTeacherMode: (on) => setState((prev) => ({ ...prev, teacherMode: on })),
     setStudentName: (name) =>
