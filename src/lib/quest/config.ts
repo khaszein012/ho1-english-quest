@@ -35,6 +35,7 @@ import futureSchoolReadingImage from "@/assets/reading-future-school.jpg";
 import grandpaToysReadingImage from "@/assets/reading-grandpa-toys.jpg";
 import oneRoomSchoolReadingImage from "@/assets/reading-one-room-school.jpg";
 import familiesReadingImage from "@/assets/reading-families.jpg";
+import { assertValidLessons } from "./config-validator";
 
 /**
  * The ONLY browser-storage key this app touches. The "quest_" prefix keeps it in
@@ -474,8 +475,8 @@ const lesson1: Lesson = {
       },
       {
         question: "What does Dito have under his desk on rainy days?",
-        options: ["his yellow boots", "a real calculator", "a heavy backpack", "his lunchbox"],
-        answer: "his yellow boots",
+        options: ["yellow boots", "a real calculator", "a heavy backpack", "his lunchbox"],
+        answer: "yellow boots",
       },
       {
         question: "What does Dito have on Tuesday?",
@@ -1435,12 +1436,12 @@ const lesson4: Lesson = {
       {
         question: "Why is Rafa with Dito's family?",
         options: [
-          "his parents are in another city",
+          "Rafa's parents are in another city",
           "his house is too small",
           "he loves badminton",
           "his school is closed",
         ],
-        answer: "his parents are in another city",
+        answer: "Rafa's parents are in another city",
       },
       {
         question: "What do Ana and her mother do on Sundays?",
@@ -1581,3 +1582,8 @@ const lesson4: Lesson = {
 };
 
 export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3, lesson4];
+
+// Fail fast during development and builds if a content edit breaks a screen
+// invariant (answers inside options, word-hunt words present in the passage,
+// alternating conversation roles, non-empty grammar patterns, ...).
+assertValidLessons(LESSONS);

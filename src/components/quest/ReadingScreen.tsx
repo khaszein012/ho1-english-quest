@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import type { Lesson } from "@/lib/quest/config";
+import { splitSentences } from "@/lib/quest/reading";
 import { useQuest } from "@/lib/quest/store";
 import {
   AudioModePanel,
@@ -12,17 +13,6 @@ import { bigCelebration, randomPraise, starBurst } from "@/lib/quest/fx";
 import { SoundSortSpotlight } from "./SoundSortSpotlight";
 
 type Token = { text: string; clean: string; sentenceIndex: number };
-
-function splitSentences(paragraphs: string[]) {
-  const sentences: { text: string; paragraph: number }[] = [];
-  paragraphs.forEach((p, pi) => {
-    (p.match(/[^.!?]+[.!?]*/g) ?? [p]).forEach((s) => {
-      const text = s.trim();
-      if (text) sentences.push({ text, paragraph: pi });
-    });
-  });
-  return sentences;
-}
 
 export function ReadingScreen({ lesson, onComplete }: { lesson: Lesson; onComplete: () => void }) {
   const { addStars } = useQuest();

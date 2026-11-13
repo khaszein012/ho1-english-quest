@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import { strict as assert } from "node:assert";
-import { DEFAULT_STUDENT_NAME, normalizeStudentName } from "./profile";
+import { DEFAULT_STUDENT_NAME, normalizeStudentName } from "./profile.ts";
 
 describe("customizable student name", () => {
   test("old saved progress without a name retains the existing student", () => {
