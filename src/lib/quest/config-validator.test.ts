@@ -131,6 +131,27 @@ describe("validateLessons catches broken content", () => {
     assert.ok(issues.some((issue) => issue.message === "duplicate lesson id"));
   });
 
+  test("units after the first need a PIN", () => {
+    const locked = baseLesson();
+    locked.number = 2;
+    assert.ok(paths(locked).some((m) => m.includes("need a PIN")));
+    locked.pin = "2468";
+    assert.ok(!paths(locked).some((m) => m.includes("PIN")));
+  });
+
+  test("two units cannot share a PIN", () => {
+    const a = baseLesson();
+    a.number = 2;
+    a.id = "test-lesson-2";
+    a.pin = "2468";
+    const b = baseLesson();
+    b.number = 3;
+    b.id = "test-lesson-3";
+    b.pin = "2468";
+    const issues = validateLessons([a, b]);
+    assert.ok(issues.some((issue) => issue.message.includes("share the PIN")));
+  });
+
   test("assertValidLessons lists every issue when it throws", () => {
     const lesson = baseLesson();
     lesson.boss[0]!.answer = "am";

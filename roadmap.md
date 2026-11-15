@@ -45,3 +45,9 @@
 # App voice picker
 - [x] Add a voice choice to the App Voice audio panel: a select listing the device's English voices live (handles Chrome's async voice loading), with "Auto (recommended)" as the default and a ☁ marker for online voices that may lag.
 - [x] The choice is saved in the quest state (`voiceURI`, empty = auto), survives reloads, falls back to auto on devices where the saved voice is missing, and applies to every spoken thing — SpeakerButtons, Test Sound and the reading read-aloud.
+
+# Unit PIN gates + first-run name popup
+- [x] Lock every unit after the first behind its own PIN (config `pin` field, tutor-editable: 2468 / 1357 / 9876); lesson 1 stays open. Locked tiles show a lock with "Enter PIN to unlock"; a friendly dialog shakes on wrong codes and celebrates + opens the unit on the right one.
+- [x] Persist PIN unlocks in the quest save (`unlockedLessons`) and keep teacher mode as the full bypass; winning a boss reveals the next unit's PIN on the victory screen.
+- [x] Show a first-run popup on a new browser asking for the student's name ("What should we call you, explorer?") — shown once (`namePrompted`), keeps the previous name when left empty.
+- [x] Extend the config validator with the PIN rules (every unit after 1 needs a PIN; two units cannot share one) with tests; verified end-to-end in the browser: welcome popup, wrong/right PIN flow, persistence across reloads and the boss-victory PIN reveal.

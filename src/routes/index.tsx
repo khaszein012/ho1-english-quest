@@ -2,7 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowUpRight, BookOpen, Sparkles, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { StudentProfile } from "@/components/quest/StudentProfile";
+import { PinDialog } from "@/components/quest/PinDialog";
 import { ThemeToggle } from "@/components/quest/ThemeToggle";
 import { TeacherModeToggle } from "@/components/quest/TeacherModeToggle";
 import { LESSONS, SCREENS, type Lesson, type ScreenId } from "@/lib/quest/config";
@@ -17,6 +26,7 @@ import { ProgressScreen } from "@/components/quest/ProgressScreen";
 import { BossChallenge } from "@/components/quest/BossChallenge";
 import { StickerAlbum } from "@/components/quest/StickerAlbum";
 import { cancelSpeech } from "@/lib/quest/audio";
+import { starBurst } from "@/lib/quest/fx";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,7 +59,8 @@ type View = { lessonId: string; screen: ScreenId | "boss" } | null;
 function QuestApp() {
   const [view, setView] = useState<View>(null);
   const [album, setAlbum] = useState(false);
-  const { state } = useQuest();
+  const [draftName, setDraftName] = useState("");
+  const { state, ready, completeNamePrompt } = useQuest();
 
   // The palette is a class on <html>; every CSS token switches with it.
   // :root is the bright Play theme, html.dark the deep-indigo Night room.
@@ -58,9 +69,44 @@ function QuestApp() {
   }, [state.theme]);
 
   const lesson = LESSONS.find((l) => l.id === view?.lessonId);
+  const showWelcome = ready && !state.namePrompted;
 
   return (
     <main className="quest-app">
+      {/* First run on a new browser: ask for the explorer's name once. */}
+      <Dialog
+        open={showWelcome}
+        onOpenChange={(open) => {
+          if (!open) completeNamePrompt(state.studentName);
+        }}
+      >
+        <DialogContent className="w-[calc(100%-2rem)] rounded-lg bg-card">
+          <DialogHeader>
+            <DialogTitle>👋 Welcome to English Quest!</DialogTitle>
+            <DialogDescription>What should we call you, explorer?</DialogDescription>
+          </DialogHeader>
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              completeNamePrompt(draftName);
+            }}
+          >
+            <Input
+              value={draftName}
+              onChange={(event) => setDraftName(event.target.value)}
+              maxLength={40}
+              placeholder={state.studentName}
+              aria-label="Student name"
+              autoFocus
+              className="h-11"
+            />
+            <Button type="submit" className="w-full">
+              Let's go! ⚡
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
       {album && <StickerAlbum onClose={() => setAlbum(false)} />}
       {!view || !lesson ? (
         <Home
@@ -102,7 +148,9 @@ function Home({
   onOpenLesson: (id: string) => void;
   onOpenAlbum: () => void;
 }) {
-  const { state, totalStars, level, wordsLearned, isScreenDone } = useQuest();
+  const { state, totalStars, level, wordsLearned, isScreenDone, isLessonOpen, unlockLesson } =
+    useQuest();
+  const [pinLesson, setPinLesson] = useState<Lesson | null>(null);
   const nextLevelAt = Number.isFinite(level.max) ? level.max + 1 : null;
   const mastered = LESSONS.reduce((sum, lesson) => sum + wordsLearned(lesson.id), 0);
   return (
@@ -146,19 +194,26 @@ function Home({
           <div className="lesson-grid">
             {LESSONS.map((lesson) => {
               const done = SCREENS.filter((screen) => isScreenDone(lesson.id, screen.id)).length;
+              const open = isLessonOpen(lesson.id);
               return (
                 <Button
                   key={lesson.id}
                   variant="ghost"
                   size="auto"
-                  onClick={() => onOpenLesson(lesson.id)}
+                  onClick={() => (open ? onOpenLesson(lesson.id) : setPinLesson(lesson))}
                   className="lesson-tile"
                 >
                   <div className="flex w-full items-start justify-between">
                     <span className="lesson-illustration" aria-hidden="true">
                       {lesson.emoji}
                     </span>
-                    <ArrowUpRight className="size-5 text-muted-foreground" />
+                    {open ? (
+                      <ArrowUpRight className="size-5 text-muted-foreground" />
+                    ) : (
+                      <span className="text-xl" aria-hidden="true">
+                        🔒
+                      </span>
+                    )}
                   </div>
                   <div className="w-full">
                     <p className="section-kicker">
@@ -166,6 +221,9 @@ function Home({
                     </p>
                     <h3>{lesson.title}</h3>
                     <p className="text-sm text-muted-foreground">{lesson.subtitle}</p>
+                    {!open && (
+                      <p className="text-xs font-bold text-muted-foreground">Enter PIN to unlock</p>
+                    )}
                   </div>
                   <div className="lesson-footer">
                     <span>
@@ -241,6 +299,17 @@ function Home({
           </Button>
         </aside>
       </div>
+      {pinLesson && (
+        <PinDialog
+          lesson={pinLesson}
+          onUnlocked={(lessonId) => {
+            unlockLesson(lessonId);
+            starBurst();
+            onOpenLesson(lessonId);
+          }}
+          onClose={() => setPinLesson(null)}
+        />
+      )}
     </div>
   );
 }

@@ -173,6 +173,8 @@ export type Lesson = {
   number: number;
   title: string;
   subtitle: string;
+  /** Secret code that unlocks this unit on the home screen (units after 1). */
+  pin?: string;
   emoji: string;
   sentenceFrames: string[];
   speedRoundSeconds: number;
@@ -594,6 +596,7 @@ const lesson2: Lesson = {
   number: 2,
   title: "My Toys",
   subtitle: "It Is / They Are + my / your",
+  pin: "2468",
   emoji: "🛹",
   sentenceFrames: ["It is a ___.", "They are ___.", "Is it your ___?"],
   speedRoundSeconds: 10,
@@ -902,6 +905,7 @@ const lesson3: Lesson = {
   number: 3,
   title: "My Classroom",
   subtitle: "This / That / These / Those",
+  pin: "1357",
   emoji: "🏫",
   sentenceFrames: ["This is a ___.", "That is a ___.", "These are ___.", "Those are ___."],
   speedRoundSeconds: 10,
@@ -1237,6 +1241,7 @@ const lesson4: Lesson = {
   number: 4,
   title: "Family and Friends",
   subtitle: "Is she? / Is he? / Are they?",
+  pin: "9876",
   emoji: "👨‍👩‍👧‍👦",
   sentenceFrames: [
     "Is she your ___?",

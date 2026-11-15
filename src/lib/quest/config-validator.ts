@@ -49,12 +49,34 @@ function checkQuizItem(
 export function validateLessons(lessons: Lesson[]): LessonValidationIssue[] {
   const issues: LessonValidationIssue[] = [];
   const ids = new Set<string>();
+  const pins = new Map<string, string>();
 
   lessons.forEach((lesson, lessonIndex) => {
     const path = `LESSONS[${lessonIndex}]`;
     if (ids.has(lesson.id))
       issues.push({ lessonId: lesson.id, path: `${path}.id`, message: "duplicate lesson id" });
     ids.add(lesson.id);
+
+    // Units after the first are PIN-locked: each needs its own code.
+    if (lesson.number > 1 && !lesson.pin?.trim()) {
+      issues.push({
+        lessonId: lesson.id,
+        path: `${path}.pin`,
+        message: "locked lessons (number > 1) need a PIN",
+      });
+    }
+    if (lesson.number > 1 && lesson.pin?.trim()) {
+      const pinKey = lesson.pin.trim().toLowerCase();
+      if (pins.has(pinKey)) {
+        issues.push({
+          lessonId: lesson.id,
+          path: `${path}.pin`,
+          message: `two lessons share the PIN "${lesson.pin.trim()}" (also used by ${pins.get(pinKey)})`,
+        });
+      } else {
+        pins.set(pinKey, lesson.id);
+      }
+    }
 
     if (!lesson.title.trim())
       issues.push({ lessonId: lesson.id, path: `${path}.title`, message: "title is empty" });

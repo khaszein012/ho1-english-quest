@@ -13,7 +13,7 @@ function pickLine(lines: string[]) {
 }
 
 export function BossChallenge({ lesson }: { lesson: Lesson }) {
-  const { addStars, defeatBoss, finishBossFight, bossUnlocked, state } = useQuest();
+  const { addStars, defeatBoss, finishBossFight, bossUnlocked, isLessonOpen, state } = useQuest();
   const cfg = bossConfig(lesson);
   const { enabled: appVoice, mode: audioMode } = useSpeak();
   const best = state.bossBest[lesson.id];
@@ -231,6 +231,9 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
   }
 
   if (phase === "won") {
+    // Beating a boss reveals the next unit's PIN — the key to the next adventure.
+    const next = LESSONS.find((l) => l.number === lesson.number + 1);
+    const nextNeedsPin = !!next && next.pin && !isLessonOpen(next.id);
     return (
       <div className="card-quest animate-pop-in space-y-3 p-8 text-center">
         <p className="text-7xl">🎉</p>
@@ -247,6 +250,11 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
             ? "New personal record! 🏅"
             : `Best: ${best?.hits} ${best?.hits === 1 ? "hit" : "hits"}, ${best?.misses} ${best?.misses === 1 ? "miss" : "misses"}`}
         </p>
+        {nextNeedsPin && (
+          <p className="rounded-2xl bg-secondary/70 px-4 py-3 font-display text-lg font-bold text-gold">
+            🔑 The gate to {next!.title} opens with PIN {next!.pin}
+          </p>
+        )}
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={start}

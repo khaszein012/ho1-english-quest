@@ -46,6 +46,10 @@ export type QuestState = {
   theme: ThemeMode;
   /** Tutor switch: when on, every boss is unlocked so any lesson can be tested instantly. */
   teacherMode: boolean;
+  /** Lesson ids the student has PIN-unlocked. Lesson 1 is always open. */
+  unlockedLessons: string[];
+  /** Whether the first-run "what's your name?" popup has been shown. */
+  namePrompted: boolean;
   bossBest: Record<string, BossRecord>;
   bossBonusAwarded: string[];
 };
@@ -62,6 +66,8 @@ const emptyState: QuestState = {
   voiceURI: "",
   theme: "light",
   teacherMode: false,
+  unlockedLessons: [],
+  namePrompted: false,
   bossBest: {},
   bossBonusAwarded: [],
 };
@@ -104,6 +110,11 @@ type QuestContextValue = {
   completeScreen: (lessonId: string, screen: ScreenId) => void;
   isScreenDone: (lessonId: string, screen: ScreenId) => boolean;
   bossUnlocked: (lessonId: string) => boolean;
+  /** True for lesson 1, teacher mode, or lessons the student has PIN-unlocked. */
+  isLessonOpen: (lessonId: string) => boolean;
+  unlockLesson: (lessonId: string) => void;
+  /** Records the first-run name popup as done (optionally saving a new name). */
+  completeNamePrompt: (name: string) => void;
   defeatBoss: (lessonId: string) => void;
   /** Records a won fight: best-record update + one-time star bonus. */
   finishBossFight: (lessonId: string, hits: number, misses: number) => void;
@@ -203,6 +214,25 @@ export function QuestProvider({ children }: { children: ReactNode }) {
       const done = state.screensDone[lessonId] ?? [];
       return BOSS_REQUIRED.every((s) => done.includes(s));
     },
+    isLessonOpen: (lessonId) => {
+      // Teacher mode opens everything; unit 1 is always free.
+      if (state.teacherMode) return true;
+      const lesson = LESSONS.find((l) => l.id === lessonId);
+      if (lesson && lesson.number === 1) return true;
+      return state.unlockedLessons.includes(lessonId);
+    },
+    unlockLesson: (lessonId) =>
+      setState((prev) =>
+        prev.unlockedLessons.includes(lessonId)
+          ? prev
+          : { ...prev, unlockedLessons: [...prev.unlockedLessons, lessonId] },
+      ),
+    completeNamePrompt: (name) =>
+      setState((prev) => ({
+        ...prev,
+        studentName: name.trim() ? normalizeStudentName(name) : prev.studentName,
+        namePrompted: true,
+      })),
     defeatBoss: (lessonId) =>
       setState((prev) => ({
         ...prev,
