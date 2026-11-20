@@ -224,6 +224,11 @@ function Home({
                     {!open && (
                       <p className="text-xs font-bold text-muted-foreground">Enter PIN to unlock</p>
                     )}
+                    {lesson.plannedMinutes !== undefined && (
+                      <p className="text-xs font-semibold text-gold">
+                        ⏱ {lesson.plannedMinutes}-minute session
+                      </p>
+                    )}
                   </div>
                   <div className="lesson-footer">
                     <span>
@@ -388,6 +393,24 @@ function LessonView({
           </nav>
           <div className="sidebar-stars">
             <StarBar />
+            {lesson.sessionPlan && lesson.sessionPlan.length > 0 && (
+              <div className="mt-3 rounded-2xl bg-card p-3">
+                <p className="section-kicker">
+                  ⏱ SESSION PLAN · {lesson.plannedMinutes ?? "—"} MIN
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {lesson.sessionPlan.map((block) => (
+                    <li
+                      key={block.label}
+                      className="flex items-center justify-between gap-2 text-xs text-muted-foreground"
+                    >
+                      <span className="min-w-0">{block.label}</span>
+                      <span className="shrink-0 font-bold text-gold">{block.minutes}′</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </aside>
         <section key={`${lesson.id}-${screen}`} className={`quest-content screen-${screen}`}>

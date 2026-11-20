@@ -51,3 +51,10 @@
 - [x] Persist PIN unlocks in the quest save (`unlockedLessons`) and keep teacher mode as the full bypass; winning a boss reveals the next unit's PIN on the victory screen.
 - [x] Show a first-run popup on a new browser asking for the student's name ("What should we call you, explorer?") — shown once (`namePrompted`), keeps the previous name when left empty.
 - [x] Extend the config validator with the PIN rules (every unit after 1 needs a PIN; two units cannot share one) with tests; verified end-to-end in the browser: welcome popup, wrong/right PIN flow, persistence across reloads and the boss-victory PIN reveal.
+
+# Lesson 5 — The Big Review (Units 1-4)
+- [x] Add lesson 5 as a 75-minute review session (`plannedMinutes` + a per-screen session plan card in the sidebar, minutes summing to exactly 75, ending with self-assessment on My Progress).
+- [x] Evaluation content drawn from all four units: 16 mixed vocabulary words (4 per unit) plus 8 review words for the game pools, 8 grammar patterns covering every structure, 8 mixed expressions, an 8-item mixed yourTurn quiz, and a 10-item hand-written evaluation boss.
+- [x] New reading "The School Fair" weaving all four structures, with 6 comprehension questions covering every unit and a two-basket long U / long O phonics review built from the Unit 1-2 sound sets.
+- [x] Role-play conversation mixing all units at the school fair; expanded 6-item self-assessment; final boss "The Grand Mixer 🌀" (18 questions, 120 HP, 5 spaced-repetition items from Units 1-4).
+- [x] Lesson 5 is PIN-gated like the others (4321) — the Unit 4 boss victory reveals it; validator extended with plannedMinutes/session-plan rules and tests.

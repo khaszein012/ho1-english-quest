@@ -222,6 +222,50 @@ export function validateLessons(lessons: Lesson[]): LessonValidationIssue[] {
         });
       }
     }
+
+    if (lesson.plannedMinutes !== undefined) {
+      if (
+        !Number.isInteger(lesson.plannedMinutes) ||
+        lesson.plannedMinutes < 15 ||
+        lesson.plannedMinutes > 180
+      ) {
+        issues.push({
+          lessonId: lesson.id,
+          path: `${path}.plannedMinutes`,
+          message: "plannedMinutes must be a whole number between 15 and 180",
+        });
+      }
+    }
+    if (lesson.sessionPlan) {
+      if (lesson.sessionPlan.length === 0) {
+        issues.push({
+          lessonId: lesson.id,
+          path: `${path}.sessionPlan`,
+          message: "session plan needs at least one block",
+        });
+      }
+      lesson.sessionPlan.forEach((block, index) => {
+        const blockPath = `${path}.sessionPlan[${index}]`;
+        if (!block.label.trim())
+          issues.push({ lessonId: lesson.id, path: blockPath, message: "label is empty" });
+        if (!Number.isInteger(block.minutes) || block.minutes <= 0)
+          issues.push({
+            lessonId: lesson.id,
+            path: blockPath,
+            message: "minutes must be a positive whole number",
+          });
+      });
+      if (lesson.plannedMinutes !== undefined) {
+        const total = lesson.sessionPlan.reduce((sum, block) => sum + block.minutes, 0);
+        if (total !== lesson.plannedMinutes) {
+          issues.push({
+            lessonId: lesson.id,
+            path: `${path}.sessionPlan`,
+            message: `session plan totals ${total} minutes but plannedMinutes is ${lesson.plannedMinutes}`,
+          });
+        }
+      }
+    }
   });
 
   return issues;

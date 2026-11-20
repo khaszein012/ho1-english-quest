@@ -152,6 +152,22 @@ describe("validateLessons catches broken content", () => {
     assert.ok(issues.some((issue) => issue.message.includes("share the PIN")));
   });
 
+  test("session plan minutes must sum to plannedMinutes", () => {
+    const lesson = baseLesson();
+    lesson.plannedMinutes = 75;
+    lesson.sessionPlan = [
+      { label: "Games", minutes: 60 },
+      { label: "Wrap-up", minutes: 15 },
+    ];
+    assert.deepEqual(validateLessons([lesson]), []);
+    lesson.sessionPlan[1]!.minutes = 10;
+    assert.ok(
+      paths(lesson).some((m) =>
+        m.includes("session plan totals 70 minutes but plannedMinutes is 75"),
+      ),
+    );
+  });
+
   test("assertValidLessons lists every issue when it throws", () => {
     const lesson = baseLesson();
     lesson.boss[0]!.answer = "am";

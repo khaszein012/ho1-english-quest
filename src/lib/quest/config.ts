@@ -14,6 +14,7 @@
  *   lesson 2 — My Toys: It is / They are + my / your
  *   lesson 3 — My Classroom: this / that / these / those + colour adjectives
  *   lesson 4 — Family and Friends: Is she…? Is he…? Are they…? + ages
+ *   lesson 5 — The Big Review: mixed evaluation of Units 1-4 (75-minute session)
  *
  * TO ADD LESSON 5 (or 6...8):
  *   1. Copy the `lesson4` object below, rename it `lesson5`.
@@ -178,6 +179,10 @@ export type Lesson = {
   emoji: string;
   sentenceFrames: string[];
   speedRoundSeconds: number;
+  /** Optional planned session runtime in minutes, shown on the tile and sidebar. */
+  plannedMinutes?: number;
+  /** Optional pacing breakdown for the tutor — the minutes must sum to plannedMinutes. */
+  sessionPlan?: { label: string; minutes: number }[];
   vocabulary: VocabWord[];
   /**
    * Words taught in an earlier course. They join the Match It / Listen & Pick
@@ -1586,7 +1591,469 @@ const lesson4: Lesson = {
   sticker: { name: "Family Photo Frame", emoji: "🖼️" },
 };
 
-export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3, lesson4];
+/* =============================================================================
+ * LESSON 5 — THE BIG REVIEW · mixed evaluation of Units 1-4
+ * A 75-minute tutoring session: vocabulary games, grammar, expressions,
+ * practice, reading, role-play, self-assessment and a final boss — every
+ * question drawn from the Unit 1-4 topics and structures.
+ * ============================================================================= */
+
+const lesson5: Lesson = {
+  id: "lesson-5",
+  number: 5,
+  title: "The Big Review",
+  subtitle: "Units 1–4 Review",
+  pin: "4321",
+  emoji: "🌟",
+  sentenceFrames: [
+    "I have a ___.",
+    "They are my ___.",
+    "That is a ___.",
+    "Is she your ___?",
+    "The ___ is ___.",
+  ],
+  speedRoundSeconds: 10,
+  plannedMinutes: 75,
+  sessionPlan: [
+    { label: "Vocabulary games", minutes: 12 },
+    { label: "Grammar Focus", minutes: 10 },
+    { label: "Learn — expressions", minutes: 8 },
+    { label: "Practice Game", minutes: 10 },
+    { label: "Reading", minutes: 12 },
+    { label: "Role-Play", minutes: 10 },
+    { label: "My Progress — self-assessment", minutes: 8 },
+    { label: "Boss Challenge", minutes: 5 },
+  ],
+  vocabulary: [
+    // Unit 1 — School Things
+    {
+      word: "backpack",
+      meaning: "a bag you carry on your back for school",
+      example: "I have a red backpack.",
+      emoji: "🎒",
+    },
+    {
+      word: "ruler",
+      meaning: "a straight tool for measuring and drawing lines",
+      example: "Do you have a ruler? — Yes, I do!",
+      emoji: "📏",
+    },
+    {
+      word: "textbook",
+      meaning: "a big book you study from in class",
+      example: "I have one textbook for every subject.",
+      emoji: "📕",
+    },
+    {
+      word: "glue stick",
+      meaning: "a tube of sticky glue for paper crafts",
+      example: "I don't have a glue stick today.",
+      emoji: "🧴",
+    },
+    // Unit 2 — My Toys
+    {
+      word: "kite",
+      meaning: "a light frame that flies on a string",
+      example: "It is my kite. It is blue and yellow.",
+      emoji: "🪁",
+    },
+    {
+      word: "puzzle",
+      meaning: "many small pieces you join to make a picture",
+      example: "It is a puzzle with 100 pieces!",
+      emoji: "🧩",
+    },
+    {
+      word: "rollerblades",
+      meaning: "shoes with wheels on the bottom (always plural!)",
+      example: "They are my new rollerblades!",
+      emoji: "🛼",
+      tag: "Always plural!",
+    },
+    {
+      word: "soccer ball",
+      meaning: "the ball for playing soccer",
+      example: "Is it your soccer ball? — Yes, it is!",
+      emoji: "⚽",
+    },
+    // Unit 3 — My Classroom
+    {
+      word: "bookcase",
+      meaning: "a piece of furniture that holds books",
+      example: "That is a big bookcase.",
+      emoji: "📚",
+    },
+    {
+      word: "map",
+      meaning: "a picture of countries or the world",
+      example: "That map shows Indonesia.",
+      emoji: "🗺️",
+    },
+    {
+      word: "poster",
+      meaning: "a big picture on the wall",
+      example: "Those posters are colourful.",
+      emoji: "🖼️",
+    },
+    {
+      word: "clock",
+      meaning: "shows the time",
+      example: "The clock is red.",
+      emoji: "🕐",
+    },
+    // Unit 4 — Family and Friends
+    {
+      word: "aunt",
+      meaning: "your mother's or father's sister",
+      example: "My aunt is 35 years old.",
+      emoji: "👩",
+    },
+    {
+      word: "uncle",
+      meaning: "your mother's or father's brother",
+      example: "My uncle is 38 years old.",
+      emoji: "🧔",
+    },
+    {
+      word: "cousin",
+      meaning: "your aunt's or uncle's child",
+      example: "My cousin is 14 years old.",
+      emoji: "🧑‍🤝‍🧑",
+    },
+    {
+      word: "grandparents",
+      meaning: "grandmother + grandfather together (always plural!)",
+      example: "They are my grandparents.",
+      emoji: "👴👵",
+      tag: "Always plural!",
+    },
+  ],
+  // Extra review words for the Match It / Listen & Pick pools — not counted
+  // toward the words-learned bar or sticker.
+  reviewVocabulary: [
+    {
+      word: "notebook",
+      meaning: "a book with empty pages for your notes",
+      example: "I have one notebook for English.",
+      emoji: "📓",
+    },
+    {
+      word: "stapler",
+      meaning: "a tool that joins papers together",
+      example: "I don't have a stapler. The teacher has one.",
+      emoji: "📎",
+    },
+    {
+      word: "doll",
+      meaning: "a small toy baby or person you can hold",
+      example: "It is my sister's doll.",
+      emoji: "🪆",
+    },
+    {
+      word: "blocks",
+      meaning: "small pieces you build towers with (always plural!)",
+      example: "They are my blocks.",
+      emoji: "🧱",
+      tag: "Always plural!",
+    },
+    {
+      word: "calendar",
+      meaning: "shows the days and months on a wall",
+      example: "That is the class calendar.",
+      emoji: "📅",
+    },
+    {
+      word: "computer",
+      meaning: "a machine for work and games",
+      example: "There is a computer on my desk.",
+      emoji: "💻",
+    },
+    {
+      word: "neighbor",
+      meaning: "someone who lives near your house",
+      example: "Our neighbor is very kind.",
+      emoji: "🏠",
+    },
+    {
+      word: "children",
+      meaning: "more than one child (always plural!)",
+      example: "The children are in the yard.",
+      emoji: "🧒🧒",
+      tag: "Always plural!",
+    },
+  ],
+  grammar: {
+    title: "The Big Review — Units 1–4",
+    explanation:
+      "Everything from Units 1–4 in one place! Unit 1: have / don't have. Unit 2: It is / They are + my / your. Unit 3: this / that / these / those + colours. Unit 4: Is she…? Is he…? Are they…? + ages. Read each pattern and say which unit it comes from!",
+    tip: "🌟 ALL FOUR UNITS — have · it is/they are · this/that · is she?",
+    patterns: [
+      { subject: "I", verb: "have", rest: "a backpack.", note: "Unit 1 — have" },
+      {
+        subject: "Do you",
+        verb: "have",
+        rest: "a ruler?",
+        note: "Unit 1 — Yes, I do. / No, I don't.",
+      },
+      { subject: "It is", verb: "my", rest: "kite.", note: "Unit 2 — ONE thing" },
+      { subject: "They are", verb: "your", rest: "rollerblades.", note: "Unit 2 — MANY things" },
+      { subject: "This is", verb: "my", rest: "desk.", note: "Unit 3 — NEAR + ONE" },
+      { subject: "Those", verb: "are", rest: "posters.", note: "Unit 3 — FAR + MANY" },
+      {
+        subject: "Is she",
+        verb: "",
+        rest: "your aunt?",
+        note: "Unit 4 — Yes, she is. / No, she isn't.",
+      },
+      { subject: "My cousin", verb: "is", rest: "14 years old.", note: "Unit 4 — ages" },
+    ],
+    examples: [
+      "I have a blue pencil case.",
+      "They are my rollerblades.",
+      "That is a big bookcase.",
+      "The clock is red.",
+      "Is she your aunt? — Yes, she is!",
+      "My cousin is 14 years old.",
+    ],
+    yourTurn: [
+      { question: "I ___ a backpack.", options: ["have", "has", "having"], answer: "have" },
+      { question: "I have three ___.", options: ["pens", "pen", "penes"], answer: "pens" },
+      { question: "They ___ my rollerblades.", options: ["is", "are", "am"], answer: "are" },
+      { question: "Is it your kite? — Yes, ___ is.", options: ["it", "they", "he"], answer: "it" },
+      { question: "___ is my pen. (near me)", options: ["This", "That", "Those"], answer: "This" },
+      { question: "The whiteboard ___ white.", options: ["is", "are", "am"], answer: "is" },
+      { question: "___ she your aunt?", options: ["Is", "Are", "Am"], answer: "Is" },
+      { question: "My cousin ___ 14 years old.", options: ["is", "are", "were"], answer: "is" },
+    ],
+  },
+  expressions: [
+    {
+      prompt: "What do you have in your backpack?",
+      answer: "I have a textbook, a ruler and two pencils.",
+    },
+    { prompt: "Do you have a stapler?", answer: "No, I don't. I don't have one at school." },
+    { prompt: "What is it?", answer: "It is my toy airplane." },
+    { prompt: "Are they your cards?", answer: "No, they aren't. They are your cards!" },
+    { prompt: "What is that?", answer: "That is a whiteboard." },
+    { prompt: "What colour is the clock?", answer: "The clock is red." },
+    { prompt: "Is she your mother?", answer: "No, she isn't. She's my aunt." },
+    { prompt: "How old is your cousin?", answer: "He is 14 years old." },
+  ],
+  practice: {
+    title: "The Big Show-and-Tell",
+    instructions:
+      "Flip a card and use the RIGHT pattern for it: school things → I have a ___; one toy → It is my ___; many toys → They are my ___; classroom → That is a ___ / The ___ is ___; people → Is she your ___? Then the speed round — everything mixed together!",
+  },
+  reading: {
+    title: "The School Fair",
+    paragraphs: [
+      "Today is the school fair at Dito and Sari's school. Everyone is excited. 'I have a big surprise,' says Dito. 'I have a kite, a puzzle and my new rollerblades for the toy stall!'",
+      "Sari has a table for the school things. 'I have rulers, glue sticks and twenty crayons,' she says. 'Do you have a stapler?' 'No, I don't,' says Dito. 'But my teacher has one!'",
+      "Look at their classroom! This is the bookcase, and that is the map of Indonesia. Those posters on the wall are new — they are blue and yellow. The clock is red, and it is very old.",
+      "Dito's family is at the fair, too. 'Is she your aunt?' asks Sari. 'Yes, she is! She is 35 years old,' says Dito. 'And they are my grandparents — they are 70 and 72 years old!'",
+      "At the end of the day, the class counts the money for the school library. 'It is a lot!' says Sari. 'We are a great team!'",
+    ],
+    questions: [
+      {
+        question: "What does Dito have for the toy stall?",
+        options: [
+          "a kite, a puzzle and my new rollerblades",
+          "a stapler and twenty crayons",
+          "a red clock",
+          "a school bag",
+        ],
+        answer: "a kite, a puzzle and my new rollerblades",
+      },
+      {
+        question: "What does Sari have on her table?",
+        options: [
+          "rulers, glue sticks and twenty crayons",
+          "a stapler and a kite",
+          "a map and a clock",
+          "a school bag",
+        ],
+        answer: "rulers, glue sticks and twenty crayons",
+      },
+      {
+        question: "What colour are the new posters?",
+        options: ["blue and yellow", "red and green", "white and grey", "black and white"],
+        answer: "blue and yellow",
+      },
+      {
+        question: "How old is Dito's aunt?",
+        options: ["35 years old", "38 years old", "14 years old", "70 years old"],
+        answer: "35 years old",
+      },
+      {
+        question: "How old are Dito's grandparents?",
+        options: [
+          "70 and 72 years old",
+          "35 and 38 years old",
+          "14 and 11 years old",
+          "72 and 75 years old",
+        ],
+        answer: "70 and 72 years old",
+      },
+      {
+        question: "What is the money for?",
+        options: ["the school library", "a new clock", "toys for the stall", "a big poster"],
+        answer: "the school library",
+      },
+    ],
+    stretchQuestion:
+      "You are at the fair with your family! Tell your teacher three things you have, one thing that is yours, and how old two of your family members are.",
+    spotlight: {
+      sound: "Long U and Long O — the big review",
+      exampleWord: "blue",
+      instruction:
+        "Listen to each word, then drop it in the right basket: long U like BLUE, or long O like BOAT. You learned both sounds — this is the big review!",
+      words: [
+        "blue",
+        "ruler",
+        "cute",
+        "boots",
+        "glue stick",
+        "boat",
+        "coat",
+        "nose",
+        "pony",
+        "cold",
+        "video game",
+      ],
+      mode: "sound_sort",
+      sortStyle: "two_buckets",
+      buckets: [
+        { id: "long-u", label: "Long U — like BLUE" },
+        { id: "long-o", label: "Long O — like BOAT" },
+      ],
+      sortWords: [
+        { word: "blue", emoji: "💙", bucket: "long-u" },
+        { word: "ruler", emoji: "📏", bucket: "long-u" },
+        { word: "cute", emoji: "🐣", bucket: "long-u" },
+        { word: "boots", emoji: "🥾", bucket: "long-u" },
+        { word: "glue stick", emoji: "🧴", bucket: "long-u" },
+        { word: "boat", emoji: "⛵", bucket: "long-o" },
+        { word: "coat", emoji: "🧥", bucket: "long-o" },
+        { word: "nose", emoji: "👃", bucket: "long-o" },
+        { word: "pony", emoji: "🐴", bucket: "long-o" },
+        { word: "cold", emoji: "❄️", bucket: "long-o" },
+        { word: "video game", emoji: "🎮", bucket: "long-o" },
+      ],
+      note: "Long U words come from Unit 1, and long O words come from Unit 2 — can you remember both sounds?",
+    },
+  },
+  rolePlay: {
+    title: "The Fair Interview",
+    conversation: {
+      title: "A new friend at the fair",
+      scene: "Dito and Sari show a new student around the school fair.",
+      image: thingsConversationImage,
+      imageAlt:
+        "Two children identifying a blue bottle, headphones, playing cards and a red bicycle at a park table.",
+      roles: ["Dito", "Sari"],
+      lines: [
+        { role: 1, text: "Wow, Dito! Look at our fair table. What do you have?" },
+        { role: 0, text: "I have a kite, a puzzle and my new rollerblades. What do you have?" },
+        {
+          role: 1,
+          text: "I have rulers, glue sticks and crayons. And look — this is my favorite board game. It is old but it is my favorite!",
+        },
+        { role: 0, text: "It is nice! And what are those on the big table?" },
+        {
+          role: 1,
+          text: "Those are posters for the fair. They are blue and yellow — my favorite colors!",
+        },
+        { role: 0, text: "They are great! Hey, is that your aunt over there?" },
+        { role: 1, text: "No, it isn't. She is my mother! And those are my grandparents." },
+        { role: 0, text: "How old are they?" },
+        { role: 1, text: "My grandmother is 70 and my grandfather is 72. They love the fair!" },
+        {
+          role: 0,
+          text: "Our fair is the best. We have everything — toys, school things, posters and family!",
+        },
+      ],
+    },
+    prompts: [
+      "Show three things and say: 'I have a ___.' / 'They are my ___.'",
+      "Point near and far: 'This is a ___.' / 'Those are ___.'",
+      "Ask about people: 'Is she your ___? How old is she?'",
+      "Say one sentence for EVERY unit — have, it is/they are, this/that, is she!",
+    ],
+    twists: [
+      "I have a surprise in my backpack — but I can't tell you!",
+      "That isn't my aunt — it's my teacher, and she has twenty crayons!",
+    ],
+    homework:
+      "Host your own mini-fair at home! Record a 2-minute tour: 3 things you have, your favorite toy (It is/They are), two things far away (That is/Those are), and introduce two family members with their ages.",
+  },
+  selfCheck: [
+    "Can I say what I have and what I don't have?",
+    "Can I use It is / They are and my / your?",
+    "Can I use this, that, these, those and say colours?",
+    "Can I ask Is she…? Is he…? Are they…? and say ages?",
+    "Can I read a story and find the answers?",
+    "Can I use my words from all four units?",
+  ],
+  boss: [
+    {
+      question: "Which word means 'a big book you study from in class'?",
+      options: ["textbook", "notebook", "map", "calendar"],
+      answer: "textbook",
+    },
+    {
+      question: "I ___ have a stapler. (say it is NOT yours)",
+      options: ["don't", "doesn't", "not", "am not"],
+      answer: "don't",
+    },
+    { question: "I have two ___.", options: ["rulers", "ruler", "rulering"], answer: "rulers" },
+    { question: "What ___ they?", options: ["are", "is", "am", "be"], answer: "are" },
+    {
+      question: "It is ___ kite. (it belongs to me)",
+      options: ["my", "your", "our"],
+      answer: "my",
+    },
+    {
+      question: "___ are the posters. (far away)",
+      options: ["Those", "This", "These", "That"],
+      answer: "Those",
+    },
+    { question: "The map ___ colourful.", options: ["is", "are", "am"], answer: "is" },
+    {
+      question: "Are they your grandparents? (say YES)",
+      options: ["Yes, they are.", "Yes, she is.", "Yes, he is.", "Yes, it is."],
+      answer: "Yes, they are.",
+    },
+    { question: "My aunt ___ 35 years old.", options: ["is", "are", "am", "be"], answer: "is" },
+    {
+      question: "Which word is ALWAYS plural?",
+      options: ["grandparents", "kite", "clock", "backpack"],
+      answer: "grandparents",
+    },
+  ],
+  bossFight: {
+    minQuestions: 18,
+    reviewQuestions: 5,
+    maxHp: 120,
+    name: "The Grand Mixer",
+    emoji: "🌀",
+  },
+  bossPersona: {
+    hurt: [
+      "Whoa! All four units at once! 🌀",
+      "My perfect mix is falling apart!",
+      "No fair — you know EVERYTHING!",
+    ],
+    taunt: [
+      "Unit 1? Unit 4? I mix them ALL! 🌀",
+      "Have? Is? Are? Let me stir it up!",
+      "You'll need more than one unit to beat me!",
+    ],
+    phases: ["The Grand Mixer is spinning faster! 🌪️", "The Grand Mixer is almost unmixed! 😵"],
+  },
+  sticker: { name: "Review Trophy", emoji: "🏆" },
+};
+
+export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3, lesson4, lesson5];
 
 // Fail fast during development and builds if a content edit breaks a screen
 // invariant (answers inside options, word-hunt words present in the passage,
