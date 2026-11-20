@@ -58,3 +58,8 @@
 - [x] New reading "The School Fair" weaving all four structures, with 6 comprehension questions covering every unit and a two-basket long U / long O phonics review built from the Unit 1-2 sound sets.
 - [x] Role-play conversation mixing all units at the school fair; expanded 6-item self-assessment; final boss "The Grand Mixer 🌀" (18 questions, 120 HP, 5 spaced-repetition items from Units 1-4).
 - [x] Lesson 5 is PIN-gated like the others (4321) — the Unit 4 boss victory reveals it; validator extended with plannedMinutes/session-plan rules and tests.
+
+# Teacher PIN + victory badges
+- [x] Gate teacher mode behind a tutor PIN (`TEACHER_PIN` in config, 7391): the 🎓 switch opens a PIN dialog before turning on (wrong codes shake politely); turning it off stays free.
+- [x] Replace the boss-victory PIN reveal with victory badge codes (config `badgeCode`: MOON-RULER / SUN-KITE / STAR-MAP / RAIN-HOME): the won screen and the defeated boss screen show the badge, which the student exchanges with the teacher for the next unit's PIN — the badge itself never unlocks anything, keeping the teacher in the loop.
+- [x] Update the PIN dialog copy ("enter the PIN they give you"); validator gains badge rules (every unit that gates a next unit needs a badge, no duplicates) with tests; fixed a badge-code swap bug found in browser verification (the won screen showed the next lesson's badge instead of the current one).

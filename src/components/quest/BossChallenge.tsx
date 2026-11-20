@@ -225,15 +225,23 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
               You've beaten this boss before — can you beat your record?
             </p>
           )}
+          {defeated && lesson.badgeCode && (
+            <p className="rounded-2xl bg-secondary/70 px-4 py-2 text-sm font-bold text-gold">
+              🏅 Your victory badge: {lesson.badgeCode} — show your teacher to unlock the next
+              adventure!
+            </p>
+          )}
         </div>
       </div>
     );
   }
 
   if (phase === "won") {
-    // Beating a boss reveals the next unit's PIN — the key to the next adventure.
+    // Beating a boss earns a victory badge. The student shows it to the
+    // teacher, who hands over the next unit's PIN — the badge itself never
+    // unlocks anything, so the teacher stays in the loop.
     const next = LESSONS.find((l) => l.number === lesson.number + 1);
-    const nextNeedsPin = !!next && next.pin && !isLessonOpen(next.id);
+    const showBadge = !!next && !!next.badgeCode && !isLessonOpen(next.id);
     return (
       <div className="card-quest animate-pop-in space-y-3 p-8 text-center">
         <p className="text-7xl">🎉</p>
@@ -250,9 +258,9 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
             ? "New personal record! 🏅"
             : `Best: ${best?.hits} ${best?.hits === 1 ? "hit" : "hits"}, ${best?.misses} ${best?.misses === 1 ? "miss" : "misses"}`}
         </p>
-        {nextNeedsPin && (
+        {showBadge && (
           <p className="rounded-2xl bg-secondary/70 px-4 py-3 font-display text-lg font-bold text-gold">
-            🔑 The gate to {next!.title} opens with PIN {next!.pin}
+            🏅 Victory badge: {lesson.badgeCode} — show your teacher to unlock {next!.title}!
           </p>
         )}
         <div className="flex flex-wrap justify-center gap-3">

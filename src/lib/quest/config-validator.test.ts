@@ -152,6 +152,36 @@ describe("validateLessons catches broken content", () => {
     assert.ok(issues.some((issue) => issue.message.includes("share the PIN")));
   });
 
+  test("every unit that gates a next unit needs a victory badge code", () => {
+    const first = baseLesson();
+    const second = baseLesson();
+    second.number = 2;
+    second.id = "test-lesson-2";
+    second.pin = "2468";
+    assert.ok(validateLessons([first, second]).some((m) => m.message.includes("victory badge")));
+    first.badgeCode = "MOON-RULER";
+    assert.ok(!validateLessons([first, second]).some((m) => m.message.includes("victory badge")));
+  });
+
+  test("the last unit needs no victory badge code", () => {
+    const last = baseLesson();
+    last.number = 5;
+    last.id = "test-lesson-last";
+    last.pin = "4321";
+    assert.ok(!validateLessons([last]).some((m) => m.message.includes("victory badge")));
+  });
+
+  test("two units cannot share a badge code", () => {
+    const a = baseLesson();
+    a.id = "test-lesson-a";
+    a.badgeCode = "MOON-RULER";
+    const b = baseLesson();
+    b.id = "test-lesson-b";
+    b.badgeCode = "moon-ruler";
+    const issues = validateLessons([a, b]);
+    assert.ok(issues.some((issue) => issue.message.includes("share the badge code")));
+  });
+
   test("session plan minutes must sum to plannedMinutes", () => {
     const lesson = baseLesson();
     lesson.plannedMinutes = 75;

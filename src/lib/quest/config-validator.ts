@@ -50,6 +50,7 @@ export function validateLessons(lessons: Lesson[]): LessonValidationIssue[] {
   const issues: LessonValidationIssue[] = [];
   const ids = new Set<string>();
   const pins = new Map<string, string>();
+  const badges = new Map<string, string>();
 
   lessons.forEach((lesson, lessonIndex) => {
     const path = `LESSONS[${lessonIndex}]`;
@@ -75,6 +76,29 @@ export function validateLessons(lessons: Lesson[]): LessonValidationIssue[] {
         });
       } else {
         pins.set(pinKey, lesson.id);
+      }
+    }
+
+    // Beating a lesson's boss earns a victory badge, exchanged with the teacher
+    // for the next unit's PIN — so every unit that gates another needs one.
+    const nextLesson = lessons[lessonIndex + 1];
+    if (nextLesson && !lesson.badgeCode?.trim()) {
+      issues.push({
+        lessonId: lesson.id,
+        path: `${path}.badgeCode`,
+        message: "needs a victory badge code (it unlocks the next unit)",
+      });
+    }
+    if (lesson.badgeCode?.trim()) {
+      const badgeKey = lesson.badgeCode.trim().toUpperCase();
+      if (badges.has(badgeKey)) {
+        issues.push({
+          lessonId: lesson.id,
+          path: `${path}.badgeCode`,
+          message: `two lessons share the badge code "${lesson.badgeCode.trim()}" (also used by ${badges.get(badgeKey)})`,
+        });
+      } else {
+        badges.set(badgeKey, lesson.id);
       }
     }
 

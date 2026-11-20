@@ -44,7 +44,8 @@ export function PinDialog({
         <DialogHeader>
           <DialogTitle>🔒 {lesson.title} is locked</DialogTitle>
           <DialogDescription>
-            Beat the previous boss to earn the PIN — or ask your teacher for it!
+            Beat the previous boss to earn a victory badge, show it to your teacher — and enter the
+            PIN they give you!
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">

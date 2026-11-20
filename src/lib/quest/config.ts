@@ -150,6 +150,12 @@ export const BOSS_FIGHT_DEFAULTS = {
 export const BOSS_WIN_BONUS = 5;
 
 /**
+ * The tutor's code for switching on teacher mode. Keep it different from every
+ * unit PIN — students learn unit PINs, so they must never match this one.
+ */
+export const TEACHER_PIN = "7391";
+
+/**
  * One face in the "Family Detective 🕵️" practice game. All answers the app gives
  * are derived truthfully from these attributes — nothing is randomised.
  */
@@ -176,6 +182,12 @@ export type Lesson = {
   subtitle: string;
   /** Secret code that unlocks this unit on the home screen (units after 1). */
   pin?: string;
+  /**
+   * Victory badge earned by beating this unit's boss. The student shows it to
+   * the teacher, who hands over the next unit's PIN — the badge itself never
+   * unlocks anything.
+   */
+  badgeCode?: string;
   emoji: string;
   sentenceFrames: string[];
   speedRoundSeconds: number;
@@ -306,6 +318,7 @@ const lesson1: Lesson = {
   number: 1,
   title: "School Things",
   subtitle: "Have / Don't Have",
+  badgeCode: "MOON-RULER",
   emoji: "🎒",
   sentenceFrames: ["I have a ___.", "I don't have a ___.", "Do you have a ___?"],
   speedRoundSeconds: 10,
@@ -602,6 +615,7 @@ const lesson2: Lesson = {
   title: "My Toys",
   subtitle: "It Is / They Are + my / your",
   pin: "2468",
+  badgeCode: "SUN-KITE",
   emoji: "🛹",
   sentenceFrames: ["It is a ___.", "They are ___.", "Is it your ___?"],
   speedRoundSeconds: 10,
@@ -911,6 +925,7 @@ const lesson3: Lesson = {
   title: "My Classroom",
   subtitle: "This / That / These / Those",
   pin: "1357",
+  badgeCode: "STAR-MAP",
   emoji: "🏫",
   sentenceFrames: ["This is a ___.", "That is a ___.", "These are ___.", "Those are ___."],
   speedRoundSeconds: 10,
@@ -1247,6 +1262,7 @@ const lesson4: Lesson = {
   title: "Family and Friends",
   subtitle: "Is she? / Is he? / Are they?",
   pin: "9876",
+  badgeCode: "RAIN-HOME",
   emoji: "👨‍👩‍👧‍👦",
   sentenceFrames: [
     "Is she your ___?",
@@ -2059,3 +2075,8 @@ export const LESSONS: Lesson[] = [lesson1, lesson2, lesson3, lesson4, lesson5];
 // invariant (answers inside options, word-hunt words present in the passage,
 // alternating conversation roles, non-empty grammar patterns, ...).
 assertValidLessons(LESSONS);
+
+// The tutor code must never match a unit PIN — students learn unit PINs.
+if (LESSONS.some((l) => l.pin === TEACHER_PIN)) {
+  throw new Error("TEACHER_PIN must be different from every unit PIN");
+}
