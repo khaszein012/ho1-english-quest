@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { LESSONS, type Lesson } from "@/lib/quest/config";
+import { lessonsFor, type Lesson } from "@/lib/quest/courses";
 import { useQuest } from "@/lib/quest/store";
 import { AudioModePanel, SpeakerButton, useSpeak } from "@/lib/quest/audio";
 import { bigCelebration, comboBurst, randomPraise, shuffle, starBurst } from "@/lib/quest/fx";
@@ -37,7 +37,7 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
   const [superArmed, setSuperArmed] = useState(false);
   const [locked, setLocked] = useState(false);
   const missCounts = useRef<Record<string, number>>({});
-  const plannedQuestions = useMemo(() => buildFight(lesson, LESSONS).length, [lesson]);
+  const plannedQuestions = useMemo(() => buildFight(lesson, lessonsFor(state.courseLevel)).length, [lesson, state.courseLevel]);
 
   const current = queue[0];
   const hpPercent = Math.round((hp / cfg.maxHp) * 100);
@@ -49,7 +49,7 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
 
   const start = useCallback(() => {
     missCounts.current = {};
-    setQueue(buildFight(lesson, LESSONS));
+    setQueue(buildFight(lesson, lessonsFor(state.courseLevel)));
     setSeen([]);
     setHp(cfg.maxHp);
     setHits(0);
@@ -240,7 +240,7 @@ export function BossChallenge({ lesson }: { lesson: Lesson }) {
     // Beating a boss earns a victory badge. The student shows it to the
     // teacher, who hands over the next unit's PIN — the badge itself never
     // unlocks anything, so the teacher stays in the loop.
-    const next = LESSONS.find((l) => l.number === lesson.number + 1);
+    const next = lessonsFor(state.courseLevel).find((l) => l.number === lesson.number + 1);
     const showBadge = !!next && !!next.badgeCode && !isLessonOpen(next.id);
     return (
       <div className="card-quest animate-pop-in space-y-3 p-8 text-center">

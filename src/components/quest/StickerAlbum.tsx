@@ -1,8 +1,10 @@
-import { LESSONS, PLANNED_LESSON_COUNT } from "@/lib/quest/config";
+import { PLANNED_LESSON_COUNT } from "@/lib/quest/config";
+import { lessonsFor } from "@/lib/quest/courses";
 import { useQuest } from "@/lib/quest/store";
 
 export function StickerAlbum({ onClose }: { onClose: () => void }) {
   const { state } = useQuest();
+  const lessons = lessonsFor(state.courseLevel);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/85 p-4 backdrop-blur">
       <div className="card-quest max-h-[90vh] w-full max-w-2xl overflow-y-auto p-6">
@@ -16,7 +18,7 @@ export function StickerAlbum({ onClose }: { onClose: () => void }) {
           Beat a Boss Challenge or learn every word in a lesson to earn its sticker.
         </p>
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {LESSONS.map((l) => {
+          {lessons.map((l) => {
             const unlocked = state.stickers.includes(l.id);
             return (
               <div
@@ -31,7 +33,7 @@ export function StickerAlbum({ onClose }: { onClose: () => void }) {
               </div>
             );
           })}
-          {Array.from({ length: Math.max(0, PLANNED_LESSON_COUNT - LESSONS.length) }).map((_, i) => (
+          {Array.from({ length: Math.max(0, PLANNED_LESSON_COUNT - lessons.length) }).map((_, i) => (
             <div key={i} className="card-quest flex flex-col items-center gap-2 p-5 text-center opacity-30">
               <span className="text-5xl">❓</span>
               <span className="font-display font-bold">Coming soon</span>

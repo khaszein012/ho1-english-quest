@@ -11,13 +11,15 @@ import {
   BOSS_REQUIRED,
   BOSS_WIN_BONUS,
   LEGACY_STORAGE_KEYS,
-  LESSONS,
+  type CourseLevel,
   STORAGE_KEY,
   WORD_MASTERY_TARGET,
   levelFor,
   type ScreenId,
 } from "./config";
+import { ALL_LESSONS, COURSES } from "./courses";
 import { DEFAULT_STUDENT_NAME, normalizeStudentName } from "./profile";
+import type { MusicTrack } from "./sfx";
 
 export type AudioMode = "app" | "teacher" | "device";
 
@@ -34,6 +36,8 @@ export type SelfCheckEntry = { date: string; lessonId: string; answers: number[]
 
 export type QuestState = {
   studentName: string;
+  /** Which course the home screen shows: "a1" (first words) or "a2". */
+  courseLevel: CourseLevel;
   starsByLesson: Record<string, number>;
   wordCounts: Record<string, number>;
   screensDone: Record<string, ScreenId[]>;
@@ -43,6 +47,10 @@ export type QuestState = {
   audioMode: AudioMode;
   /** Chosen App Voice (""), or the voiceURI of a specific browser voice. Empty = auto. */
   voiceURI: string;
+  /** Button tap sounds and little win chimes. */
+  soundOn: boolean;
+  /** Which background music loop plays ("off" = silence). */
+  musicTrack: MusicTrack | "off";
   theme: ThemeMode;
   /** Tutor switch: when on, every boss is unlocked so any lesson can be tested instantly. */
   teacherMode: boolean;
@@ -56,6 +64,7 @@ export type QuestState = {
 
 const emptyState: QuestState = {
   studentName: DEFAULT_STUDENT_NAME,
+  courseLevel: "a2",
   starsByLesson: {},
   wordCounts: {},
   screensDone: {},
@@ -64,6 +73,8 @@ const emptyState: QuestState = {
   selfChecks: [],
   audioMode: "app",
   voiceURI: "",
+  soundOn: true,
+  musicTrack: "sunny",
   theme: "light",
   teacherMode: false,
   unlockedLessons: [],
@@ -93,7 +104,13 @@ function load(): QuestState {
     // Only accept our own shape — never trust a stray key from another app.
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return emptyState;
     const saved = parsed as Partial<QuestState>;
-    return { ...emptyState, ...saved, studentName: normalizeStudentName(saved.studentName) };
+    const courseLevel: CourseLevel = saved.courseLevel === "a1" ? "a1" : "a2";
+    return {
+      ...emptyState,
+      ...saved,
+      courseLevel,
+      studentName: normalizeStudentName(saved.studentName),
+    };
   } catch {
     return emptyState;
   }
@@ -122,8 +139,12 @@ type QuestContextValue = {
   saveSelfCheck: (lessonId: string, answers: number[]) => void;
   setAudioMode: (mode: AudioMode) => void;
   setVoiceURI: (uri: string) => void;
+  setSoundOn: (on: boolean) => void;
+  setMusicTrack: (track: MusicTrack | "off") => void;
   setTheme: (theme: ThemeMode) => void;
   setTeacherMode: (on: boolean) => void;
+  /** Switches the home screen between the A1 and A2 courses. */
+  setCourseLevel: (level: CourseLevel) => void;
   setStudentName: (name: string) => void;
 };
 
@@ -147,14 +168,16 @@ export function QuestProvider({ children }: { children: ReactNode }) {
     }
   }, [state, ready]);
 
+  // Stars count only the selected course, so each course has its own level.
   const totalStars = useMemo(
-    () => Object.values(state.starsByLesson).reduce((sum, n) => sum + n, 0),
-    [state.starsByLesson],
+    () =>
+      COURSES[state.courseLevel].reduce((sum, l) => sum + (state.starsByLesson[l.id] ?? 0), 0),
+    [state.courseLevel, state.starsByLesson],
   );
 
   const wordsLearned = useCallback(
     (lessonId: string) => {
-      const lesson = LESSONS.find((l) => l.id === lessonId);
+      const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
       if (!lesson) return 0;
       return lesson.vocabulary.filter(
         (w) => (state.wordCounts[`${lessonId}:${w.word}`] ?? 0) >= WORD_MASTERY_TARGET,
@@ -189,7 +212,7 @@ export function QuestProvider({ children }: { children: ReactNode }) {
           ...prev,
           wordCounts: { ...prev.wordCounts, [key]: (prev.wordCounts[key] ?? 0) + 1 },
         };
-        const lesson = LESSONS.find((l) => l.id === lessonId);
+        const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
         if (lesson) {
           const learned = lesson.vocabulary.filter(
             (w) => (next.wordCounts[`${lessonId}:${w.word}`] ?? 0) >= WORD_MASTERY_TARGET,
@@ -217,7 +240,7 @@ export function QuestProvider({ children }: { children: ReactNode }) {
     isLessonOpen: (lessonId) => {
       // Teacher mode opens everything; unit 1 is always free.
       if (state.teacherMode) return true;
-      const lesson = LESSONS.find((l) => l.id === lessonId);
+      const lesson = ALL_LESSONS.find((l) => l.id === lessonId);
       if (lesson && lesson.number === 1) return true;
       return state.unlockedLessons.includes(lessonId);
     },
@@ -269,8 +292,11 @@ export function QuestProvider({ children }: { children: ReactNode }) {
       })),
     setAudioMode: (mode) => setState((prev) => ({ ...prev, audioMode: mode })),
     setVoiceURI: (uri) => setState((prev) => ({ ...prev, voiceURI: uri })),
+    setSoundOn: (on) => setState((prev) => ({ ...prev, soundOn: on })),
+    setMusicTrack: (track) => setState((prev) => ({ ...prev, musicTrack: track })),
     setTheme: (theme) => setState((prev) => ({ ...prev, theme })),
     setTeacherMode: (on) => setState((prev) => ({ ...prev, teacherMode: on })),
+    setCourseLevel: (level) => setState((prev) => ({ ...prev, courseLevel: level })),
     setStudentName: (name) =>
       setState((prev) => ({ ...prev, studentName: normalizeStudentName(name) })),
   };

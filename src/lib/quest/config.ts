@@ -37,6 +37,7 @@ import grandpaToysReadingImage from "@/assets/reading-grandpa-toys.jpg";
 import oneRoomSchoolReadingImage from "@/assets/reading-one-room-school.jpg";
 import familiesReadingImage from "@/assets/reading-families.jpg";
 import { assertValidLessons } from "./config-validator";
+export { assertValidLessons };
 
 /**
  * The ONLY browser-storage key this app touches. The "quest_" prefix keeps it in
@@ -174,6 +175,8 @@ export type DetectiveConfig = {
   instructions: string;
   faces: DetectiveFace[];
 };
+
+export type CourseLevel = "a1" | "a2";
 
 export type Lesson = {
   id: string;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQuest, type AudioMode } from "./store";
+import { duckMusic } from "./sfx";
 
 /** Slightly brisker than the A1 course — A2 learners follow a little more speech. */
 const LEARNER_RATE = 0.85;
@@ -135,9 +136,12 @@ export function speakText(text: string, opts: { rate?: number; onEnd?: () => voi
   let done = false;
   let watchdog = 0;
   let retried = false;
+  // Read-aloud gets the spotlight: quiet the background music, restore after.
+  duckMusic(true);
   const finish = () => {
     if (done) return;
     done = true;
+    duckMusic(false);
     window.clearTimeout(watchdog);
     opts.onEnd?.();
   };
@@ -251,7 +255,7 @@ export function AudioModePanel({
   scriptTitle?: string;
   scriptLines?: string[];
 }) {
-  const { state, setAudioMode, setVoiceURI } = useQuest();
+  const { state, setAudioMode, setVoiceURI, setSoundOn, setMusicTrack } = useQuest();
   const [testAnswer, setTestAnswer] = useState<"none" | "yes" | "no">("none");
   const [popupBlocked, setPopupBlocked] = useState(false);
   const englishVoices = useEnglishVoices();
@@ -279,6 +283,31 @@ export function AudioModePanel({
             {m.label}
           </button>
         ))}
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
+        <button
+          onClick={() => setSoundOn(!state.soundOn)}
+          aria-pressed={state.soundOn}
+          className={`btn-pop px-3 py-2 text-sm ${
+            state.soundOn
+              ? "bg-gold text-gold-foreground"
+              : "bg-secondary text-secondary-foreground hover:brightness-110"
+          }`}
+        >
+          {state.soundOn ? "🔊 Sounds On" : "🔇 Sounds Off"}
+        </button>
+        <select
+          value={state.musicTrack}
+          onChange={(e) => setMusicTrack(e.target.value as typeof state.musicTrack)}
+          className="btn-pop bg-secondary px-3 py-2 text-sm text-secondary-foreground"
+          aria-label="Background music"
+        >
+          <option value="off">🎵 Music: Off</option>
+          <option value="sunny">🎵 Music: Sunny Morning</option>
+          <option value="night">🎵 Music: Night Sky</option>
+        </select>
+        <span className="text-xs text-muted-foreground">Plays after your first tap (browser rule).</span>
       </div>
 
       {state.audioMode === "app" && (

@@ -30,6 +30,7 @@ export function FlipCard({
           if (!flipped) onFirstFlip?.();
         }}
         className="flip-inner h-full w-full cursor-pointer text-left"
+        data-sfx="card"
         style={{ transform: flipped ? "rotateY(180deg)" : "none" }}
         aria-pressed={flipped}
       >

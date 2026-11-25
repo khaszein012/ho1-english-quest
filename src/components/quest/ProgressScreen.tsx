@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { LESSONS, type Lesson } from "@/lib/quest/config";
+import type { Lesson } from "@/lib/quest/config";
+import { lessonsFor } from "@/lib/quest/courses";
 import { useQuest } from "@/lib/quest/store";
 import { starBurst } from "@/lib/quest/fx";
 
@@ -76,7 +77,7 @@ export function ProgressScreen({ lesson, onComplete }: { lesson: Lesson; onCompl
 
       <div className="card-quest space-y-3 p-5">
         <h3 className="font-display text-xl font-bold">Stars &amp; words by lesson</h3>
-        {LESSONS.map((l) => {
+        {lessonsFor(state.courseLevel).map((l) => {
           const stars = state.starsByLesson[l.id] ?? 0;
           const learned = wordsLearned(l.id);
           return (

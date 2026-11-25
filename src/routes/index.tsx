@@ -15,6 +15,7 @@ import { PinDialog } from "@/components/quest/PinDialog";
 import { ThemeToggle } from "@/components/quest/ThemeToggle";
 import { TeacherModeToggle } from "@/components/quest/TeacherModeToggle";
 import { LESSONS, SCREENS, type Lesson, type ScreenId } from "@/lib/quest/config";
+import { COURSE_LABEL, lessonsFor, type CourseLevel } from "@/lib/quest/courses";
 import { QuestProvider, useQuest } from "@/lib/quest/store";
 import { VocabularyScreen } from "@/components/quest/VocabularyScreen";
 import { GrammarScreen } from "@/components/quest/GrammarScreen";
@@ -26,7 +27,43 @@ import { ProgressScreen } from "@/components/quest/ProgressScreen";
 import { BossChallenge } from "@/components/quest/BossChallenge";
 import { StickerAlbum } from "@/components/quest/StickerAlbum";
 import { cancelSpeech } from "@/lib/quest/audio";
+import { playCardPop, setSfxEnabled, startMusic, stopMusic, playClick } from "@/lib/quest/sfx";
 import { starBurst } from "@/lib/quest/fx";
+
+/**
+ * Bridges saved sound settings to the Web Audio engine and plays a soft click
+ * on every button/link press. Renders nothing.
+ */
+function SoundManager() {
+  const { state, ready } = useQuest();
+  const soundOn = state.soundOn && state.audioMode !== "teacher";
+  const track = soundOn && state.musicTrack !== "off" ? state.musicTrack : null;
+
+  useEffect(() => {
+    setSfxEnabled(soundOn);
+  }, [soundOn]);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (track) startMusic(track);
+    else stopMusic();
+  }, [track, ready]);
+
+  useEffect(() => {
+    const onPress = (e: PointerEvent) => {
+      const el = e.target instanceof Element ? e.target.closest("button, a, [role='button']") : null;
+      if (!el || (el instanceof HTMLButtonElement && el.disabled)) return;
+      // Elements can opt into their own sound with data-sfx (e.g. card flips).
+      const kind = el.closest("[data-sfx]")?.getAttribute("data-sfx");
+      if (kind === "card") playCardPop();
+      else playClick();
+    };
+    document.addEventListener("pointerdown", onPress);
+    return () => document.removeEventListener("pointerdown", onPress);
+  }, []);
+
+  return null;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,6 +86,7 @@ export const Route = createFileRoute("/")({
   }),
   component: () => (
     <QuestProvider>
+      <SoundManager />
       <QuestApp />
     </QuestProvider>
   ),
@@ -68,7 +106,7 @@ function QuestApp() {
     document.documentElement.classList.toggle("dark", state.theme === "dark");
   }, [state.theme]);
 
-  const lesson = LESSONS.find((l) => l.id === view?.lessonId);
+  const lesson = lessonsFor(state.courseLevel).find((l) => l.id === view?.lessonId);
   const showWelcome = ready && !state.namePrompted;
 
   return (
@@ -141,6 +179,35 @@ function StarBar() {
   );
 }
 
+/** A1 / A2 course switcher — each course keeps its own progress. */
+function CourseLevelToggle() {
+  const { state, setCourseLevel } = useQuest();
+  return (
+    <div
+      className="flex rounded-full bg-secondary p-1"
+      role="group"
+      aria-label="Course level"
+    >
+      {(["a1", "a2"] as CourseLevel[]).map((level) => {
+        const active = state.courseLevel === level;
+        return (
+          <button
+            key={level}
+            type="button"
+            onClick={() => setCourseLevel(level)}
+            aria-pressed={active}
+            className={`rounded-full px-3 py-1 font-display text-sm font-extrabold transition-colors ${
+              active ? "bg-gold text-gold-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {level.toUpperCase()}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function Home({
   onOpenLesson,
   onOpenAlbum,
@@ -148,11 +215,12 @@ function Home({
   onOpenLesson: (id: string) => void;
   onOpenAlbum: () => void;
 }) {
-  const { state, totalStars, level, wordsLearned, isScreenDone, isLessonOpen, unlockLesson } =
+  const { state, totalStars, level, wordsLearned, isScreenDone, isLessonOpen, unlockLesson, setCourseLevel } =
     useQuest();
   const [pinLesson, setPinLesson] = useState<Lesson | null>(null);
+  const lessons = lessonsFor(state.courseLevel);
   const nextLevelAt = Number.isFinite(level.max) ? level.max + 1 : null;
-  const mastered = LESSONS.reduce((sum, lesson) => sum + wordsLearned(lesson.id), 0);
+  const mastered = lessons.reduce((sum, lesson) => sum + wordsLearned(lesson.id), 0);
   return (
     <div className="quest-home">
       <header className="app-topbar">
@@ -162,10 +230,11 @@ function Home({
           </span>
           <div>
             <p className="font-display font-bold">English Quest</p>
-            <p className="text-xs text-muted-foreground">LEVEL A2 · GRAMMAR & READING</p>
+            <p className="text-xs text-muted-foreground">{COURSE_LABEL[state.courseLevel]}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <CourseLevelToggle />
           <StudentProfile />
           <TeacherModeToggle />
           <ThemeToggle />
@@ -189,10 +258,10 @@ function Home({
         <section className="lesson-collection">
           <div className="section-heading">
             <h2>Choose Your Lesson</h2>
-            <span className="text-sm text-muted-foreground">{LESSONS.length} adventures</span>
+            <span className="text-sm text-muted-foreground">{lessons.length} adventures</span>
           </div>
           <div className="lesson-grid">
-            {LESSONS.map((lesson) => {
+            {lessons.map((lesson) => {
               const done = SCREENS.filter((screen) => isScreenDone(lesson.id, screen.id)).length;
               const open = isLessonOpen(lesson.id);
               return (
@@ -285,12 +354,12 @@ function Home({
               <span>words mastered</span>
             </div>
             <div>
-              <strong>{state.stickers.length}</strong>
+              <strong>{state.stickers.filter((id) => lessons.some((l) => l.id === id)).length}</strong>
               <span>stickers earned</span>
             </div>
           </div>
           <div className="dashboard-lessons">
-            {LESSONS.map((lesson) => (
+            {lessons.map((lesson) => (
               <div key={lesson.id}>
                 <span className="min-w-0">
                   {lesson.emoji} {lesson.title}
